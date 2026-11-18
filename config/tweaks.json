@@ -1,0 +1,110 @@
+[
+  {
+    "Id": "DisableTelemetry",
+    "Category": "Privacidad",
+    "Name": "Desactivar telemetría",
+    "Description": "Reduce el envío de datos de diagnóstico a Microsoft y detiene el servicio DiagTrack.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "Name": "AllowTelemetry", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+    ],
+    "service": [
+      { "Name": "DiagTrack", "StartupType": "Disabled", "OriginalType": "Automatic" }
+    ]
+  },
+  {
+    "Id": "DisableActivityHistory",
+    "Category": "Privacidad",
+    "Name": "Desactivar historial de actividad",
+    "Description": "Evita que Windows registre y suba tu historial de actividad (Timeline).",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "EnableActivityFeed", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "PublishUserActivities", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "UploadUserActivities", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "DisableAdvertisingId",
+    "Category": "Privacidad",
+    "Name": "Desactivar ID de publicidad",
+    "Description": "Impide que las apps usen tu ID de publicidad para anuncios personalizados.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "Name": "Enabled", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+    ]
+  },
+  {
+    "Id": "DisableConsumerFeatures",
+    "Category": "Debloat",
+    "Name": "Desactivar apps sugeridas / consumer features",
+    "Description": "Evita que Windows instale automáticamente apps promocionales (Candy Crush, etc.).",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "Name": "DisableWindowsConsumerFeatures", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "DisableBingSearch",
+    "Category": "Debloat",
+    "Name": "Desactivar Bing en el menú Inicio",
+    "Description": "La búsqueda del menú Inicio deja de mandar consultas a Bing y mostrar sugerencias web.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer", "Name": "DisableSearchBoxSuggestions", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "DisableGameDVR",
+    "Category": "Rendimiento",
+    "Name": "Desactivar Game DVR / Game Bar capture",
+    "Description": "Apaga la grabación en segundo plano de Xbox Game Bar. Menos overhead en juegos.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\System\\GameConfigStore", "Name": "GameDVR_Enabled", "Type": "DWord", "Value": "0", "OriginalValue": "1" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR", "Name": "AllowGameDVR", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "HighPerformancePower",
+    "Category": "Rendimiento",
+    "Name": "Plan de energía: Alto rendimiento",
+    "Description": "Activa el plan de alto rendimiento. En notebooks aumenta el consumo de batería.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "powercfg /setactive SCHEME_MIN",
+      "undo": "powercfg /setactive SCHEME_BALANCED"
+    }
+  },
+  {
+    "Id": "DisableHibernation",
+    "Category": "Rendimiento",
+    "Name": "Desactivar hibernación",
+    "Description": "Libera varios GB (hiberfil.sys). También desactiva Inicio rápido.",
+    "Risk": "Medio",
+    "commands": {
+      "apply": "powercfg /hibernate off",
+      "undo": "powercfg /hibernate on"
+    }
+  },
+  {
+    "Id": "ShowFileExtensions",
+    "Category": "Interfaz",
+    "Name": "Mostrar extensiones de archivo",
+    "Description": "Muestra .exe, .pdf, etc. en el Explorador. Mejora la seguridad.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "HideFileExt", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+    ]
+  },
+  {
+    "Id": "ShowHiddenFiles",
+    "Category": "Interfaz",
+    "Name": "Mostrar archivos ocultos",
+    "Description": "Muestra archivos y carpetas ocultos en el Explorador.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "Hidden", "Type": "DWord", "Value": "1", "OriginalValue": "2" }
+    ]
+  }
+]
