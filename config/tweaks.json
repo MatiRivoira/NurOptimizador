@@ -624,7 +624,7 @@
     "Id": "VisualEffectsPerformance",
     "Category": "Rendimiento",
     "Name": "Efectos visuales: solo lo esencial",
-    "Description": "Deja activados solo cuatro efectos: mostrar el contenido de la ventana mientras se arrastra, el rectángulo de selección translúcido, las miniaturas en lugar de íconos y el suavizado de bordes de las fuentes de pantalla. Apaga el resto: animaciones, sombras, Peek, vistas previas de la barra y transparencias. Se aplica al cerrar sesión y volver a entrar.",
+    "Description": "Deja la ventana de Opciones de rendimiento exactamente así: solo activados \"Mostrar el contenido de la ventana mientras se arrastra\", \"Mostrar el rectángulo de selección translúcido\", \"Mostrar vistas en miniatura en lugar de iconos\" y \"Suavizar bordes para las fuentes de pantalla\". Todo lo demás (animaciones, sombras, Peek, vistas previas de la barra) queda apagado y las transparencias también. Se aplica al instante y reinicia el Explorador (la barra parpadea).",
     "Risk": "Bajo",
     "registry": [
       {
@@ -711,7 +711,12 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "commands": {
+      "apply": "Update-VisualEffectsLive",
+      "undo": "Update-VisualEffectsLive",
+      "test": "Test-VisualEffects"
+    }
   },
   {
     "Id": "EnableHAGS",

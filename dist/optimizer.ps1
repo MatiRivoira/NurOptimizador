@@ -635,7 +635,7 @@ $script:Tweaks = @'
     "Id": "VisualEffectsPerformance",
     "Category": "Rendimiento",
     "Name": "Efectos visuales: solo lo esencial",
-    "Description": "Deja activados solo cuatro efectos: mostrar el contenido de la ventana mientras se arrastra, el rectángulo de selección translúcido, las miniaturas en lugar de íconos y el suavizado de bordes de las fuentes de pantalla. Apaga el resto: animaciones, sombras, Peek, vistas previas de la barra y transparencias. Se aplica al cerrar sesión y volver a entrar.",
+    "Description": "Deja la ventana de Opciones de rendimiento exactamente así: solo activados \"Mostrar el contenido de la ventana mientras se arrastra\", \"Mostrar el rectángulo de selección translúcido\", \"Mostrar vistas en miniatura en lugar de iconos\" y \"Suavizar bordes para las fuentes de pantalla\". Todo lo demás (animaciones, sombras, Peek, vistas previas de la barra) queda apagado y las transparencias también. Se aplica al instante y reinicia el Explorador (la barra parpadea).",
     "Risk": "Bajo",
     "registry": [
       {
@@ -722,7 +722,12 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "commands": {
+      "apply": "Update-VisualEffectsLive",
+      "undo": "Update-VisualEffectsLive",
+      "test": "Test-VisualEffects"
+    }
   },
   {
     "Id": "EnableHAGS",
@@ -1846,6 +1851,69 @@ function Hide-ShortcutArrow {
 function Show-ShortcutArrow {
     Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons' -Name '29' -ErrorAction SilentlyContinue
     Stop-Process -Name explorer -Force
+}
+
+# ---------- Efectos visuales: aplicar en vivo (como la ventana "Opciones de rendimiento") ----------
+if (-not ('NurSpi' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class NurSpi {
+    [StructLayout(LayoutKind.Sequential)]
+    struct ANIMATIONINFO { public uint cbSize; public int iMinAnimate; }
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SystemParametersInfo(uint action, uint param, IntPtr data, uint flags);
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool SystemParametersInfo(uint action, uint param, ref ANIMATIONINFO data, uint flags);
+    const uint SAVE = 0x01 | 0x02;   // SPIF_UPDATEINIFILE | SPIF_SENDCHANGE
+    // acciones cuyo valor va en pvParam
+    public static bool SetData(uint action, bool on) { return SystemParametersInfo(action, 0, new IntPtr(on ? 1 : 0), SAVE); }
+    // acciones cuyo valor va en uiParam
+    public static bool SetParam(uint action, bool on) { return SystemParametersInfo(action, on ? 1u : 0u, IntPtr.Zero, SAVE); }
+    public static bool SetMinAnimate(bool on) {
+        ANIMATIONINFO ai = new ANIMATIONINFO(); ai.cbSize = 8; ai.iMinAnimate = on ? 1 : 0;
+        return SystemParametersInfo(0x0049, 8, ref ai, SAVE);
+    }
+}
+'@
+}
+
+function Test-MaskBit($Mask, [int]$Index, [int]$Bit) {
+    return [bool]($Mask[$Index] -band $Bit)
+}
+
+# Lee lo que hay en el registro y lo aplica a la sesión actual (sirve para aplicar y para revertir)
+function Update-VisualEffectsLive {
+    $d    = Get-ItemProperty 'HKCU:\Control Panel\Desktop' -ErrorAction SilentlyContinue
+    $wm   = Get-ItemProperty 'HKCU:\Control Panel\Desktop\WindowMetrics' -ErrorAction SilentlyContinue
+    $mask = [byte[]]$d.UserPreferencesMask
+    if ($mask -and $mask.Length -ge 5) {
+        [void][NurSpi]::SetData(0x1007, (Test-MaskBit $mask 0 0x08))   # desplazamiento suave de cuadros de lista
+        [void][NurSpi]::SetData(0x1005, (Test-MaskBit $mask 0 0x04))   # deslizar cuadros combinados
+        [void][NurSpi]::SetData(0x1003, (Test-MaskBit $mask 0 0x02))   # atenuar/deslizar menús
+        [void][NurSpi]::SetData(0x101B, (Test-MaskBit $mask 1 0x20))   # sombra bajo el puntero
+        [void][NurSpi]::SetData(0x1017, (Test-MaskBit $mask 1 0x08))   # atenuar/deslizar tooltips
+        [void][NurSpi]::SetData(0x1015, (Test-MaskBit $mask 1 0x04))   # atenuar elementos tras hacer clic
+        [void][NurSpi]::SetData(0x1025, (Test-MaskBit $mask 2 0x04))   # sombras bajo las ventanas
+        [void][NurSpi]::SetData(0x1043, (Test-MaskBit $mask 4 0x02))   # animar controles dentro de ventanas
+    }
+    [void][NurSpi]::SetParam(0x0025, ($d.DragFullWindows -eq '1'))     # contenido de la ventana al arrastrar
+    [void][NurSpi]::SetParam(0x004B, ($d.FontSmoothing -ne '0'))       # suavizar bordes de fuentes
+    [void][NurSpi]::SetMinAnimate(($wm.MinAnimate -eq '1'))            # animar al minimizar/maximizar
+    Write-Log '  Efectos aplicados a la sesión actual. Reiniciando el Explorador...'
+    Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+}
+
+# Compara por lo que importa (no por los bytes exactos de la máscara, que Windows puede reescribir)
+function Test-VisualEffects {
+    $d  = Get-ItemProperty 'HKCU:\Control Panel\Desktop' -ErrorAction SilentlyContinue
+    $wm = Get-ItemProperty 'HKCU:\Control Panel\Desktop\WindowMetrics' -ErrorAction SilentlyContinue
+    $a  = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -ErrorAction SilentlyContinue
+    $m  = [byte[]]$d.UserPreferencesMask
+    if (-not $m -or $m.Length -lt 5) { return $false }
+    if (($m[0] -band 0x0E) -ne 0 -or ($m[1] -band 0x2C) -ne 0 -or ($m[2] -band 0x04) -ne 0 -or ($m[4] -band 0x02) -ne 0) { return $false }
+    return ($d.DragFullWindows -eq '1' -and $d.FontSmoothing -eq '2' -and $wm.MinAnimate -eq '0' -and
+            $a.ListviewAlphaSelect -eq 1 -and $a.IconsOnly -eq 0 -and $a.ListviewShadow -eq 0 -and $a.TaskbarAnimations -eq 0)
 }
 
 
