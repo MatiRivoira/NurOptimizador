@@ -66,14 +66,24 @@ function Test-TweakApplied($Tweak) {
     if ($Tweak.commands.test) {
         try { return [bool](& ([scriptblock]::Create($Tweak.commands.test))) } catch { return $false }
     }
+    $checked = $false
     if ($Tweak.registry) {
         foreach ($r in $Tweak.registry) {
             $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
             if ($null -eq $p) { return $false }
             if ("$($p.($r.Name))" -ne "$($r.Value)") { return $false }
         }
-        return $true
+        $checked = $true
     }
+    if ($Tweak.service) {
+        foreach ($s in $Tweak.service) {
+            $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
+            if (-not $svc) { continue }   # servicio que no existe en este equipo: se ignora
+            if ([string]$svc.StartType -ne $s.StartupType) { return $false }
+            $checked = $true
+        }
+    }
+    if ($checked) { return $true }
     # Tweaks solo de comandos: se considera aplicado si lo aplicamos nosotros
     return (Get-Backup).ContainsKey($Tweak.Id)
 }
@@ -94,8 +104,11 @@ function Invoke-Tweak {
             }
             foreach ($r in $Tweak.registry) { Set-RegValue $r.Path $r.Name $r.Type $r.Value }
             foreach ($s in $Tweak.service) {
+                $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
+                if (-not $svc) { Write-Log "  Servicio $($s.Name): no existe en este equipo, se omite"; continue }
                 Set-Service -Name $s.Name -StartupType $s.StartupType -ErrorAction SilentlyContinue
                 if ($s.StartupType -eq 'Disabled') { Stop-Service -Name $s.Name -Force -ErrorAction SilentlyContinue }
+                Write-Log "  Servicio $($s.Name): $($s.StartupType)"
             }
             if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         }
@@ -108,7 +121,7 @@ function Invoke-Tweak {
                 }
                 foreach ($s in $snap.Services) {
                     Set-Service -Name $s.Name -StartupType $s.StartType -ErrorAction SilentlyContinue
-                    if ($s.StartType -ne 'Disabled') { Start-Service -Name $s.Name -ErrorAction SilentlyContinue }
+                    if ($s.StartType -eq 'Automatic') { Start-Service -Name $s.Name -ErrorAction SilentlyContinue }
                 }
                 $backup.Remove($Tweak.Id)
                 Save-Backup $backup

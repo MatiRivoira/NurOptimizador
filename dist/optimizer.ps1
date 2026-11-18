@@ -17,10 +17,20 @@ $script:Tweaks = @'
     "Description": "Reduce el envío de datos de diagnóstico a Microsoft y detiene el servicio DiagTrack.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "Name": "AllowTelemetry", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+        "Name": "AllowTelemetry",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ],
     "service": [
-      { "Name": "DiagTrack", "StartupType": "Disabled", "OriginalType": "Automatic" }
+      {
+        "Name": "DiagTrack",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      }
     ]
   },
   {
@@ -30,9 +40,27 @@ $script:Tweaks = @'
     "Description": "Evita que Windows registre y suba tu historial de actividad (Timeline).",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "EnableActivityFeed", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" },
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "PublishUserActivities", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" },
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System", "Name": "UploadUserActivities", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "EnableActivityFeed",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "PublishUserActivities",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "UploadUserActivities",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
@@ -42,7 +70,13 @@ $script:Tweaks = @'
     "Description": "Impide que las apps usen tu ID de publicidad para anuncios personalizados.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo", "Name": "Enabled", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+        "Name": "Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
     ]
   },
   {
@@ -52,7 +86,13 @@ $script:Tweaks = @'
     "Description": "Bloquea el acceso de Windows y las apps a tu ubicación. Apps como Mapas o Clima dejan de ubicarte solas.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "Name": "Value", "Type": "String", "Value": "Deny", "OriginalValue": "Allow" }
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "Name": "Value",
+        "Type": "String",
+        "Value": "Deny",
+        "OriginalValue": "Allow"
+      }
     ]
   },
   {
@@ -62,10 +102,34 @@ $script:Tweaks = @'
     "Description": "Aplica las políticas de Windows que apagan Copilot y el análisis de datos con IA (Recall), y oculta el botón de la barra. Según la compilación, Copilot como app aparte puede seguir instalado.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI", "Name": "DisableAIDataAnalysis", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
-      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "ShowCopilotButton", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "Name": "TurnOffWindowsCopilotFeature",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+        "Name": "TurnOffWindowsCopilotFeature",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",
+        "Name": "DisableAIDataAnalysis",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowCopilotButton",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
     ]
   },
   {
@@ -75,7 +139,13 @@ $script:Tweaks = @'
     "Description": "Evita que Windows instale automáticamente apps promocionales (Candy Crush, etc.).",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "Name": "DisableWindowsConsumerFeatures", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+        "Name": "DisableWindowsConsumerFeatures",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
@@ -85,7 +155,13 @@ $script:Tweaks = @'
     "Description": "La búsqueda del menú Inicio deja de mandar consultas a Bing y mostrar sugerencias web.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer", "Name": "DisableSearchBoxSuggestions", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "Name": "DisableSearchBoxSuggestions",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
@@ -95,8 +171,20 @@ $script:Tweaks = @'
     "Description": "Apaga la grabación en segundo plano de Xbox Game Bar. Menos overhead en juegos.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\System\\GameConfigStore", "Name": "GameDVR_Enabled", "Type": "DWord", "Value": "0", "OriginalValue": "1" },
-      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR", "Name": "AllowGameDVR", "Type": "DWord", "Value": "0", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKCU:\\System\\GameConfigStore",
+        "Name": "GameDVR_Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+        "Name": "AllowGameDVR",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
@@ -141,7 +229,13 @@ $script:Tweaks = @'
     "Description": "Agrega \"Finalizar tarea\" al clic derecho de los íconos de la barra de tareas. Sirve para cerrar apps trabadas sin abrir el Administrador de tareas.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "Name": "TaskbarEndTask", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+        "Name": "TaskbarEndTask",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
@@ -151,9 +245,27 @@ $script:Tweaks = @'
     "Description": "El puntero responde siempre igual a tu movimiento (ideal para juegos y diseño). Se aplica al volver a iniciar sesión.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseSpeed", "Type": "String", "Value": "0", "OriginalValue": "1" },
-      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold1", "Type": "String", "Value": "0", "OriginalValue": "6" },
-      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold2", "Type": "String", "Value": "0", "OriginalValue": "10" }
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseSpeed",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold1",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "6"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold2",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "10"
+      }
     ]
   },
   {
@@ -163,7 +275,13 @@ $script:Tweaks = @'
     "Description": "Muestra .exe, .pdf, etc. en el Explorador. Mejora la seguridad.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "HideFileExt", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "HideFileExt",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
     ]
   },
   {
@@ -173,7 +291,13 @@ $script:Tweaks = @'
     "Description": "Muestra archivos y carpetas ocultos en el Explorador.",
     "Risk": "Bajo",
     "registry": [
-      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "Hidden", "Type": "DWord", "Value": "1", "OriginalValue": "2" }
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "Hidden",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "2"
+      }
     ]
   },
   {
@@ -183,7 +307,9 @@ $script:Tweaks = @'
     "Name": "Limpiar archivos temporales",
     "Description": "Borra los temporales del usuario y de Windows y te dice cuánto espacio liberó. Los archivos en uso se saltean.",
     "Risk": "Bajo",
-    "commands": { "apply": "Clear-TempFiles" }
+    "commands": {
+      "apply": "Clear-TempFiles"
+    }
   },
   {
     "Id": "RemoveBloatApps",
@@ -194,10 +320,18 @@ $script:Tweaks = @'
     "Risk": "Medio",
     "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
     "appx": [
-      "Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Getstarted",
-      "Microsoft.MicrosoftSolitaireCollection", "Microsoft.WindowsFeedbackHub", "Clipchamp.Clipchamp",
-      "Microsoft.MicrosoftOfficeHub", "Microsoft.People", "Microsoft.PowerAutomateDesktop",
-      "Microsoft.Todos", "Microsoft.549981C3F5F10"
+      "Microsoft.BingNews",
+      "Microsoft.BingWeather",
+      "Microsoft.GetHelp",
+      "Microsoft.Getstarted",
+      "Microsoft.MicrosoftSolitaireCollection",
+      "Microsoft.WindowsFeedbackHub",
+      "Clipchamp.Clipchamp",
+      "Microsoft.MicrosoftOfficeHub",
+      "Microsoft.People",
+      "Microsoft.PowerAutomateDesktop",
+      "Microsoft.Todos",
+      "Microsoft.549981C3F5F10"
     ]
   },
   {
@@ -222,9 +356,182 @@ $script:Tweaks = @'
     "commands": {
       "apply": "ipconfig /flushdns | Out-Null; netsh winsock reset | Out-Null; netsh int ip reset | Out-Null; Write-Log '  Reiniciá la PC para completar el reseteo de red.'"
     }
+  },
+  {
+    "Id": "CleanTaskbar",
+    "Category": "Barra de tareas",
+    "Name": "Barra de tareas limpia",
+    "Description": "Oculta la búsqueda, la vista de tareas, los widgets y el chat. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "Name": "SearchboxTaskbarMode",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowTaskViewButton",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "Name": "AllowNewsAndInterests",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Chat",
+        "Name": "ChatIcon",
+        "Type": "DWord",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Stop-Process -Name explorer -Force",
+      "undo": "Stop-Process -Name explorer -Force"
+    }
+  },
+  {
+    "Id": "UnpinTaskbarApps",
+    "Kind": "action",
+    "Category": "Barra de tareas",
+    "Name": "Desanclar todas las apps de la barra",
+    "Description": "Saca de la barra de tareas todo lo que viene anclado (Edge, Store, Correo, etc.) para que la armes a tu gusto. Después podés volver a anclar lo que quieras.",
+    "Risk": "Bajo",
+    "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
+    }
+  },
+  {
+    "Id": "DisableUselessServices",
+    "Category": "Servicios",
+    "Name": "Desactivar servicios innecesarios",
+    "Description": "Desactiva servicios que casi nadie usa: archivos sin conexión (CscService), mapas descargados (MapsBroker), modo demo de tienda (RetailDemo), informe de errores (WerSvc), WAP Push (dmwappushservice), modo quiosco (AssignedAccessManagerSvc), bloqueo de diálogos (DialogBlockingService), control parental (WpcMonSvc), Insider (wisvc) y uso compartido de Media Player (WMPNetworkSvc). Pone el servicio de almacenamiento (StorSvc) en Manual. No lo uses en PCs de empresa ni si estás en el programa Insider.",
+    "Risk": "Bajo",
+    "service": [
+      {
+        "Name": "CscService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "MapsBroker",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "RetailDemo",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "WerSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "dmwappushservice",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "AssignedAccessManagerSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "DialogBlockingService",
+        "StartupType": "Disabled",
+        "OriginalType": "Disabled"
+      },
+      {
+        "Name": "WpcMonSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "wisvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "WMPNetworkSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "StorSvc",
+        "StartupType": "Manual",
+        "OriginalType": "Automatic"
+      }
+    ]
+  },
+  {
+    "Id": "DisableXboxServices",
+    "Category": "Servicios",
+    "Name": "Desactivar servicios de Xbox",
+    "Description": "Apaga los servicios de Xbox Live (XblAuthManager, XblGameSave, XboxNetApiSvc, XboxGipSvc). No lo actives si usás Game Pass, la app de Xbox o juegos que piden iniciar sesión con Xbox.",
+    "Risk": "Medio",
+    "service": [
+      {
+        "Name": "XblAuthManager",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "XblGameSave",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "XboxNetApiSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "XboxGipSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ]
+  },
+  {
+    "Id": "DisableSysMain",
+    "Category": "Servicios",
+    "Name": "Desactivar SysMain (Superfetch)",
+    "Description": "Deja de precargar apps en memoria. Tiene sentido si tu Windows está en un SSD. En un disco mecánico (HDD) puede empeorar la velocidad, así que no lo actives.",
+    "Risk": "Medio",
+    "service": [
+      {
+        "Name": "SysMain",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      }
+    ]
+  },
+  {
+    "Id": "DisablePrintSpooler",
+    "Category": "Servicios",
+    "Name": "Desactivar servicio de impresión",
+    "Description": "Apaga la cola de impresión. Solo si no imprimís nunca: sin este servicio tampoco funciona \"Microsoft Print to PDF\".",
+    "Risk": "Medio",
+    "service": [
+      {
+        "Name": "Spooler",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      }
+    ]
   }
 ]
-
 '@ | ConvertFrom-Json
 
 $script:Xaml = @'
@@ -585,14 +892,24 @@ function Test-TweakApplied($Tweak) {
     if ($Tweak.commands.test) {
         try { return [bool](& ([scriptblock]::Create($Tweak.commands.test))) } catch { return $false }
     }
+    $checked = $false
     if ($Tweak.registry) {
         foreach ($r in $Tweak.registry) {
             $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
             if ($null -eq $p) { return $false }
             if ("$($p.($r.Name))" -ne "$($r.Value)") { return $false }
         }
-        return $true
+        $checked = $true
     }
+    if ($Tweak.service) {
+        foreach ($s in $Tweak.service) {
+            $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
+            if (-not $svc) { continue }   # servicio que no existe en este equipo: se ignora
+            if ([string]$svc.StartType -ne $s.StartupType) { return $false }
+            $checked = $true
+        }
+    }
+    if ($checked) { return $true }
     # Tweaks solo de comandos: se considera aplicado si lo aplicamos nosotros
     return (Get-Backup).ContainsKey($Tweak.Id)
 }
@@ -613,8 +930,11 @@ function Invoke-Tweak {
             }
             foreach ($r in $Tweak.registry) { Set-RegValue $r.Path $r.Name $r.Type $r.Value }
             foreach ($s in $Tweak.service) {
+                $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
+                if (-not $svc) { Write-Log "  Servicio $($s.Name): no existe en este equipo, se omite"; continue }
                 Set-Service -Name $s.Name -StartupType $s.StartupType -ErrorAction SilentlyContinue
                 if ($s.StartupType -eq 'Disabled') { Stop-Service -Name $s.Name -Force -ErrorAction SilentlyContinue }
+                Write-Log "  Servicio $($s.Name): $($s.StartupType)"
             }
             if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         }
@@ -627,7 +947,7 @@ function Invoke-Tweak {
                 }
                 foreach ($s in $snap.Services) {
                     Set-Service -Name $s.Name -StartupType $s.StartType -ErrorAction SilentlyContinue
-                    if ($s.StartType -ne 'Disabled') { Start-Service -Name $s.Name -ErrorAction SilentlyContinue }
+                    if ($s.StartType -eq 'Automatic') { Start-Service -Name $s.Name -ErrorAction SilentlyContinue }
                 }
                 $backup.Remove($Tweak.Id)
                 Save-Backup $backup
@@ -763,7 +1083,7 @@ $script:PageInfo = @{
 # Qué categoría del JSON va en qué página
 $script:CategoryPage = @{
     'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
-    'Interfaz'   = 'Personalizar'
+    'Interfaz'   = 'Personalizar'; 'Barra de tareas' = 'Personalizar'
     'Limpieza'   = 'Mantenimiento'; 'Reparación' = 'Mantenimiento'
 }
 $script:CurrentPage  = 'Optimizar'
