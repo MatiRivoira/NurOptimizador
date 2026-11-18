@@ -11,7 +11,7 @@ $ui   = Get-Content "$root\src\UI.ps1"   -Raw -Encoding UTF8
 
 $header = @'
 # Mi Optimizador - generado por Build.ps1, no editar a mano
-$ScriptUrl = 'https://raw.githubusercontent.com/TU_USUARIO/mi-optimizador/main/dist/optimizer.ps1'
+$ScriptUrl = 'https://raw.githubusercontent.com/MatiRivoira/NurOptimizador/main/dist/optimizer.ps1'
 
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
@@ -29,5 +29,5 @@ $content = @(
     $ui
 ) -join "`n`n"
 
-[IO.File]::WriteAllText($out, $content, (New-Object Text.UTF8Encoding $true))
+[IO.File]::WriteAllText($out, $content, (New-Object Text.UTF8Encoding $false))
 Write-Host "Generado: $out"
