@@ -133,6 +133,338 @@ $script:Tweaks = @'
     ]
   },
   {
+    "Id": "DisableTelemetryTasks",
+    "Category": "Privacidad",
+    "Name": "Desactivar tareas programadas de telemetría",
+    "Description": "Apaga las tareas que recolectan y envían datos de diagnóstico: Compatibility Appraiser, programa de experiencia del cliente, informe de errores, diagnóstico de disco y comentarios. Puede demorar que Windows Update te ofrezca actualizaciones de versión.",
+    "Risk": "Bajo",
+    "task": [
+      {
+        "Path": "\\Microsoft\\Windows\\Application Experience\\",
+        "Name": "Microsoft Compatibility Appraiser"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Application Experience\\",
+        "Name": "ProgramDataUpdater"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Application Experience\\",
+        "Name": "MareBackup"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\",
+        "Name": "Consolidator"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\",
+        "Name": "UsbCeip"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Customer Experience Improvement Program\\",
+        "Name": "KernelCeipTask"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\DiskDiagnostic\\",
+        "Name": "Microsoft-Windows-DiskDiagnosticDataCollector"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Feedback\\Siuf\\",
+        "Name": "DmClient"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Feedback\\Siuf\\",
+        "Name": "DmClientOnScenarioDownload"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Windows Error Reporting\\",
+        "Name": "QueueReporting"
+      },
+      {
+        "Path": "\\Microsoft\\Windows\\Autochk\\",
+        "Name": "Proxy"
+      }
+    ]
+  },
+  {
+    "Id": "DisableTipsAndAds",
+    "Category": "Privacidad",
+    "Name": "Quitar consejos, sugerencias y publicidad",
+    "Description": "Apaga las sugerencias de Configuración, los consejos y trucos de la pantalla de bloqueo, las apps sugeridas que se instalan solas, los avisos de \"terminá de configurar tu dispositivo\" y las promociones de OneDrive en el Explorador.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-338387Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-338388Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-338389Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-338393Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-353694Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-353696Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-353698Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SubscribedContent-310093Enabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SystemPaneSuggestionsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SoftLandingEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "RotatingLockScreenOverlayEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "ContentDeliveryAllowed",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "FeatureManagementEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "OemPreInstalledAppsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "PreInstalledAppsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "PreInstalledAppsEverEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+        "Name": "SilentInstalledAppsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\UserProfileEngagement",
+        "Name": "ScoobeSystemSettingEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowSyncProviderNotifications",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+        "Name": "DisableSoftLanding",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "DisableDeliveryOptimization",
+    "Category": "Privacidad",
+    "Name": "Desactivar Delivery Optimization",
+    "Description": "Windows deja de compartir las actualizaciones descargadas con otras PCs (en tu red o en Internet). Descarga solo desde Microsoft y ahorra ancho de banda de subida.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "Name": "DODownloadMode",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "DisableStoreSearch",
+    "Category": "Privacidad",
+    "Name": "Quitar sugerencias de la Store en la búsqueda",
+    "Description": "Saca las apps sugeridas de la Microsoft Store de los resultados de búsqueda de Windows. Es la opción nativa de Configuración, que ya viene en 24H2, 25H2 y 26H2 si estás al día.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",
+        "Name": "IsStoreSuggestionsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
+    ]
+  },
+  {
+    "Id": "DisableEdgeAI",
+    "Category": "IA",
+    "Name": "Desactivar IA en Microsoft Edge",
+    "Description": "Por política: oculta el Copilot lateral y el ícono de Copilot, bloquea Copilot en la página de nueva pestaña y el acceso al contenido de la página, la escritura asistida (Rewrite), los temas generados con IA y la descarga del modelo de IA local.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "HubsSidebarEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "CopilotPageContext",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "CopilotNewTabPageEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "Microsoft365CopilotChatIconEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "ComposeInlineEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "AIGenThemesEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "GenAILocalFoundationalModelSettings",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "NewTabPageBingChatEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "DisableOfficeAI",
+    "Category": "IA",
+    "Name": "Desactivar IA en Microsoft Office",
+    "Description": "Desactiva las \"experiencias conectadas que analizan tu contenido\" de Office, que es lo que habilita Copilot en Word, Excel, PowerPoint y OneNote. Ojo: también apaga otras funciones en la nube que leen tu documento, como Diseñador o sugerencias de Editor.",
+    "Risk": "Medio",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\office\\16.0\\common\\privacy",
+        "Name": "usercontentdisabled",
+        "Type": "DWord",
+        "Value": "2",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "RemoveWindowsAI",
+    "Kind": "action",
+    "Category": "IA",
+    "Name": "Quitar IA de Windows (apps, servicio y Recall)",
+    "Description": "Desinstala las apps de Copilot, apaga el servicio WSAIFabricSvc (AI Fabric), quita la característica Recall (solo existe en PCs Copilot+) y desactiva las tareas programadas de IA. Puede requerir reiniciar.",
+    "Risk": "Medio",
+    "Confirm": "Se van a desinstalar las apps de Copilot, apagar el servicio de IA de Windows y quitar Recall.\n\nLas apps se pueden reinstalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.Copilot",
+      "MicrosoftWindows.Client.CoPilot",
+      "Microsoft.Windows.Ai.Copilot.Provider"
+    ],
+    "commands": {
+      "apply": "Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name WSAIFabricSvc -Force -ErrorAction SilentlyContinue; Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue | Out-Null; Get-ScheduledTask -TaskPath '\\Microsoft\\Windows\\WindowsAI\\*' -ErrorAction SilentlyContinue | Disable-ScheduledTask -ErrorAction SilentlyContinue | Out-Null"
+    }
+  },
+  {
     "Id": "DisableConsumerFeatures",
     "Category": "Debloat",
     "Name": "Desactivar apps sugeridas / consumer features",
@@ -160,6 +492,106 @@ $script:Tweaks = @'
         "Name": "DisableSearchBoxSuggestions",
         "Type": "DWord",
         "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "EdgeDebloat",
+    "Category": "Debloat",
+    "Name": "Debloat de Microsoft Edge",
+    "Description": "Por política: sin pantalla de bienvenida, sin arranque anticipado ni ejecución en segundo plano, sin asistente de compras, sin widget web, sin recomendaciones, sin promos del canal Insider, sin acceso directo nuevo en el escritorio en cada actualización y sin envío de comentarios ni datos de personalización.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "HideFirstRunExperience",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "StartupBoostEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "BackgroundModeEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "EdgeShoppingAssistantEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "WebWidgetAllowed",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "ShowRecommendationsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "SpotlightExperiencesAndRecommendationsEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "MicrosoftEdgeInsiderPromotionEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "DefaultBrowserSettingsCampaignEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "UserFeedbackAllowed",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "PersonalizationReportingEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "InAppSupportEnabled",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "Name": "CreateDesktopShortcutDefault",
+        "Type": "DWord",
+        "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
     ]
@@ -211,204 +643,159 @@ $script:Tweaks = @'
     }
   },
   {
-    "Id": "ClassicContextMenu",
-    "Category": "Interfaz",
-    "Name": "Menú contextual clásico",
-    "Description": "Vuelve el clic derecho completo de Windows 10, sin tener que tocar \"Mostrar más opciones\". Reinicia el Explorador (la barra parpadea un instante).",
-    "Risk": "Bajo",
-    "commands": {
-      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
-      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
-      "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
-    }
-  },
-  {
-    "Id": "EndTaskRightClick",
-    "Category": "Interfaz",
-    "Name": "Finalizar tarea con clic derecho",
-    "Description": "Agrega \"Finalizar tarea\" al clic derecho de los íconos de la barra de tareas. Sirve para cerrar apps trabadas sin abrir el Administrador de tareas.",
+    "Id": "VisualEffectsPerformance",
+    "Category": "Rendimiento",
+    "Name": "Efectos visuales: mejor rendimiento",
+    "Description": "Quita animaciones de ventanas y de la barra, sombras de selección, vista previa de Aero Peek y transparencias. Windows se ve más plano pero responde más rápido en equipos modestos. Se aplica al cerrar sesión y volver a entrar.",
     "Risk": "Bajo",
     "registry": [
       {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
-        "Name": "TaskbarEndTask",
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "Name": "VisualFXSetting",
         "Type": "DWord",
-        "Value": "1",
-        "OriginalValue": "<RemoveEntry>"
-      }
-    ]
-  },
-  {
-    "Id": "DisableMouseAcceleration",
-    "Category": "Interfaz",
-    "Name": "Desactivar aceleración del mouse",
-    "Description": "El puntero responde siempre igual a tu movimiento (ideal para juegos y diseño). Se aplica al volver a iniciar sesión.",
-    "Risk": "Bajo",
-    "registry": [
+        "Value": "3",
+        "OriginalValue": "1"
+      },
       {
-        "Path": "HKCU:\\Control Panel\\Mouse",
-        "Name": "MouseSpeed",
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "UserPreferencesMask",
+        "Type": "Binary",
+        "Value": "90,12,03,80,10,00,00,00",
+        "OriginalValue": "9e,3e,07,80,12,00,00,00"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+        "Name": "MinAnimate",
         "Type": "String",
         "Value": "0",
         "OriginalValue": "1"
       },
       {
-        "Path": "HKCU:\\Control Panel\\Mouse",
-        "Name": "MouseThreshold1",
-        "Type": "String",
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "TaskbarAnimations",
+        "Type": "DWord",
         "Value": "0",
-        "OriginalValue": "6"
+        "OriginalValue": "1"
       },
       {
-        "Path": "HKCU:\\Control Panel\\Mouse",
-        "Name": "MouseThreshold2",
-        "Type": "String",
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ListviewAlphaSelect",
+        "Type": "DWord",
         "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ListviewShadow",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
+        "Name": "EnableAeroPeek",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        "Name": "EnableTransparency",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
+    ]
+  },
+  {
+    "Id": "GameTweaks",
+    "Category": "Rendimiento",
+    "Name": "Ajustes de juego: prioridad de CPU y multimedia",
+    "Description": "Da prioridad al programa en primer plano, quita el límite de red del programador multimedia y sube la prioridad de los juegos. El beneficio depende del equipo y puede ser pequeño. Se aplica al reiniciar.",
+    "Risk": "Medio",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "Name": "SystemResponsiveness",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "20"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "Name": "NetworkThrottlingIndex",
+        "Type": "DWord",
+        "Value": "-1",
         "OriginalValue": "10"
-      }
-    ]
-  },
-  {
-    "Id": "ShowFileExtensions",
-    "Category": "Interfaz",
-    "Name": "Mostrar extensiones de archivo",
-    "Description": "Muestra .exe, .pdf, etc. en el Explorador. Mejora la seguridad.",
-    "Risk": "Bajo",
-    "registry": [
+      },
       {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "Name": "HideFileExt",
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "GPU Priority",
         "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "1"
-      }
-    ]
-  },
-  {
-    "Id": "ShowHiddenFiles",
-    "Category": "Interfaz",
-    "Name": "Mostrar archivos ocultos",
-    "Description": "Muestra archivos y carpetas ocultos en el Explorador.",
-    "Risk": "Bajo",
-    "registry": [
+        "Value": "8",
+        "OriginalValue": "8"
+      },
       {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "Name": "Hidden",
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "Priority",
         "Type": "DWord",
-        "Value": "1",
+        "Value": "6",
+        "OriginalValue": "2"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "Scheduling Category",
+        "Type": "String",
+        "Value": "High",
+        "OriginalValue": "Medium"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "SFIO Priority",
+        "Type": "String",
+        "Value": "High",
+        "OriginalValue": "Normal"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+        "Name": "Win32PrioritySeparation",
+        "Type": "DWord",
+        "Value": "38",
         "OriginalValue": "2"
       }
     ]
   },
   {
-    "Id": "CleanTempFiles",
-    "Kind": "action",
-    "Category": "Limpieza",
-    "Name": "Limpiar archivos temporales",
-    "Description": "Borra los temporales del usuario y de Windows y te dice cuánto espacio liberó. Los archivos en uso se saltean.",
-    "Risk": "Bajo",
-    "commands": {
-      "apply": "Clear-TempFiles"
-    }
-  },
-  {
-    "Id": "RemoveBloatApps",
-    "Kind": "action",
-    "Category": "Limpieza",
-    "Name": "Quitar apps preinstaladas innecesarias",
-    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Id": "EnableHAGS",
+    "Category": "Rendimiento",
+    "Name": "Programación de GPU acelerada por hardware (HAGS)",
+    "Description": "Deja que la placa de video administre su propia memoria y cola de trabajo. Puede mejorar la fluidez en placas modernas y empeorarla en viejas. Requiere driver compatible y reiniciar.",
     "Risk": "Medio",
-    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
-    "appx": [
-      "Microsoft.BingNews",
-      "Microsoft.BingWeather",
-      "Microsoft.GetHelp",
-      "Microsoft.Getstarted",
-      "Microsoft.MicrosoftSolitaireCollection",
-      "Microsoft.WindowsFeedbackHub",
-      "Clipchamp.Clipchamp",
-      "Microsoft.MicrosoftOfficeHub",
-      "Microsoft.People",
-      "Microsoft.PowerAutomateDesktop",
-      "Microsoft.Todos",
-      "Microsoft.549981C3F5F10"
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "HwSchMode",
+        "Type": "DWord",
+        "Value": "2",
+        "OriginalValue": "<RemoveEntry>"
+      }
     ]
   },
   {
-    "Id": "RepairSystem",
-    "Kind": "action",
-    "Category": "Reparación",
-    "Name": "Reparar archivos del sistema (DISM + SFC)",
-    "Description": "Repara la imagen de Windows y verifica los archivos del sistema. Abre una ventana aparte y puede tardar 10 a 20 minutos.",
-    "Risk": "Bajo",
-    "commands": {
-      "apply": "Start-Process powershell -ArgumentList '-NoExit','-Command','DISM /Online /Cleanup-Image /RestoreHealth; sfc /scannow'"
-    }
-  },
-  {
-    "Id": "ResetNetwork",
-    "Kind": "action",
-    "Category": "Reparación",
-    "Name": "Reiniciar la red",
-    "Description": "Limpia la caché DNS y restablece Winsock y la pila TCP/IP. Soluciona problemas de conexión. Requiere reiniciar la PC y puede borrar una IP fija configurada.",
-    "Risk": "Medio",
-    "Confirm": "Se va a restablecer la pila de red (DNS, Winsock y TCP/IP).\n\nSi usás IP fija, tendrás que configurarla de nuevo. Después hay que reiniciar la PC.\n\n¿Continuar?",
-    "commands": {
-      "apply": "ipconfig /flushdns | Out-Null; netsh winsock reset | Out-Null; netsh int ip reset | Out-Null; Write-Log '  Reiniciá la PC para completar el reseteo de red.'"
-    }
-  },
-  {
-    "Id": "CleanTaskbar",
-    "Category": "Barra de tareas",
-    "Name": "Barra de tareas limpia",
-    "Description": "Oculta la búsqueda, la vista de tareas, los widgets y el chat. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Id": "EnableLongPaths",
+    "Category": "Rendimiento",
+    "Name": "Habilitar rutas largas",
+    "Description": "Permite rutas de más de 260 caracteres. Evita errores en herramientas de desarrollo, node_modules y copias de carpetas muy anidadas.",
     "Risk": "Bajo",
     "registry": [
       {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-        "Name": "SearchboxTaskbarMode",
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "Name": "LongPathsEnabled",
         "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "1"
-      },
-      {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "Name": "ShowTaskViewButton",
-        "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "1"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
-        "Name": "AllowNewsAndInterests",
-        "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "<RemoveEntry>"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Chat",
-        "Name": "ChatIcon",
-        "Type": "DWord",
-        "Value": "3",
-        "OriginalValue": "<RemoveEntry>"
+        "Value": "1",
+        "OriginalValue": "0"
       }
-    ],
-    "commands": {
-      "apply": "Stop-Process -Name explorer -Force",
-      "undo": "Stop-Process -Name explorer -Force"
-    }
-  },
-  {
-    "Id": "UnpinTaskbarApps",
-    "Kind": "action",
-    "Category": "Barra de tareas",
-    "Name": "Desanclar todas las apps de la barra",
-    "Description": "Saca de la barra de tareas todo lo que viene anclado (Edge, Store, Correo, etc.) para que la armes a tu gusto. Después podés volver a anclar lo que quieras.",
-    "Risk": "Bajo",
-    "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
-    "commands": {
-      "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
-    }
+    ]
   },
   {
     "Id": "DisableUselessServices",
@@ -530,6 +917,365 @@ $script:Tweaks = @'
         "OriginalType": "Automatic"
       }
     ]
+  },
+  {
+    "Id": "ClassicContextMenu",
+    "Category": "Interfaz",
+    "Name": "Menú contextual clásico",
+    "Description": "Vuelve el clic derecho completo de Windows 10, sin tener que tocar \"Mostrar más opciones\". Reinicia el Explorador (la barra parpadea un instante).",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
+      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
+      "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
+    }
+  },
+  {
+    "Id": "EndTaskRightClick",
+    "Category": "Interfaz",
+    "Name": "Finalizar tarea con clic derecho",
+    "Description": "Agrega \"Finalizar tarea\" al clic derecho de los íconos de la barra de tareas. Sirve para cerrar apps trabadas sin abrir el Administrador de tareas.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+        "Name": "TaskbarEndTask",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "DisableMouseAcceleration",
+    "Category": "Interfaz",
+    "Name": "Desactivar aceleración del mouse",
+    "Description": "El puntero responde siempre igual a tu movimiento (ideal para juegos y diseño). Se aplica al volver a iniciar sesión.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseSpeed",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold1",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "6"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold2",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "10"
+      }
+    ]
+  },
+  {
+    "Id": "ShowFileExtensions",
+    "Category": "Interfaz",
+    "Name": "Mostrar extensiones de archivo",
+    "Description": "Muestra .exe, .pdf, etc. en el Explorador. Mejora la seguridad.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "HideFileExt",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
+    ]
+  },
+  {
+    "Id": "ShowHiddenFiles",
+    "Category": "Interfaz",
+    "Name": "Mostrar archivos ocultos",
+    "Description": "Muestra archivos y carpetas ocultos en el Explorador.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "Hidden",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "2"
+      }
+    ]
+  },
+  {
+    "Id": "HideGallery",
+    "Category": "Interfaz",
+    "Name": "Quitar Galería del Explorador",
+    "Description": "Oculta Galería del panel de navegación del Explorador de archivos. No toca Inicio. Reinicia el Explorador (parpadea un instante).",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
+        "Name": "System.IsPinnedToNameSpaceTree",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Stop-Process -Name explorer -Force",
+      "undo": "Stop-Process -Name explorer -Force"
+    }
+  },
+  {
+    "Id": "DisableStickyKeys",
+    "Category": "Interfaz",
+    "Name": "Desactivar atajos de Sticky Keys y Filter Keys",
+    "Description": "Se terminan los popups al apretar Shift 5 veces (Sticky Keys), mantener Shift 8 segundos (Filter Keys) o Num Lock 5 segundos (Toggle Keys). Muy útil si jugás.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
+        "Name": "Flags",
+        "Type": "String",
+        "Value": "506",
+        "OriginalValue": "510"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Accessibility\\Keyboard Response",
+        "Name": "Flags",
+        "Type": "String",
+        "Value": "122",
+        "OriginalValue": "126"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Accessibility\\ToggleKeys",
+        "Name": "Flags",
+        "Type": "String",
+        "Value": "58",
+        "OriginalValue": "62"
+      }
+    ]
+  },
+  {
+    "Id": "HideShortcutArrow",
+    "Category": "Interfaz",
+    "Name": "Quitar flecha de los accesos directos",
+    "Description": "Saca la flechita que aparece sobre los íconos de accesos directos. Es solo estético. Si no se ve el cambio enseguida, cerrá sesión o reiniciá. Reinicia el Explorador.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "Hide-ShortcutArrow",
+      "undo": "Show-ShortcutArrow",
+      "test": "[bool](Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons' -Name '29' -ErrorAction SilentlyContinue)"
+    }
+  },
+  {
+    "Id": "CleanTaskbar",
+    "Category": "Barra de tareas",
+    "Name": "Barra de tareas limpia",
+    "Description": "Oculta la búsqueda, la vista de tareas, los widgets y el chat. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "Name": "SearchboxTaskbarMode",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowTaskViewButton",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "Name": "AllowNewsAndInterests",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Chat",
+        "Name": "ChatIcon",
+        "Type": "DWord",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Stop-Process -Name explorer -Force",
+      "undo": "Stop-Process -Name explorer -Force"
+    }
+  },
+  {
+    "Id": "UnpinTaskbarApps",
+    "Kind": "action",
+    "Category": "Barra de tareas",
+    "Name": "Desanclar todas las apps de la barra",
+    "Description": "Saca de la barra de tareas todo lo que viene anclado (Edge, Store, Correo, etc.) para que la armes a tu gusto. Después podés volver a anclar lo que quieras.",
+    "Risk": "Bajo",
+    "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
+    }
+  },
+  {
+    "Id": "CleanStartMenu",
+    "Category": "Menú Inicio",
+    "Name": "Menú Inicio limpio",
+    "Description": "Quita todo lo anclado de tu menú Inicio y aplica una lista de anclados vacía para usuarios nuevos. Guarda una copia de tus anclados para poder revertir. En Windows Home la política puede ser ignorada.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+        "Name": "ConfigureStartPins",
+        "Type": "String",
+        "Value": "{\"pinnedList\":[]}",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Clear-StartMenuPins",
+      "undo": "Restore-StartMenuPins"
+    }
+  },
+  {
+    "Id": "HideStartRecommendations",
+    "Category": "Menú Inicio",
+    "Name": "Ocultar recomendaciones del menú Inicio",
+    "Description": "Esconde la sección Recomendados y las sugerencias de apps y sitios. En Windows Home la sección queda visible pero vacía. 26H2 también deja ocultar secciones desde Configuración.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "Name": "HideRecommendedSection",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "Start_IrisRecommendations",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      }
+    ]
+  },
+  {
+    "Id": "SoundTweaks",
+    "Category": "Sonido",
+    "Name": "Sonido: sin ducking en llamadas y sin sonido de inicio",
+    "Description": "Windows deja de bajar el volumen de lo que escuchás cuando detecta una llamada (Discord, Teams, etc.) y se silencia el sonido de arranque.",
+    "Risk": "Bajo",
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Multimedia\\Audio",
+        "Name": "UserDuckingPreference",
+        "Type": "DWord",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation",
+        "Name": "DisableStartupSound",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "DisableStartupSound",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ]
+  },
+  {
+    "Id": "CleanTempFiles",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Limpiar archivos temporales",
+    "Description": "Borra los temporales del usuario y de Windows y te dice cuánto espacio liberó. Los archivos en uso se saltean.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "Clear-TempFiles"
+    }
+  },
+  {
+    "Id": "RemoveBloatApps",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Quitar apps preinstaladas innecesarias",
+    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Risk": "Medio",
+    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.BingNews",
+      "Microsoft.BingWeather",
+      "Microsoft.GetHelp",
+      "Microsoft.Getstarted",
+      "Microsoft.MicrosoftSolitaireCollection",
+      "Microsoft.WindowsFeedbackHub",
+      "Clipchamp.Clipchamp",
+      "Microsoft.MicrosoftOfficeHub",
+      "Microsoft.People",
+      "Microsoft.PowerAutomateDesktop",
+      "Microsoft.Todos",
+      "Microsoft.549981C3F5F10"
+    ]
+  },
+  {
+    "Id": "RemoveOneDrive",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Quitar Microsoft OneDrive",
+    "Description": "Cierra y desinstala OneDrive. Revisá antes que no tengas archivos sin sincronizar. Se puede volver a instalar desde la web de Microsoft o con winget.",
+    "Risk": "Medio",
+    "Confirm": "Se va a desinstalar OneDrive.\n\nSi tenés archivos sin terminar de sincronizar, revisalos antes. Los archivos ya descargados en tu PC no se borran.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-OneDrive"
+    }
+  },
+  {
+    "Id": "RemoveLegacyFeatures",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Quitar características heredadas (lista segura)",
+    "Description": "Quita componentes viejos que casi nadie usa: Grabador de pasos, Panel de entrada matemática, Fax y Escáner, Windows Media Player clásico, PowerShell 2.0, SMB1, Work Folders y XPS Services. Solo toca lo que esté instalado. Puede tardar un par de minutos.",
+    "Risk": "Medio",
+    "Confirm": "Se van a quitar componentes heredados de Windows (Grabador de pasos, Fax y Escáner, Media Player clásico, PowerShell 2.0, SMB1, Work Folders, XPS Services).\n\nPuede tardar un par de minutos y no se revierte con este botón.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-LegacyFeatures"
+    }
+  },
+  {
+    "Id": "RepairSystem",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reparar archivos del sistema (DISM + SFC)",
+    "Description": "Repara la imagen de Windows y verifica los archivos del sistema. Abre una ventana aparte y puede tardar 10 a 20 minutos.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "Start-Process powershell -ArgumentList '-NoExit','-Command','DISM /Online /Cleanup-Image /RestoreHealth; sfc /scannow'"
+    }
+  },
+  {
+    "Id": "ResetNetwork",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reiniciar la red",
+    "Description": "Limpia la caché DNS y restablece Winsock y la pila TCP/IP. Soluciona problemas de conexión. Requiere reiniciar la PC y puede borrar una IP fija configurada.",
+    "Risk": "Medio",
+    "Confirm": "Se va a restablecer la pila de red (DNS, Winsock y TCP/IP).\n\nSi usás IP fija, tendrás que configurarla de nuevo. Después hay que reiniciar la PC.\n\n¿Continuar?",
+    "commands": {
+      "apply": "ipconfig /flushdns | Out-Null; netsh winsock reset | Out-Null; netsh int ip reset | Out-Null; Write-Log '  Reiniciá la PC para completar el reseteo de red.'"
+    }
   }
 ]
 '@ | ConvertFrom-Json
@@ -860,7 +1606,7 @@ function New-RestorePoint {
 }
 
 function Get-Snapshot($Tweak) {
-    $snap = @{ Registry = @(); Services = @() }
+    $snap = @{ Registry = @(); Services = @(); Tasks = @() }
     foreach ($r in $Tweak.registry) {
         $item = @{ Path = $r.Path; Name = $r.Name; Type = $r.Type; Existed = $false; Value = $null }
         $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
@@ -871,6 +1617,10 @@ function Get-Snapshot($Tweak) {
         $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
         if ($svc) { $snap.Services += @{ Name = $s.Name; StartType = [string]$svc.StartType } }
     }
+    foreach ($t in $Tweak.task) {
+        $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
+        if ($task) { $snap.Tasks += @{ Path = $t.Path; Name = $t.Name; State = [string]$task.State } }
+    }
     return $snap
 }
 
@@ -878,6 +1628,11 @@ function ConvertTo-RegValue($Type, $Value) {
     switch ($Type) {
         'DWord' { return [int]$Value }
         'QWord' { return [long]$Value }
+        'Binary' {
+            if ($Value -is [byte[]]) { return ,$Value }
+            $bytes = [byte[]](($Value -split ',') | ForEach-Object { [Convert]::ToByte($_.Trim(), 16) })
+            return ,$bytes
+        }
         default { return [string]$Value }
     }
 }
@@ -897,7 +1652,13 @@ function Test-TweakApplied($Tweak) {
         foreach ($r in $Tweak.registry) {
             $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
             if ($null -eq $p) { return $false }
-            if ("$($p.($r.Name))" -ne "$($r.Value)") { return $false }
+            $cur = $p.($r.Name)
+            if ($r.Type -eq 'Binary') {
+                $curHex = (@($cur) | ForEach-Object { '{0:x2}' -f $_ }) -join ','
+                $want   = (($r.Value -split ',') | ForEach-Object { $_.Trim().ToLower().PadLeft(2, '0') }) -join ','
+                if ($curHex -ne $want) { return $false }
+            }
+            elseif ("$cur" -ne "$($r.Value)") { return $false }
         }
         $checked = $true
     }
@@ -906,6 +1667,14 @@ function Test-TweakApplied($Tweak) {
             $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
             if (-not $svc) { continue }   # servicio que no existe en este equipo: se ignora
             if ([string]$svc.StartType -ne $s.StartupType) { return $false }
+            $checked = $true
+        }
+    }
+    if ($Tweak.task) {
+        foreach ($t in $Tweak.task) {
+            $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
+            if (-not $task) { continue }   # tarea que no existe en este equipo: se ignora
+            if ([string]$task.State -ne 'Disabled') { return $false }
             $checked = $true
         }
     }
@@ -936,6 +1705,12 @@ function Invoke-Tweak {
                 if ($s.StartupType -eq 'Disabled') { Stop-Service -Name $s.Name -Force -ErrorAction SilentlyContinue }
                 Write-Log "  Servicio $($s.Name): $($s.StartupType)"
             }
+            foreach ($t in $Tweak.task) {
+                $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
+                if (-not $task) { Write-Log "  Tarea $($t.Name): no existe en este equipo, se omite"; continue }
+                Disable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue | Out-Null
+                Write-Log "  Tarea $($t.Name): desactivada"
+            }
             if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         }
         else {
@@ -949,6 +1724,9 @@ function Invoke-Tweak {
                     Set-Service -Name $s.Name -StartupType $s.StartType -ErrorAction SilentlyContinue
                     if ($s.StartType -eq 'Automatic') { Start-Service -Name $s.Name -ErrorAction SilentlyContinue }
                 }
+                foreach ($t in $snap.Tasks) {
+                    if ($t.State -ne 'Disabled') { Enable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue | Out-Null }
+                }
                 $backup.Remove($Tweak.Id)
                 Save-Backup $backup
             }
@@ -960,6 +1738,9 @@ function Invoke-Tweak {
                 }
                 foreach ($s in $Tweak.service) {
                     Set-Service -Name $s.Name -StartupType $s.OriginalType -ErrorAction SilentlyContinue
+                }
+                foreach ($t in $Tweak.task) {
+                    Enable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue | Out-Null
                 }
             }
             if ($Tweak.commands.undo) { & ([scriptblock]::Create($Tweak.commands.undo)) | Out-Null }
@@ -1013,6 +1794,99 @@ function Invoke-Action {
         Write-Log "  ERROR: $($_.Exception.Message)"
         return $false
     }
+}
+
+# ---------- Funciones auxiliares usadas por tweaks y acciones ----------
+function Remove-OneDrive {
+    Write-Log '  Cerrando OneDrive...'
+    Stop-Process -Name OneDrive -Force -ErrorAction SilentlyContinue
+    $setup = Join-Path $env:SystemRoot 'SysWOW64\OneDriveSetup.exe'
+    if (-not (Test-Path $setup)) { $setup = Join-Path $env:SystemRoot 'System32\OneDriveSetup.exe' }
+    if (Test-Path $setup) {
+        Write-Log '  Desinstalando OneDrive...'
+        Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait
+    }
+    elseif (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Log '  Desinstalando OneDrive con winget...'
+        winget uninstall --id Microsoft.OneDrive --silent --accept-source-agreements | Out-Null
+    }
+    else {
+        throw 'No se encontró el desinstalador de OneDrive.'
+    }
+}
+
+function Remove-LegacyFeatures {
+    $caps = @('App.StepsRecorder', 'MathRecognizer', 'Print.Fax.Scan', 'Media.WindowsMediaPlayer')
+    foreach ($c in $caps) {
+        $found = Get-WindowsCapability -Online -Name "$c*" -ErrorAction SilentlyContinue | Where-Object { $_.State -eq 'Installed' }
+        foreach ($f in $found) {
+            Write-Log "  Quitando capacidad: $($f.Name)"
+            Remove-WindowsCapability -Online -Name $f.Name -ErrorAction SilentlyContinue | Out-Null
+        }
+    }
+    $feats = @('MicrosoftWindowsPowerShellV2Root', 'MicrosoftWindowsPowerShellV2', 'SMB1Protocol', 'WorkFolders-Client', 'Printing-XPSServices-Features')
+    foreach ($f in $feats) {
+        $o = Get-WindowsOptionalFeature -Online -FeatureName $f -ErrorAction SilentlyContinue
+        if ($o -and $o.State -eq 'Enabled') {
+            Write-Log "  Desactivando característica: $f"
+            Disable-WindowsOptionalFeature -Online -FeatureName $f -NoRestart -ErrorAction SilentlyContinue | Out-Null
+        }
+    }
+    Write-Log '  Algunos cambios pueden requerir reiniciar la PC.'
+}
+
+# Menú Inicio: guarda una copia de los anclados y los borra (Windows los regenera según la política)
+function Get-StartMenuPaths {
+    $dir = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState'
+    $bk  = Join-Path $script:AppDir 'start-backup'
+    return @($dir, $bk)
+}
+function Clear-StartMenuPins {
+    $dir, $bk = Get-StartMenuPaths
+    New-Item $bk -ItemType Directory -Force | Out-Null
+    foreach ($f in 'start.bin', 'start2.bin') {
+        $src = Join-Path $dir $f
+        if (Test-Path $src) {
+            if (-not (Test-Path (Join-Path $bk $f))) { Copy-Item $src $bk -Force }   # no pisar la primera copia
+            Remove-Item $src -Force -ErrorAction SilentlyContinue
+        }
+    }
+    Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
+}
+function Restore-StartMenuPins {
+    $dir, $bk = Get-StartMenuPaths
+    foreach ($f in 'start.bin', 'start2.bin') {
+        $src = Join-Path $bk $f
+        if (Test-Path $src) { Copy-Item $src $dir -Force }
+    }
+    Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
+}
+
+# Flecha de accesos directos: se reemplaza por un ícono transparente generado acá mismo
+function New-BlankIcon([string]$Path) {
+    $ms = New-Object System.IO.MemoryStream
+    $bw = New-Object System.IO.BinaryWriter($ms)
+    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                     # cabecera ICO
+    $bw.Write([byte]16); $bw.Write([byte]16); $bw.Write([byte]0); $bw.Write([byte]0)    # 16x16
+    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]1128); $bw.Write([uint32]22)
+    $bw.Write([uint32]40); $bw.Write([int32]16); $bw.Write([int32]32)                     # BITMAPINFOHEADER
+    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]0); $bw.Write([uint32]1088)
+    $bw.Write([int32]0); $bw.Write([int32]0); $bw.Write([uint32]0); $bw.Write([uint32]0)
+    $bw.Write([byte[]](New-Object byte[] 1024))                                           # píxeles transparentes
+    $bw.Write([byte[]](New-Object byte[] 64))                                             # máscara
+    [System.IO.File]::WriteAllBytes($Path, $ms.ToArray())
+}
+function Hide-ShortcutArrow {
+    $ico = Join-Path $script:AppDir 'blank.ico'
+    New-BlankIcon $ico
+    $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons'
+    if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
+    Set-ItemProperty -Path $key -Name '29' -Value "$ico,0" -Type String -Force
+    Stop-Process -Name explorer -Force
+}
+function Show-ShortcutArrow {
+    Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons' -Name '29' -ErrorAction SilentlyContinue
+    Stop-Process -Name explorer -Force
 }
 
 
@@ -1083,7 +1957,7 @@ $script:PageInfo = @{
 # Qué categoría del JSON va en qué página
 $script:CategoryPage = @{
     'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
-    'Interfaz'   = 'Personalizar'; 'Barra de tareas' = 'Personalizar'
+    'Interfaz'   = 'Personalizar'; 'Barra de tareas' = 'Personalizar'; 'Menú Inicio' = 'Personalizar'; 'Sonido' = 'Personalizar'
     'Limpieza'   = 'Mantenimiento'; 'Reparación' = 'Mantenimiento'
 }
 $script:CurrentPage  = 'Optimizar'
