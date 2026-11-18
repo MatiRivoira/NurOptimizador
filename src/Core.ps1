@@ -63,7 +63,7 @@ function Invoke-Tweak {
     param($Tweak, [switch]$Undo)
     $backup = Get-Backup
     $mode = if ($Undo) { 'Revirtiendo' } else { 'Aplicando' }
-    Write-Log "$mode: $($Tweak.Name)"
+    Write-Log "${mode}: $($Tweak.Name)"
 
     try {
         if (-not $Undo) {
