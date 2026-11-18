@@ -632,21 +632,10 @@ $script:Tweaks = @'
     }
   },
   {
-    "Id": "DisableHibernation",
-    "Category": "Rendimiento",
-    "Name": "Desactivar hibernación",
-    "Description": "Libera varios GB (hiberfil.sys). También desactiva Inicio rápido.",
-    "Risk": "Medio",
-    "commands": {
-      "apply": "powercfg /hibernate off",
-      "undo": "powercfg /hibernate on"
-    }
-  },
-  {
     "Id": "VisualEffectsPerformance",
     "Category": "Rendimiento",
     "Name": "Efectos visuales: solo lo esencial",
-    "Description": "Deja activados solo tres efectos: mostrar el contenido de la ventana mientras se arrastra, el rectángulo de selección translúcido y las miniaturas en lugar de íconos. Apaga el resto: animaciones, sombras, Peek, vistas previas de la barra, suavizado de bordes de fuentes y transparencias. Se aplica al cerrar sesión y volver a entrar.",
+    "Description": "Deja activados solo cuatro efectos: mostrar el contenido de la ventana mientras se arrastra, el rectángulo de selección translúcido, las miniaturas en lugar de íconos y el suavizado de bordes de las fuentes de pantalla. Apaga el resto: animaciones, sombras, Peek, vistas previas de la barra y transparencias. Se aplica al cerrar sesión y volver a entrar.",
     "Risk": "Bajo",
     "registry": [
       {
@@ -688,7 +677,7 @@ $script:Tweaks = @'
         "Path": "HKCU:\\Control Panel\\Desktop",
         "Name": "FontSmoothing",
         "Type": "String",
-        "Value": "0",
+        "Value": "2",
         "OriginalValue": "2"
       },
       {
@@ -732,64 +721,6 @@ $script:Tweaks = @'
         "Type": "DWord",
         "Value": "0",
         "OriginalValue": "1"
-      }
-    ]
-  },
-  {
-    "Id": "GameTweaks",
-    "Category": "Rendimiento",
-    "Name": "Ajustes de juego: prioridad de CPU y multimedia",
-    "Description": "Da prioridad al programa en primer plano, quita el límite de red del programador multimedia y sube la prioridad de los juegos. El beneficio depende del equipo y puede ser pequeño. Se aplica al reiniciar.",
-    "Risk": "Medio",
-    "registry": [
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
-        "Name": "SystemResponsiveness",
-        "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "20"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
-        "Name": "NetworkThrottlingIndex",
-        "Type": "DWord",
-        "Value": "-1",
-        "OriginalValue": "10"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
-        "Name": "GPU Priority",
-        "Type": "DWord",
-        "Value": "8",
-        "OriginalValue": "8"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
-        "Name": "Priority",
-        "Type": "DWord",
-        "Value": "6",
-        "OriginalValue": "2"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
-        "Name": "Scheduling Category",
-        "Type": "String",
-        "Value": "High",
-        "OriginalValue": "Medium"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
-        "Name": "SFIO Priority",
-        "Type": "String",
-        "Value": "High",
-        "OriginalValue": "Normal"
-      },
-      {
-        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
-        "Name": "Win32PrioritySeparation",
-        "Type": "DWord",
-        "Value": "38",
-        "OriginalValue": "2"
       }
     ]
   },
