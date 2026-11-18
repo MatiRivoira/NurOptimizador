@@ -20,7 +20,8 @@
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableActivityHistory",
@@ -50,7 +51,8 @@
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableAdvertisingId",
@@ -66,7 +68,8 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableLocation",
@@ -82,7 +85,8 @@
         "Value": "Deny",
         "OriginalValue": "Allow"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableCopilotRecall",
@@ -119,7 +123,8 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableTelemetryTasks",
@@ -172,7 +177,8 @@
         "Path": "\\Microsoft\\Windows\\Autochk\\",
         "Name": "Proxy"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableTipsAndAds",
@@ -321,7 +327,8 @@
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableDeliveryOptimization",
@@ -337,7 +344,8 @@
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableStoreSearch",
@@ -353,7 +361,8 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableEdgeAI",
@@ -418,7 +427,8 @@
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableOfficeAI",
@@ -434,7 +444,8 @@
         "Value": "2",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "RemoveWindowsAI",
@@ -451,7 +462,8 @@
     ],
     "commands": {
       "apply": "Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name WSAIFabricSvc -Force -ErrorAction SilentlyContinue; Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue | Out-Null; Get-ScheduledTask -TaskPath '\\Microsoft\\Windows\\WindowsAI\\*' -ErrorAction SilentlyContinue | Disable-ScheduledTask -ErrorAction SilentlyContinue | Out-Null"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "DisableConsumerFeatures",
@@ -467,7 +479,8 @@
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableBingSearch",
@@ -483,7 +496,8 @@
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "EdgeDebloat",
@@ -583,7 +597,8 @@
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableGameDVR",
@@ -606,7 +621,8 @@
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "UltimatePerformance",
@@ -618,7 +634,8 @@
       "apply": "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 | Out-Null; powercfg /setactive 99999999-9999-9999-9999-999999999999; if ($LASTEXITCODE -ne 0) { throw 'No se pudo activar Ultimate Performance en este equipo.' }",
       "undo": "powercfg /setactive SCHEME_BALANCED",
       "test": "[bool]((powercfg /getactivescheme) -match '99999999-9999-9999-9999-999999999999')"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "VisualEffectsPerformance",
@@ -716,7 +733,8 @@
       "apply": "Update-VisualEffectsLive",
       "undo": "Update-VisualEffectsLive",
       "test": "Test-VisualEffects"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "EnableHAGS",
@@ -732,7 +750,8 @@
         "Value": "2",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "EnableLongPaths",
@@ -812,7 +831,8 @@
         "StartupType": "Manual",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableXboxServices",
@@ -841,7 +861,9 @@
         "StartupType": "Disabled",
         "OriginalType": "Manual"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "DisableSysMain",
@@ -855,7 +877,9 @@
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "DisablePrintSpooler",
@@ -869,7 +893,9 @@
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "ClassicContextMenu",
@@ -881,7 +907,9 @@
       "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
       "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
       "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
-    }
+    },
+    "Optional": true,
+    "OptionalGroup": "Personalización"
   },
   {
     "Id": "EndTaskRightClick",
@@ -897,7 +925,8 @@
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableMouseAcceleration",
@@ -927,7 +956,8 @@
         "Value": "0",
         "OriginalValue": "10"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "ShowFileExtensions",
@@ -943,7 +973,8 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "ShowHiddenFiles",
@@ -959,7 +990,8 @@
         "Value": "1",
         "OriginalValue": "2"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "HideGallery",
@@ -979,7 +1011,8 @@
     "commands": {
       "apply": "Stop-Process -Name explorer -Force",
       "undo": "Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "DisableStickyKeys",
@@ -1009,7 +1042,8 @@
         "Value": "58",
         "OriginalValue": "62"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "HideShortcutArrow",
@@ -1021,7 +1055,9 @@
       "apply": "Hide-ShortcutArrow",
       "undo": "Show-ShortcutArrow",
       "test": "[bool](Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons' -Name '29' -ErrorAction SilentlyContinue)"
-    }
+    },
+    "Optional": true,
+    "OptionalGroup": "Personalización"
   },
   {
     "Id": "CleanTaskbar",
@@ -1062,7 +1098,8 @@
     "commands": {
       "apply": "Stop-Process -Name explorer -Force",
       "undo": "Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "UnpinTaskbarApps",
@@ -1074,7 +1111,8 @@
     "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "CleanStartMenu",
@@ -1094,7 +1132,8 @@
     "commands": {
       "apply": "Clear-StartMenuPins",
       "undo": "Restore-StartMenuPins"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "HideStartRecommendations",
@@ -1117,7 +1156,8 @@
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "SoundTweaks",
@@ -1147,7 +1187,8 @@
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "CleanTempFiles",
@@ -1181,7 +1222,8 @@
       "Microsoft.PowerAutomateDesktop",
       "Microsoft.Todos",
       "Microsoft.549981C3F5F10"
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "RemoveOneDrive",
@@ -1193,7 +1235,8 @@
     "Confirm": "Se va a desinstalar OneDrive.\n\nSi tenés archivos sin terminar de sincronizar, revisalos antes. Los archivos ya descargados en tu PC no se borran.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-OneDrive"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "RemoveLegacyFeatures",
@@ -1205,7 +1248,8 @@
     "Confirm": "Se van a quitar componentes heredados de Windows (Grabador de pasos, Fax y Escáner, Media Player clásico, PowerShell 2.0, SMB1, Work Folders, XPS Services).\n\nPuede tardar un par de minutos y no se revierte con este botón.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-LegacyFeatures"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "RepairSystem",

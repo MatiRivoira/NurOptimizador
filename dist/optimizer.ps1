@@ -31,7 +31,8 @@ $script:Tweaks = @'
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableActivityHistory",
@@ -61,7 +62,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableAdvertisingId",
@@ -77,7 +79,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableLocation",
@@ -93,7 +96,8 @@ $script:Tweaks = @'
         "Value": "Deny",
         "OriginalValue": "Allow"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableCopilotRecall",
@@ -130,7 +134,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableTelemetryTasks",
@@ -183,7 +188,8 @@ $script:Tweaks = @'
         "Path": "\\Microsoft\\Windows\\Autochk\\",
         "Name": "Proxy"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableTipsAndAds",
@@ -332,7 +338,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableDeliveryOptimization",
@@ -348,7 +355,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableStoreSearch",
@@ -364,7 +372,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableEdgeAI",
@@ -429,7 +438,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableOfficeAI",
@@ -445,7 +455,8 @@ $script:Tweaks = @'
         "Value": "2",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "RemoveWindowsAI",
@@ -462,7 +473,8 @@ $script:Tweaks = @'
     ],
     "commands": {
       "apply": "Set-Service -Name WSAIFabricSvc -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name WSAIFabricSvc -Force -ErrorAction SilentlyContinue; Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue | Out-Null; Get-ScheduledTask -TaskPath '\\Microsoft\\Windows\\WindowsAI\\*' -ErrorAction SilentlyContinue | Disable-ScheduledTask -ErrorAction SilentlyContinue | Out-Null"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "DisableConsumerFeatures",
@@ -478,7 +490,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableBingSearch",
@@ -494,7 +507,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "EdgeDebloat",
@@ -594,7 +608,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableGameDVR",
@@ -617,7 +632,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "UltimatePerformance",
@@ -629,7 +645,8 @@ $script:Tweaks = @'
       "apply": "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 | Out-Null; powercfg /setactive 99999999-9999-9999-9999-999999999999; if ($LASTEXITCODE -ne 0) { throw 'No se pudo activar Ultimate Performance en este equipo.' }",
       "undo": "powercfg /setactive SCHEME_BALANCED",
       "test": "[bool]((powercfg /getactivescheme) -match '99999999-9999-9999-9999-999999999999')"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "VisualEffectsPerformance",
@@ -727,7 +744,8 @@ $script:Tweaks = @'
       "apply": "Update-VisualEffectsLive",
       "undo": "Update-VisualEffectsLive",
       "test": "Test-VisualEffects"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "EnableHAGS",
@@ -743,7 +761,8 @@ $script:Tweaks = @'
         "Value": "2",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "EnableLongPaths",
@@ -823,7 +842,8 @@ $script:Tweaks = @'
         "StartupType": "Manual",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableXboxServices",
@@ -852,7 +872,9 @@ $script:Tweaks = @'
         "StartupType": "Disabled",
         "OriginalType": "Manual"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "DisableSysMain",
@@ -866,7 +888,9 @@ $script:Tweaks = @'
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "DisablePrintSpooler",
@@ -880,7 +904,9 @@ $script:Tweaks = @'
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
       }
-    ]
+    ],
+    "Optional": true,
+    "OptionalGroup": "Servicios"
   },
   {
     "Id": "ClassicContextMenu",
@@ -892,7 +918,9 @@ $script:Tweaks = @'
       "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
       "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
       "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
-    }
+    },
+    "Optional": true,
+    "OptionalGroup": "Personalización"
   },
   {
     "Id": "EndTaskRightClick",
@@ -908,7 +936,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "DisableMouseAcceleration",
@@ -938,7 +967,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "10"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "ShowFileExtensions",
@@ -954,7 +984,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "ShowHiddenFiles",
@@ -970,7 +1001,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "2"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "HideGallery",
@@ -990,7 +1022,8 @@ $script:Tweaks = @'
     "commands": {
       "apply": "Stop-Process -Name explorer -Force",
       "undo": "Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "DisableStickyKeys",
@@ -1020,7 +1053,8 @@ $script:Tweaks = @'
         "Value": "58",
         "OriginalValue": "62"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "HideShortcutArrow",
@@ -1032,7 +1066,9 @@ $script:Tweaks = @'
       "apply": "Hide-ShortcutArrow",
       "undo": "Show-ShortcutArrow",
       "test": "[bool](Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons' -Name '29' -ErrorAction SilentlyContinue)"
-    }
+    },
+    "Optional": true,
+    "OptionalGroup": "Personalización"
   },
   {
     "Id": "CleanTaskbar",
@@ -1073,7 +1109,8 @@ $script:Tweaks = @'
     "commands": {
       "apply": "Stop-Process -Name explorer -Force",
       "undo": "Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "UnpinTaskbarApps",
@@ -1085,7 +1122,8 @@ $script:Tweaks = @'
     "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "CleanStartMenu",
@@ -1105,7 +1143,8 @@ $script:Tweaks = @'
     "commands": {
       "apply": "Clear-StartMenuPins",
       "undo": "Restore-StartMenuPins"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "HideStartRecommendations",
@@ -1128,7 +1167,8 @@ $script:Tweaks = @'
         "Value": "0",
         "OriginalValue": "1"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "SoundTweaks",
@@ -1158,7 +1198,8 @@ $script:Tweaks = @'
         "Value": "1",
         "OriginalValue": "<RemoveEntry>"
       }
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "CleanTempFiles",
@@ -1192,7 +1233,8 @@ $script:Tweaks = @'
       "Microsoft.PowerAutomateDesktop",
       "Microsoft.Todos",
       "Microsoft.549981C3F5F10"
-    ]
+    ],
+    "Quick": true
   },
   {
     "Id": "RemoveOneDrive",
@@ -1204,7 +1246,8 @@ $script:Tweaks = @'
     "Confirm": "Se va a desinstalar OneDrive.\n\nSi tenés archivos sin terminar de sincronizar, revisalos antes. Los archivos ya descargados en tu PC no se borran.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-OneDrive"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "RemoveLegacyFeatures",
@@ -1216,7 +1259,8 @@ $script:Tweaks = @'
     "Confirm": "Se van a quitar componentes heredados de Windows (Grabador de pasos, Fax y Escáner, Media Player clásico, PowerShell 2.0, SMB1, Work Folders, XPS Services).\n\nPuede tardar un par de minutos y no se revierte con este botón.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-LegacyFeatures"
-    }
+    },
+    "Quick": true
   },
   {
     "Id": "RepairSystem",
@@ -1424,6 +1468,28 @@ $script:Xaml = @'
         </Setter.Value>
       </Setter>
     </Style>
+
+    <!-- Barra de progreso de vidrio -->
+    <Style x:Key="GlassProgress" TargetType="ProgressBar">
+      <Setter Property="Height" Value="14"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ProgressBar">
+            <Grid>
+              <Border x:Name="PART_Track" CornerRadius="7" Background="#26FFFFFF" BorderBrush="#66FFFFFF" BorderThickness="1"/>
+              <Border x:Name="PART_Indicator" CornerRadius="7" HorizontalAlignment="Left">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FF8B7CFF" Offset="0"/>
+                    <GradientStop Color="#FF38BDF8" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
   </Window.Resources>
 
   <Border x:Name="Tint" Background="{StaticResource GlassTint}" ClipToBounds="True">
@@ -1459,19 +1525,9 @@ $script:Xaml = @'
         </Grid>
 
         <!-- Barra lateral -->
-        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
+        <Border x:Name="Sidebar" Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
           <DockPanel>
             <StackPanel DockPanel.Dock="Bottom">
-              <Grid Margin="4,0,0,12">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Crear punto de restauración antes de cambiar" TextWrapping="Wrap"
-                           Foreground="#CCFFFFFF" FontSize="12" VerticalAlignment="Center"/>
-                <ToggleButton x:Name="RestoreSwitch" Grid.Column="1" Style="{StaticResource Switch}"
-                              IsChecked="True" Margin="10,0,0,0" VerticalAlignment="Center"/>
-              </Grid>
               <Button x:Name="BtnRestore" Style="{StaticResource GlassButton}" Content="Crear punto ahora"/>
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
@@ -1488,7 +1544,7 @@ $script:Xaml = @'
         </Border>
 
         <!-- Contenido -->
-        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,16,16">
+        <Grid x:Name="ContentArea" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Margin="0,0,16,16">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -1526,6 +1582,85 @@ $script:Xaml = @'
                        VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
             </Border>
           </Grid>
+        </Grid>
+
+        <!-- Asistente de inicio -->
+        <Grid x:Name="Wizard" Grid.Row="1" Grid.ColumnSpan="2" Margin="16,0,16,16">
+          <Border Style="{StaticResource GlassCard}" Width="660" MaxHeight="610" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="34">
+            <Grid>
+
+              <StackPanel x:Name="WzRestore">
+                <TextBlock Text="Antes de comenzar" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="¿Querés hacer un punto de restauración? Si algo no te gusta, podés volver a cómo estaba tu PC."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"/>
+                <StackPanel x:Name="WzRestoreButtons" Orientation="Horizontal">
+                  <Button x:Name="WzRestoreYes" Style="{StaticResource GlassButton}" Content="Sí, crear punto" MinWidth="170" Margin="0,0,12,0"/>
+                  <Button x:Name="WzRestoreNo" Style="{StaticResource GlassButton}" Content="No, continuar" MinWidth="170"/>
+                </StackPanel>
+                <TextBlock x:Name="WzRestoreBusy" Visibility="Collapsed" Foreground="#A6E3A1" FontSize="14" TextWrapping="Wrap"
+                           Text="Creando el punto de restauración... puede tardar unos segundos."/>
+              </StackPanel>
+
+              <StackPanel x:Name="WzMode" Visibility="Collapsed">
+                <TextBlock Text="Elegí cómo querés optimizar" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="Podés dejar que la app aplique todo lo recomendado, o elegir ajuste por ajuste."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,24"/>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Button x:Name="WzQuick" Grid.Column="0" Style="{StaticResource GlassButton}" Height="180">
+                    <StackPanel>
+                      <TextBlock Text="Modo rápido" FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                      <TextBlock x:Name="WzQuickDesc" TextWrapping="Wrap" TextAlignment="Center" Foreground="#CCFFFFFF" FontSize="12.5" Margin="0,12,0,0"/>
+                    </StackPanel>
+                  </Button>
+                  <Button x:Name="WzAdvanced" Grid.Column="2" Style="{StaticResource GlassButton}" Height="180">
+                    <StackPanel>
+                      <TextBlock Text="Modo avanzado" FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                      <TextBlock x:Name="WzAdvDesc" TextWrapping="Wrap" TextAlignment="Center" Foreground="#CCFFFFFF" FontSize="12.5" Margin="0,12,0,0"/>
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel x:Name="WzProgress" Visibility="Collapsed">
+                <TextBlock x:Name="WzProgTitle" Text="Optimizando tu PC..." FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="No cierres la ventana. Algunos pasos tardan un rato y la ventana puede quedar quieta unos segundos."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="13" Margin="0,8,0,26"/>
+                <ProgressBar x:Name="WzProgBar" Style="{StaticResource GlassProgress}" Minimum="0" Maximum="100" Value="0"/>
+                <Grid Margin="0,12,0,0">
+                  <TextBlock x:Name="WzProgText" Foreground="White" FontSize="14" TextTrimming="CharacterEllipsis" Margin="0,0,90,0"/>
+                  <TextBlock x:Name="WzProgCount" Foreground="#B3FFFFFF" FontSize="13" HorizontalAlignment="Right"/>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel x:Name="WzOptional" Visibility="Collapsed">
+                <TextBlock Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,16"/>
+                <ScrollViewer MaxHeight="330" VerticalScrollBarVisibility="Auto">
+                  <StackPanel x:Name="WzOptList" Margin="0,0,10,0"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                  <Button x:Name="WzOptApply" Style="{StaticResource GlassButton}" Content="Aplicar los marcados" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzOptSkip" Style="{StaticResource GlassButton}" Content="Omitir" MinWidth="120"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzDone" Visibility="Collapsed">
+                <TextBlock Text="Listo" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzDoneText" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzDoneAdvanced" Style="{StaticResource GlassButton}" Content="Abrir modo avanzado" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzDoneClose" Style="{StaticResource GlassButton}" Content="Cerrar" MinWidth="120"/>
+                </StackPanel>
+              </StackPanel>
+
+            </Grid>
+          </Border>
         </Grid>
       </Grid>
     </Grid>
@@ -1956,7 +2091,6 @@ $script:PageSub      = $script:window.FindName('PageSub')
 $script:SearchBox    = $script:window.FindName('SearchBox')
 $script:SearchHint   = $script:window.FindName('SearchHint')
 $script:SearchBorder = $script:window.FindName('SearchBorder')
-$script:RestoreSwitch = $script:window.FindName('RestoreSwitch')
 
 $script:PageUI = @{
     Optimizar    = $script:window.FindName('PageOptimizar')
@@ -1990,6 +2124,8 @@ $script:CategoryPage = @{
 $script:CurrentPage  = 'Optimizar'
 $script:RestoreDone  = $false
 $script:Sections     = New-Object System.Collections.ArrayList
+$script:Controls     = @{}
+$script:TweakById    = @{}
 
 # ---------- Helpers ----------
 function Get-Brush([string]$Hex) {
@@ -1998,14 +2134,6 @@ function Get-Brush([string]$Hex) {
 
 function Update-UI {
     $script:window.Dispatcher.Invoke([Action]{}, [Windows.Threading.DispatcherPriority]::Render)
-}
-
-function Initialize-RestorePoint {
-    if ($script:RestoreDone) { return }
-    Write-Log 'Creando punto de restauración (puede tardar unos segundos)...'
-    Update-UI
-    New-RestorePoint
-    $script:RestoreDone = $true
 }
 
 function Show-Page([string]$Name) {
@@ -2101,13 +2229,13 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
             param($sender, $e)
             $t = $sender.Tag
             $want = [bool]$sender.IsChecked
-            if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
             $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
             $ok = [bool]($res | Select-Object -Last 1)
             if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
         })
     }
 
+    $script:Controls[$Tweak.Id] = $sw
     [Windows.Controls.Grid]::SetColumn($sw, 1)
     [void]$grid.Children.Add($left)
     [void]$grid.Children.Add($sw)
@@ -2211,6 +2339,206 @@ $script:window.Add_SourceInitialized({
         Write-Log 'Acrílico no disponible en esta versión de Windows: usando fondo de respaldo.'
     }
 })
+
+# ---------- Asistente de inicio: punto de restauración -> modo rápido / avanzado ----------
+foreach ($tw in $script:Tweaks) { $script:TweakById[$tw.Id] = $tw }
+$script:BatchOk    = 0
+$script:BatchFail  = New-Object System.Collections.ArrayList
+$script:ActionDone = @{}
+$script:OptChecks  = @()
+$script:Dirty      = $false
+
+$script:Wizard      = $script:window.FindName('Wizard')
+$script:WzProgBar   = $script:window.FindName('WzProgBar')
+$script:WzProgText  = $script:window.FindName('WzProgText')
+$script:WzProgCount = $script:window.FindName('WzProgCount')
+$script:WzProgTitle = $script:window.FindName('WzProgTitle')
+$script:WzOptList   = $script:window.FindName('WzOptList')
+$script:WzDoneText  = $script:window.FindName('WzDoneText')
+$script:WzPages = @{}
+foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
+
+function Show-WizardPage([string]$Name) {
+    foreach ($k in $script:WzPages.Keys) {
+        $script:WzPages[$k].Visibility = if ($k -eq $Name) { 'Visible' } else { 'Collapsed' }
+    }
+}
+
+# Después de aplicar cosas en el asistente, deja los interruptores del modo avanzado en su estado real
+function Sync-Controls {
+    foreach ($id in @($script:Controls.Keys)) {
+        $c = $script:Controls[$id]
+        $t = $script:TweakById[$id]
+        if ($t.Kind -eq 'action') { if ($script:ActionDone.ContainsKey($id)) { $c.Content = 'Hecho' } }
+        else { $c.IsChecked = [bool](Test-TweakApplied $t) }
+    }
+}
+
+function Enter-Advanced {
+    if ($script:Dirty) { Sync-Controls; $script:Dirty = $false }
+    $script:Wizard.Visibility = 'Collapsed'
+    $script:window.FindName('Sidebar').Visibility = 'Visible'
+    $script:window.FindName('ContentArea').Visibility = 'Visible'
+}
+
+# Aplica una lista de ajustes mostrando la barra de progreso
+function Start-Batch([string[]]$Ids) {
+    $total = $Ids.Count
+    $i = 0
+    foreach ($id in $Ids) {
+        $t = $script:TweakById[$id]
+        if (-not $t) { continue }
+        $script:WzProgBar.Value  = [math]::Round(100 * $i / $total)
+        $script:WzProgText.Text  = $t.Name
+        $script:WzProgCount.Text = "$($i + 1) de $total"
+        Update-UI
+        $res = if ($t.Kind -eq 'action') { Invoke-Action -Tweak $t } else { Invoke-Tweak -Tweak $t }
+        if ([bool]($res | Select-Object -Last 1)) {
+            $script:BatchOk++
+            if ($t.Kind -eq 'action') { $script:ActionDone[$id] = $true }
+        }
+        else { [void]$script:BatchFail.Add($t.Name) }
+        $i++
+    }
+    $script:Dirty = $true
+    $script:WzProgBar.Value = 100
+    $script:WzProgText.Text = 'Terminando...'
+    Update-UI
+}
+
+function Show-Done {
+    $txt = "Se aplicaron $($script:BatchOk) ajustes."
+    if ($script:BatchFail.Count -gt 0) {
+        $txt += "`n`nNo se pudieron aplicar ($($script:BatchFail.Count)): " + ($script:BatchFail -join ', ') + ".`nMirá la pestaña Registro del modo avanzado para ver el motivo."
+    }
+    $txt += "`n`nAlgunos cambios se ven recién al cerrar sesión o reiniciar la PC."
+    $script:WzDoneText.Text = $txt
+    Show-WizardPage 'Done'
+}
+
+function New-OptionRow($Tweak, [bool]$ShowSeparator) {
+    $grid = New-Object Windows.Controls.Grid
+    $c1 = New-Object Windows.Controls.ColumnDefinition
+    $c1.Width = [Windows.GridLength]::new(1, [Windows.GridUnitType]::Star)
+    $c2 = New-Object Windows.Controls.ColumnDefinition
+    $c2.Width = [Windows.GridLength]::Auto
+    [void]$grid.ColumnDefinitions.Add($c1)
+    [void]$grid.ColumnDefinitions.Add($c2)
+
+    $left = New-Object Windows.Controls.StackPanel
+    $name = New-Object Windows.Controls.TextBlock
+    $name.Text = $Tweak.Name
+    $name.FontSize = 14
+    $name.FontWeight = [Windows.FontWeights]::SemiBold
+    $name.Foreground = [Windows.Media.Brushes]::White
+    $desc = New-Object Windows.Controls.TextBlock
+    $desc.Text = $Tweak.Description
+    $desc.TextWrapping = 'Wrap'
+    $desc.FontSize = 12
+    $desc.Foreground = Get-Brush '#B3FFFFFF'
+    $desc.Margin = [Windows.Thickness]::new(0, 3, 0, 0)
+    [void]$left.Children.Add($name)
+    [void]$left.Children.Add($desc)
+
+    $sw = New-Object Windows.Controls.Primitives.ToggleButton
+    $sw.Style = $script:window.FindResource('Switch')
+    $sw.VerticalAlignment = 'Center'
+    $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+    $sw.Tag = $Tweak
+    $sw.IsChecked = $false
+
+    [Windows.Controls.Grid]::SetColumn($sw, 1)
+    [void]$grid.Children.Add($left)
+    [void]$grid.Children.Add($sw)
+
+    $row = New-Object Windows.Controls.Border
+    $row.Padding = [Windows.Thickness]::new(18, 12, 18, 12)
+    if ($ShowSeparator) {
+        $row.BorderThickness = [Windows.Thickness]::new(0, 0, 0, 1)
+        $row.BorderBrush = Get-Brush '#1AFFFFFF'
+    }
+    $row.Child = $grid
+    $row.Tag = $sw          # para poder leer el interruptor desde la fila
+    return $row
+}
+
+function Show-OptionalPage {
+    $opt = @($script:Tweaks | Where-Object { $_.Optional })
+    if ($opt.Count -eq 0) { Show-Done; return }
+    $script:WzOptList.Children.Clear()
+    $script:OptChecks = @()
+    foreach ($g in ($opt | Group-Object OptionalGroup)) {
+        $title = New-Object Windows.Controls.TextBlock
+        $title.Text = $g.Name
+        $title.FontSize = 15
+        $title.FontWeight = [Windows.FontWeights]::SemiBold
+        $title.Foreground = [Windows.Media.Brushes]::White
+        $title.Margin = [Windows.Thickness]::new(4, 8, 0, 6)
+        [void]$script:WzOptList.Children.Add($title)
+
+        $card = New-Object Windows.Controls.Border
+        $card.Style = $script:window.FindResource('GlassCard')
+        $card.Margin = [Windows.Thickness]::new(0, 0, 0, 8)
+        $stack = New-Object Windows.Controls.StackPanel
+        $card.Child = $stack
+        $items = @($g.Group)
+        for ($i = 0; $i -lt $items.Count; $i++) {
+            $row = New-OptionRow $items[$i] ($i -lt $items.Count - 1)
+            [void]$stack.Children.Add($row)
+            $script:OptChecks += $row.Tag
+        }
+        [void]$script:WzOptList.Children.Add($card)
+    }
+    Show-WizardPage 'Optional'
+}
+
+function Start-QuickMode {
+    $ids = @($script:Tweaks | Where-Object { $_.Quick } | ForEach-Object { $_.Id })
+    $msg = "El modo rápido va a aplicar $($ids.Count) ajustes, entre ellos:`n`n" +
+           "  - Quitar OneDrive, apps preinstaladas y características heredadas`n" +
+           "  - Quitar IA de Windows, Edge y Office`n" +
+           "  - Desanclar todo de la barra de tareas y del menú Inicio`n`n" +
+           "Casi todo se puede revertir desde el modo avanzado, pero quitar apps y OneDrive no.`n`n¿Continuar?"
+    $ans = [Windows.MessageBox]::Show($msg, 'NurOptimizador', 'YesNo', 'Question')
+    if ($ans -ne 'Yes') { return }
+    $script:WzProgTitle.Text = 'Optimizando tu PC...'
+    Show-WizardPage 'Progress'
+    Update-UI
+    Start-Batch $ids
+    Show-OptionalPage
+}
+
+$quickCount = @($script:Tweaks | Where-Object { $_.Quick }).Count
+$script:window.FindName('WzQuickDesc').Text = "Aplica $quickCount ajustes recomendados de una vez, con una barra de progreso. Al final te pregunta por algunos opcionales."
+$script:window.FindName('WzAdvDesc').Text   = 'Elegí ajuste por ajuste con interruptores, viendo qué hace cada uno. Cada uno se puede revertir.'
+
+$script:window.FindName('WzRestoreYes').Add_Click({
+    $script:window.FindName('WzRestoreButtons').Visibility = 'Collapsed'
+    $script:window.FindName('WzRestoreBusy').Visibility = 'Visible'
+    Write-Log 'Creando punto de restauración (puede tardar unos segundos)...'
+    Update-UI
+    New-RestorePoint
+    $script:RestoreDone = $true
+    Show-WizardPage 'Mode'
+})
+$script:window.FindName('WzRestoreNo').Add_Click({ Show-WizardPage 'Mode' })
+$script:window.FindName('WzQuick').Add_Click({ Start-QuickMode })
+$script:window.FindName('WzAdvanced').Add_Click({ Enter-Advanced })
+$script:window.FindName('WzOptApply').Add_Click({
+    $ids = @($script:OptChecks | Where-Object { $_.IsChecked } | ForEach-Object { $_.Tag.Id })
+    if ($ids.Count -gt 0) {
+        $script:WzProgTitle.Text = 'Aplicando ajustes opcionales...'
+        Show-WizardPage 'Progress'
+        Update-UI
+        Start-Batch $ids
+    }
+    Show-Done
+})
+$script:window.FindName('WzOptSkip').Add_Click({ Show-Done })
+$script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
+$script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
+
+Show-WizardPage 'Restore'
 
 $script:UiReady = $true
 Show-Page 'Optimizar'

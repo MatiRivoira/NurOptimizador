@@ -177,6 +177,28 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+    <!-- Barra de progreso de vidrio -->
+    <Style x:Key="GlassProgress" TargetType="ProgressBar">
+      <Setter Property="Height" Value="14"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ProgressBar">
+            <Grid>
+              <Border x:Name="PART_Track" CornerRadius="7" Background="#26FFFFFF" BorderBrush="#66FFFFFF" BorderThickness="1"/>
+              <Border x:Name="PART_Indicator" CornerRadius="7" HorizontalAlignment="Left">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FF8B7CFF" Offset="0"/>
+                    <GradientStop Color="#FF38BDF8" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
   </Window.Resources>
 
   <Border x:Name="Tint" Background="{StaticResource GlassTint}" ClipToBounds="True">
@@ -212,19 +234,9 @@
         </Grid>
 
         <!-- Barra lateral -->
-        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
+        <Border x:Name="Sidebar" Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
           <DockPanel>
             <StackPanel DockPanel.Dock="Bottom">
-              <Grid Margin="4,0,0,12">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Crear punto de restauración antes de cambiar" TextWrapping="Wrap"
-                           Foreground="#CCFFFFFF" FontSize="12" VerticalAlignment="Center"/>
-                <ToggleButton x:Name="RestoreSwitch" Grid.Column="1" Style="{StaticResource Switch}"
-                              IsChecked="True" Margin="10,0,0,0" VerticalAlignment="Center"/>
-              </Grid>
               <Button x:Name="BtnRestore" Style="{StaticResource GlassButton}" Content="Crear punto ahora"/>
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
@@ -241,7 +253,7 @@
         </Border>
 
         <!-- Contenido -->
-        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,16,16">
+        <Grid x:Name="ContentArea" Visibility="Collapsed" Grid.Row="1" Grid.Column="1" Margin="0,0,16,16">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -279,6 +291,85 @@
                        VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
             </Border>
           </Grid>
+        </Grid>
+
+        <!-- Asistente de inicio -->
+        <Grid x:Name="Wizard" Grid.Row="1" Grid.ColumnSpan="2" Margin="16,0,16,16">
+          <Border Style="{StaticResource GlassCard}" Width="660" MaxHeight="610" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="34">
+            <Grid>
+
+              <StackPanel x:Name="WzRestore">
+                <TextBlock Text="Antes de comenzar" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="¿Querés hacer un punto de restauración? Si algo no te gusta, podés volver a cómo estaba tu PC."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"/>
+                <StackPanel x:Name="WzRestoreButtons" Orientation="Horizontal">
+                  <Button x:Name="WzRestoreYes" Style="{StaticResource GlassButton}" Content="Sí, crear punto" MinWidth="170" Margin="0,0,12,0"/>
+                  <Button x:Name="WzRestoreNo" Style="{StaticResource GlassButton}" Content="No, continuar" MinWidth="170"/>
+                </StackPanel>
+                <TextBlock x:Name="WzRestoreBusy" Visibility="Collapsed" Foreground="#A6E3A1" FontSize="14" TextWrapping="Wrap"
+                           Text="Creando el punto de restauración... puede tardar unos segundos."/>
+              </StackPanel>
+
+              <StackPanel x:Name="WzMode" Visibility="Collapsed">
+                <TextBlock Text="Elegí cómo querés optimizar" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="Podés dejar que la app aplique todo lo recomendado, o elegir ajuste por ajuste."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,24"/>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Button x:Name="WzQuick" Grid.Column="0" Style="{StaticResource GlassButton}" Height="180">
+                    <StackPanel>
+                      <TextBlock Text="Modo rápido" FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                      <TextBlock x:Name="WzQuickDesc" TextWrapping="Wrap" TextAlignment="Center" Foreground="#CCFFFFFF" FontSize="12.5" Margin="0,12,0,0"/>
+                    </StackPanel>
+                  </Button>
+                  <Button x:Name="WzAdvanced" Grid.Column="2" Style="{StaticResource GlassButton}" Height="180">
+                    <StackPanel>
+                      <TextBlock Text="Modo avanzado" FontSize="21" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                      <TextBlock x:Name="WzAdvDesc" TextWrapping="Wrap" TextAlignment="Center" Foreground="#CCFFFFFF" FontSize="12.5" Margin="0,12,0,0"/>
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel x:Name="WzProgress" Visibility="Collapsed">
+                <TextBlock x:Name="WzProgTitle" Text="Optimizando tu PC..." FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="No cierres la ventana. Algunos pasos tardan un rato y la ventana puede quedar quieta unos segundos."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="13" Margin="0,8,0,26"/>
+                <ProgressBar x:Name="WzProgBar" Style="{StaticResource GlassProgress}" Minimum="0" Maximum="100" Value="0"/>
+                <Grid Margin="0,12,0,0">
+                  <TextBlock x:Name="WzProgText" Foreground="White" FontSize="14" TextTrimming="CharacterEllipsis" Margin="0,0,90,0"/>
+                  <TextBlock x:Name="WzProgCount" Foreground="#B3FFFFFF" FontSize="13" HorizontalAlignment="Right"/>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel x:Name="WzOptional" Visibility="Collapsed">
+                <TextBlock Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
+                           TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,16"/>
+                <ScrollViewer MaxHeight="330" VerticalScrollBarVisibility="Auto">
+                  <StackPanel x:Name="WzOptList" Margin="0,0,10,0"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                  <Button x:Name="WzOptApply" Style="{StaticResource GlassButton}" Content="Aplicar los marcados" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzOptSkip" Style="{StaticResource GlassButton}" Content="Omitir" MinWidth="120"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzDone" Visibility="Collapsed">
+                <TextBlock Text="Listo" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzDoneText" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzDoneAdvanced" Style="{StaticResource GlassButton}" Content="Abrir modo avanzado" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzDoneClose" Style="{StaticResource GlassButton}" Content="Cerrar" MinWidth="120"/>
+                </StackPanel>
+              </StackPanel>
+
+            </Grid>
+          </Border>
         </Grid>
       </Grid>
     </Grid>
