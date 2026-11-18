@@ -65,7 +65,7 @@ $script:PageInfo = @{
 # Qué categoría del JSON va en qué página
 $script:CategoryPage = @{
     'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
-    'Interfaz'   = 'Personalizar'; 'Barra de tareas' = 'Personalizar'
+    'Interfaz'   = 'Personalizar'; 'Barra de tareas' = 'Personalizar'; 'Menú Inicio' = 'Personalizar'; 'Sonido' = 'Personalizar'
     'Limpieza'   = 'Mantenimiento'; 'Reparación' = 'Mantenimiento'
 }
 $script:CurrentPage  = 'Optimizar'
