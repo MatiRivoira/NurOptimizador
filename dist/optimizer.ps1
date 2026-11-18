@@ -645,8 +645,8 @@ $script:Tweaks = @'
   {
     "Id": "VisualEffectsPerformance",
     "Category": "Rendimiento",
-    "Name": "Efectos visuales: mejor rendimiento",
-    "Description": "Quita animaciones de ventanas y de la barra, sombras de selección, vista previa de Aero Peek y transparencias. Windows se ve más plano pero responde más rápido en equipos modestos. Se aplica al cerrar sesión y volver a entrar.",
+    "Name": "Efectos visuales: solo lo esencial",
+    "Description": "Deja activados solo tres efectos: mostrar el contenido de la ventana mientras se arrastra, el rectángulo de selección translúcido y las miniaturas en lugar de íconos. Apaga el resto: animaciones, sombras, Peek, vistas previas de la barra, suavizado de bordes de fuentes y transparencias. Se aplica al cerrar sesión y volver a entrar.",
     "Risk": "Bajo",
     "registry": [
       {
@@ -664,6 +664,34 @@ $script:Tweaks = @'
         "OriginalValue": "9e,3e,07,80,12,00,00,00"
       },
       {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "DragFullWindows",
+        "Type": "String",
+        "Value": "1",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ListviewAlphaSelect",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "IconsOnly",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "0"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "FontSmoothing",
+        "Type": "String",
+        "Value": "0",
+        "OriginalValue": "2"
+      },
+      {
         "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
         "Name": "MinAnimate",
         "Type": "String",
@@ -679,13 +707,6 @@ $script:Tweaks = @'
       },
       {
         "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-        "Name": "ListviewAlphaSelect",
-        "Type": "DWord",
-        "Value": "0",
-        "OriginalValue": "1"
-      },
-      {
-        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
         "Name": "ListviewShadow",
         "Type": "DWord",
         "Value": "0",
@@ -694,6 +715,13 @@ $script:Tweaks = @'
       {
         "Path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
         "Name": "EnableAeroPeek",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
+        "Name": "AlwaysHibernateThumbnails",
         "Type": "DWord",
         "Value": "0",
         "OriginalValue": "1"
