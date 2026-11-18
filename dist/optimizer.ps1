@@ -125,39 +125,285 @@ $script:Tweaks = @'
 $script:Xaml = @'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Mi Optimizador - Windows 11" Width="760" Height="660"
-        WindowStartupLocation="CenterScreen" Background="#1E1E2E">
+        Title="NurOptimizador" Width="1060" Height="700"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanMinimize"
+        Background="Transparent" Foreground="White"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13">
   <Window.Resources>
-    <Style TargetType="CheckBox">
-      <Setter Property="Foreground" Value="#E6E6F0"/>
-      <Setter Property="Margin" Value="12,4,0,4"/>
+
+    <!-- Fondo con tinte translúcido (sobre acrílico) y versión opaca de respaldo -->
+    <LinearGradientBrush x:Key="GlassTint" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#D01E1458" Offset="0"/>
+      <GradientStop Color="#D00C2457" Offset="0.55"/>
+      <GradientStop Color="#D0081426" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="FallbackBg" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#FF1E1458" Offset="0"/>
+      <GradientStop Color="#FF0C2457" Offset="0.55"/>
+      <GradientStop Color="#FF081426" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Tarjeta de vidrio -->
+    <Style x:Key="GlassCard" TargetType="Border">
+      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#2EFFFFFF" Offset="0"/>
+            <GradientStop Color="#0DFFFFFF" Offset="1"/>
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderBrush">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#70FFFFFF" Offset="0"/>
+            <GradientStop Color="#14FFFFFF" Offset="1"/>
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Effect">
+        <Setter.Value>
+          <DropShadowEffect BlurRadius="28" ShadowDepth="8" Direction="270" Opacity="0.3" Color="Black"/>
+        </Setter.Value>
+      </Setter>
     </Style>
-    <Style TargetType="Button">
-      <Setter Property="Padding" Value="14,6"/>
-      <Setter Property="Margin" Value="0,0,8,0"/>
+
+    <!-- Interruptor estilo Winhance -->
+    <Style x:Key="Switch" TargetType="ToggleButton">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ToggleButton">
+            <Grid Width="48" Height="26" Background="Transparent">
+              <Border x:Name="Track" CornerRadius="13" Background="#33FFFFFF" BorderBrush="#66FFFFFF" BorderThickness="1"/>
+              <Ellipse x:Name="Knob" Width="18" Height="18" Fill="White" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Track" Property="Background">
+                  <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                      <GradientStop Color="#FF8B7CFF" Offset="0"/>
+                      <GradientStop Color="#FF38BDF8" Offset="1"/>
+                    </LinearGradientBrush>
+                  </Setter.Value>
+                </Setter>
+                <Setter TargetName="Track" Property="BorderBrush" Value="#88FFFFFF"/>
+                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Item de navegación lateral -->
+    <Style x:Key="NavItem" TargetType="RadioButton">
+      <Setter Property="Foreground" Value="#CCFFFFFF"/>
+      <Setter Property="Margin" Value="0,3"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="Bd" CornerRadius="10" Padding="12,10" Background="Transparent"
+                    BorderThickness="1" BorderBrush="Transparent">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="16"
+                           Width="28" VerticalAlignment="Center"/>
+                <ContentPresenter VerticalAlignment="Center"/>
+              </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#1FFFFFFF"/>
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#38FFFFFF"/>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="#66FFFFFF"/>
+                <Setter Property="Foreground" Value="White"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Botones de la barra de título -->
+    <Style x:Key="TitleBtn" TargetType="Button">
+      <Setter Property="Width" Value="42"/>
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="Transparent" CornerRadius="8">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#33FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Botón de vidrio -->
+    <Style x:Key="GlassButton" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" CornerRadius="10" Padding="14,9" Background="#26FFFFFF"
+                    BorderBrush="#55FFFFFF" BorderThickness="1">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#40FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Barra de scroll fina -->
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="8"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Track x:Name="PART_Track" IsDirectionReversed="True">
+              <Track.Thumb>
+                <Thumb>
+                  <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                      <Border CornerRadius="4" Background="#55FFFFFF" Margin="1"/>
+                    </ControlTemplate>
+                  </Thumb.Template>
+                </Thumb>
+              </Track.Thumb>
+            </Track>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
   </Window.Resources>
-  <Grid Margin="12">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="150"/>
-    </Grid.RowDefinitions>
-    <TextBlock Grid.Row="0" Text="Mi Optimizador para Windows 11" FontSize="20"
-               FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
-    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-      <StackPanel x:Name="TweaksPanel"/>
-    </ScrollViewer>
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,10">
-      <Button x:Name="BtnApply" Content="Aplicar seleccionados"/>
-      <Button x:Name="BtnUndo" Content="Revertir seleccionados"/>
-      <Button x:Name="BtnRestore" Content="Crear punto de restauración"/>
-    </StackPanel>
-    <TextBox Grid.Row="3" x:Name="LogBox" IsReadOnly="True" Background="#11111B"
-             Foreground="#A6E3A1" FontFamily="Consolas" VerticalScrollBarVisibility="Auto"
-             TextWrapping="Wrap"/>
-  </Grid>
+
+  <Border x:Name="Tint" Background="{StaticResource GlassTint}" ClipToBounds="True">
+    <Grid>
+      <!-- Manchas de color: le dan al vidrio algo que "refractar" -->
+      <Ellipse Width="460" Height="460" Fill="#997C5CFF" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-120,-140,0,0" IsHitTestVisible="False">
+        <Ellipse.Effect><BlurEffect Radius="110"/></Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Width="420" Height="420" Fill="#7700C2FF" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-110,-140" IsHitTestVisible="False">
+        <Ellipse.Effect><BlurEffect Radius="110"/></Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Width="300" Height="300" Fill="#55FF4DA6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-60,140,0" IsHitTestVisible="False">
+        <Ellipse.Effect><BlurEffect Radius="100"/></Ellipse.Effect>
+      </Ellipse>
+
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="42"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="250"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Barra de título -->
+        <Grid x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent">
+          <TextBlock Text="NurOptimizador" Foreground="#B3FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="20,0,0,0"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,10,0" VerticalAlignment="Top">
+            <Button x:Name="BtnMin" Style="{StaticResource TitleBtn}" Content="&#xE921;"/>
+            <Button x:Name="BtnClose" Style="{StaticResource TitleBtn}" Content="&#xE8BB;"/>
+          </StackPanel>
+        </Grid>
+
+        <!-- Barra lateral -->
+        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Bottom">
+              <Grid Margin="4,0,0,12">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Crear punto de restauración antes de cambiar" TextWrapping="Wrap"
+                           Foreground="#CCFFFFFF" FontSize="12" VerticalAlignment="Center"/>
+                <ToggleButton x:Name="RestoreSwitch" Grid.Column="1" Style="{StaticResource Switch}"
+                              IsChecked="True" Margin="10,0,0,0" VerticalAlignment="Center"/>
+              </Grid>
+              <Button x:Name="BtnRestore" Style="{StaticResource GlassButton}" Content="Crear punto ahora"/>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
+              <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
+              <TextBlock Text="Windows 11" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
+            </StackPanel>
+            <StackPanel>
+              <RadioButton x:Name="NavOptimizar" Style="{StaticResource NavItem}" Tag="&#xE945;" Content="Optimizar" IsChecked="True" GroupName="nav"/>
+              <RadioButton x:Name="NavPersonalizar" Style="{StaticResource NavItem}" Tag="&#xE771;" Content="Personalizar" GroupName="nav"/>
+              <RadioButton x:Name="NavRegistro" Style="{StaticResource NavItem}" Tag="&#xE8A5;" Content="Registro" GroupName="nav"/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <!-- Contenido -->
+        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,16,16">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <Grid Grid.Row="0" Margin="6,0,0,14">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock x:Name="PageTitle" FontSize="26" FontWeight="SemiBold" Text="Optimizar"/>
+              <TextBlock x:Name="PageSub" Foreground="#B3FFFFFF" FontSize="12.5" Margin="1,2,0,0"/>
+            </StackPanel>
+            <Border x:Name="SearchBorder" Style="{StaticResource GlassCard}" CornerRadius="12"
+                    Width="270" Height="38" HorizontalAlignment="Right" VerticalAlignment="Center">
+              <Grid>
+                <TextBlock x:Name="SearchHint" Text="Buscar ajustes" Foreground="#99FFFFFF"
+                           Margin="14,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <TextBox x:Name="SearchBox" Background="Transparent" BorderThickness="0" Foreground="White"
+                         CaretBrush="White" VerticalContentAlignment="Center" Padding="10,0"/>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <Grid Grid.Row="1">
+            <ScrollViewer x:Name="PageOptimizar" VerticalScrollBarVisibility="Auto">
+              <StackPanel x:Name="PanelOptimizar" Margin="0,0,10,0"/>
+            </ScrollViewer>
+            <ScrollViewer x:Name="PagePersonalizar" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+              <StackPanel x:Name="PanelPersonalizar" Margin="0,0,10,0"/>
+            </ScrollViewer>
+            <Border x:Name="PageRegistro" Style="{StaticResource GlassCard}" Visibility="Collapsed" Padding="14">
+              <TextBox x:Name="LogBox" IsReadOnly="True" Background="Transparent" BorderThickness="0"
+                       Foreground="#A6E3A1" FontFamily="Consolas" FontSize="12.5"
+                       VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+            </Border>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Border>
 </Window>
 
 '@
@@ -223,6 +469,21 @@ function Set-RegValue($Path, $Name, $Type, $Value) {
     Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value (ConvertTo-RegValue $Type $Value) -Force
 }
 
+# Devuelve $true si el tweak ya está aplicado (para mostrar el interruptor en ON al abrir)
+function Test-TweakApplied($Tweak) {
+    if ($Tweak.registry) {
+        foreach ($r in $Tweak.registry) {
+            $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
+            if ($null -eq $p) { return $false }
+            if ("$($p.($r.Name))" -ne "$($r.Value)") { return $false }
+        }
+        return $true
+    }
+    # Tweaks solo de comandos: se considera aplicado si lo aplicamos nosotros
+    return (Get-Backup).ContainsKey($Tweak.Id)
+}
+
+# Devuelve $true si salió bien, $false si hubo error
 function Invoke-Tweak {
     param($Tweak, [switch]$Undo)
     $backup = Get-Backup
@@ -270,52 +531,277 @@ function Invoke-Tweak {
             if ($Tweak.commands.undo) { & ([scriptblock]::Create($Tweak.commands.undo)) | Out-Null }
         }
         Write-Log '  OK'
+        return $true
     } catch {
         Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
     }
 }
 
 
-# ---------- UI: ventana WPF generada desde XAML + tweaks.json ----------
-Add-Type -AssemblyName PresentationFramework
+# ---------- UI: layout tipo Winhance con estilo glassmorphism ----------
+Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
+
+# Acrílico real de Windows 11 (22H2+) vía DWM. En versiones viejas se usa un fondo de respaldo.
+if (-not ('NurGlass' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class NurGlass {
+    [StructLayout(LayoutKind.Sequential)]
+    struct MARGINS { public int L, R, T, B; }
+    [DllImport("dwmapi.dll")]
+    static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
+    [DllImport("dwmapi.dll")]
+    static extern int DwmExtendFrameIntoClientArea(IntPtr hwnd, ref MARGINS m);
+    public static bool Enable(IntPtr hwnd) {
+        try {
+            int dark = 1;   DwmSetWindowAttribute(hwnd, 20, ref dark, 4);   // modo oscuro
+            int round = 2;  DwmSetWindowAttribute(hwnd, 33, ref round, 4);  // esquinas redondeadas
+            MARGINS m = new MARGINS(); m.L = -1; m.R = -1; m.T = -1; m.B = -1;
+            DwmExtendFrameIntoClientArea(hwnd, ref m);
+            int acrylic = 3;                                                // 3 = acrílico
+            return DwmSetWindowAttribute(hwnd, 38, ref acrylic, 4) == 0;
+        } catch { return false; }
+    }
+}
+'@
+}
 
 $reader = New-Object System.Xml.XmlNodeReader ([xml]$script:Xaml)
-$window = [Windows.Markup.XamlReader]::Load($reader)
+$script:window = [Windows.Markup.XamlReader]::Load($reader)
 
-$panel         = $window.FindName('TweaksPanel')
-$script:LogBox = $window.FindName('LogBox')
-$checks        = @()
+$script:Tint         = $script:window.FindName('Tint')
+$script:LogBox       = $script:window.FindName('LogBox')
+$script:PageTitle    = $script:window.FindName('PageTitle')
+$script:PageSub      = $script:window.FindName('PageSub')
+$script:SearchBox    = $script:window.FindName('SearchBox')
+$script:SearchHint   = $script:window.FindName('SearchHint')
+$script:SearchBorder = $script:window.FindName('SearchBorder')
+$script:RestoreSwitch = $script:window.FindName('RestoreSwitch')
 
-foreach ($group in ($script:Tweaks | Group-Object Category)) {
-    $header = New-Object Windows.Controls.TextBlock
-    $header.Text = $group.Name
-    $header.FontSize = 15
-    $header.FontWeight = 'Bold'
-    $header.Foreground = '#89B4FA'
-    $header.Margin = '0,12,0,4'
-    [void]$panel.Children.Add($header)
+$script:PageUI = @{
+    Optimizar    = $script:window.FindName('PageOptimizar')
+    Personalizar = $script:window.FindName('PagePersonalizar')
+    Registro     = $script:window.FindName('PageRegistro')
+}
+$script:Nav = @{
+    Optimizar    = $script:window.FindName('NavOptimizar')
+    Personalizar = $script:window.FindName('NavPersonalizar')
+    Registro     = $script:window.FindName('NavRegistro')
+}
+$script:Panels = @{
+    Optimizar    = $script:window.FindName('PanelOptimizar')
+    Personalizar = $script:window.FindName('PanelPersonalizar')
+}
+$script:PageInfo = @{
+    Optimizar    = @('Optimizar', 'Privacidad, rendimiento y limpieza de Windows')
+    Personalizar = @('Personalizar', 'Cómo se ve y se comporta el Explorador y el sistema')
+    Registro     = @('Registro', 'Todo lo que hizo la app en esta sesión')
+}
+# Qué categoría del JSON va en qué página
+$script:CategoryPage = @{
+    'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
+    'Interfaz'   = 'Personalizar'
+}
+$script:CurrentPage  = 'Optimizar'
+$script:RestoreDone  = $false
+$script:Sections     = New-Object System.Collections.ArrayList
 
-    foreach ($t in $group.Group) {
-        $cb = New-Object Windows.Controls.CheckBox
-        $cb.Content = "$($t.Name)  [riesgo: $($t.Risk)]"
-        $cb.ToolTip = $t.Description
-        $cb.Tag = $t
-        [void]$panel.Children.Add($cb)
-        $checks += $cb
-    }
+# ---------- Helpers ----------
+function Get-Brush([string]$Hex) {
+    (New-Object System.Windows.Media.BrushConverter).ConvertFromString($Hex)
 }
 
-$window.FindName('BtnApply').Add_Click({
-    $sel = $checks | Where-Object { $_.IsChecked }
-    if (-not $sel) { Write-Log 'No hay tweaks seleccionados.'; return }
-    New-RestorePoint
-    foreach ($cb in $sel) { Invoke-Tweak -Tweak $cb.Tag }
-    Write-Log 'Listo. Algunos cambios requieren reiniciar sesión o la PC.'
-})
-$window.FindName('BtnUndo').Add_Click({
-    foreach ($cb in ($checks | Where-Object { $_.IsChecked })) { Invoke-Tweak -Tweak $cb.Tag -Undo }
-})
-$window.FindName('BtnRestore').Add_Click({ New-RestorePoint })
+function Update-UI {
+    $script:window.Dispatcher.Invoke([Action]{}, [Windows.Threading.DispatcherPriority]::Render)
+}
 
-Write-Log 'Listo. Marcá los tweaks y apretá Aplicar.'
-[void]$window.ShowDialog()
+function Initialize-RestorePoint {
+    if ($script:RestoreDone) { return }
+    Write-Log 'Creando punto de restauración (puede tardar unos segundos)...'
+    Update-UI
+    New-RestorePoint
+    $script:RestoreDone = $true
+}
+
+function Show-Page([string]$Name) {
+    $script:CurrentPage = $Name
+    foreach ($k in $script:PageUI.Keys) {
+        $script:PageUI[$k].Visibility = if ($k -eq $Name) { 'Visible' } else { 'Collapsed' }
+    }
+    $script:PageTitle.Text = $script:PageInfo[$Name][0]
+    $script:PageSub.Text   = $script:PageInfo[$Name][1]
+    $script:SearchBorder.Visibility = if ($Name -eq 'Registro') { 'Collapsed' } else { 'Visible' }
+}
+
+function New-TweakRow($Tweak, [bool]$ShowSeparator) {
+    $grid = New-Object Windows.Controls.Grid
+    $c1 = New-Object Windows.Controls.ColumnDefinition
+    $c1.Width = [Windows.GridLength]::new(1, [Windows.GridUnitType]::Star)
+    $c2 = New-Object Windows.Controls.ColumnDefinition
+    $c2.Width = [Windows.GridLength]::Auto
+    [void]$grid.ColumnDefinitions.Add($c1)
+    [void]$grid.ColumnDefinitions.Add($c2)
+
+    $left = New-Object Windows.Controls.StackPanel
+
+    $name = New-Object Windows.Controls.TextBlock
+    $name.Text = $Tweak.Name
+    $name.FontSize = 14
+    $name.FontWeight = [Windows.FontWeights]::SemiBold
+    $name.Foreground = [Windows.Media.Brushes]::White
+
+    $desc = New-Object Windows.Controls.TextBlock
+    $desc.Text = $Tweak.Description
+    $desc.TextWrapping = 'Wrap'
+    $desc.FontSize = 12
+    $desc.Foreground = Get-Brush '#B3FFFFFF'
+    $desc.Margin = [Windows.Thickness]::new(0, 3, 0, 0)
+
+    switch ($Tweak.Risk) {
+        'Bajo'  { $chipBg = '#3322C55E'; $chipFg = '#FF86EFAC' }
+        'Medio' { $chipBg = '#33F59E0B'; $chipFg = '#FFFCD34D' }
+        default { $chipBg = '#33EF4444'; $chipFg = '#FFFCA5A5' }
+    }
+    $chip = New-Object Windows.Controls.Border
+    $chip.CornerRadius = [Windows.CornerRadius]::new(8)
+    $chip.Padding = [Windows.Thickness]::new(8, 2, 8, 2)
+    $chip.Margin = [Windows.Thickness]::new(0, 8, 0, 0)
+    $chip.HorizontalAlignment = 'Left'
+    $chip.Background = Get-Brush $chipBg
+    $chipText = New-Object Windows.Controls.TextBlock
+    $chipText.Text = "Riesgo $($Tweak.Risk)"
+    $chipText.FontSize = 11
+    $chipText.Foreground = Get-Brush $chipFg
+    $chip.Child = $chipText
+
+    [void]$left.Children.Add($name)
+    [void]$left.Children.Add($desc)
+    [void]$left.Children.Add($chip)
+
+    $sw = New-Object Windows.Controls.Primitives.ToggleButton
+    $sw.Style = $script:window.FindResource('Switch')
+    $sw.VerticalAlignment = 'Center'
+    $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+    $sw.Tag = $Tweak
+    $sw.IsChecked = [bool](Test-TweakApplied $Tweak)   # antes de enganchar el evento Click
+
+    # Click solo se dispara por acción del usuario: ON = aplicar, OFF = revertir
+    $sw.Add_Click({
+        param($sender, $e)
+        $t = $sender.Tag
+        $want = [bool]$sender.IsChecked
+        if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
+        $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
+        $ok = [bool]($res | Select-Object -Last 1)
+        if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
+    })
+
+    [Windows.Controls.Grid]::SetColumn($sw, 1)
+    [void]$grid.Children.Add($left)
+    [void]$grid.Children.Add($sw)
+
+    $row = New-Object Windows.Controls.Border
+    $row.Padding = [Windows.Thickness]::new(20, 14, 20, 14)
+    if ($ShowSeparator) {
+        $row.BorderThickness = [Windows.Thickness]::new(0, 0, 0, 1)
+        $row.BorderBrush = Get-Brush '#1AFFFFFF'
+    }
+    $row.Child = $grid
+    return $row
+}
+
+# ---------- Construir las páginas desde tweaks.json ----------
+foreach ($group in ($script:Tweaks | Group-Object Category)) {
+    $pageKey = if ($script:CategoryPage.ContainsKey($group.Name)) { $script:CategoryPage[$group.Name] } else { 'Optimizar' }
+
+    $section = New-Object Windows.Controls.StackPanel
+    $section.Margin = [Windows.Thickness]::new(0, 0, 0, 20)
+
+    $title = New-Object Windows.Controls.TextBlock
+    $title.Text = $group.Name
+    $title.FontSize = 16
+    $title.FontWeight = [Windows.FontWeights]::SemiBold
+    $title.Foreground = [Windows.Media.Brushes]::White
+    $title.Margin = [Windows.Thickness]::new(6, 0, 0, 8)
+
+    $card = New-Object Windows.Controls.Border
+    $card.Style = $script:window.FindResource('GlassCard')
+    $stack = New-Object Windows.Controls.StackPanel
+    $card.Child = $stack
+
+    $items = @($group.Group)
+    $rows = New-Object System.Collections.ArrayList
+    for ($i = 0; $i -lt $items.Count; $i++) {
+        $row = New-TweakRow $items[$i] ($i -lt $items.Count - 1)
+        [void]$stack.Children.Add($row)
+        [void]$rows.Add(@{
+            Element = $row
+            Text    = ("$($items[$i].Name) $($items[$i].Description) $($group.Name)").ToLower()
+        })
+    }
+
+    [void]$section.Children.Add($title)
+    [void]$section.Children.Add($card)
+    [void]$script:Panels[$pageKey].Children.Add($section)
+    [void]$script:Sections.Add(@{ Element = $section; Rows = $rows; Page = $pageKey })
+}
+
+# ---------- Eventos ----------
+foreach ($k in @($script:Nav.Keys)) {
+    $script:Nav[$k].Add_Checked({
+        param($sender, $e)
+        Show-Page $sender.Name.Substring(3)    # NavOptimizar -> Optimizar
+    })
+}
+
+$script:SearchBox.Add_TextChanged({
+    $q = $script:SearchBox.Text.Trim().ToLower()
+    $script:SearchHint.Visibility = if ($q) { 'Collapsed' } else { 'Visible' }
+    $hits = @{ Optimizar = 0; Personalizar = 0 }
+    foreach ($s in $script:Sections) {
+        $vis = 0
+        foreach ($r in $s.Rows) {
+            $match = ($q -eq '') -or $r.Text.Contains($q)
+            $r.Element.Visibility = if ($match) { 'Visible' } else { 'Collapsed' }
+            if ($match) { $vis++ }
+        }
+        $s.Element.Visibility = if ($vis -gt 0) { 'Visible' } else { 'Collapsed' }
+        $hits[$s.Page] += $vis
+    }
+    # Si la página actual no tiene resultados, saltar a la primera que sí
+    if ($q -and $hits.ContainsKey($script:CurrentPage) -and $hits[$script:CurrentPage] -eq 0) {
+        $first = $hits.Keys | Where-Object { $hits[$_] -gt 0 } | Select-Object -First 1
+        if ($first) { $script:Nav[$first].IsChecked = $true }
+    }
+})
+
+$script:window.FindName('TitleBar').Add_MouseLeftButtonDown({ $script:window.DragMove() })
+$script:window.FindName('BtnMin').Add_Click({ $script:window.WindowState = 'Minimized' })
+$script:window.FindName('BtnClose').Add_Click({ $script:window.Close() })
+$script:window.FindName('BtnRestore').Add_Click({
+    Write-Log 'Creando punto de restauración (puede tardar unos segundos)...'
+    Update-UI
+    New-RestorePoint
+    $script:RestoreDone = $true
+})
+
+# Acrílico: se activa cuando la ventana ya tiene handle
+$script:window.Add_SourceInitialized({
+    $ok = $false
+    if ([Environment]::OSVersion.Version.Build -ge 22621) {
+        $hwnd = (New-Object System.Windows.Interop.WindowInteropHelper($script:window)).Handle
+        $src = [System.Windows.Interop.HwndSource]::FromHwnd($hwnd)
+        $src.CompositionTarget.BackgroundColor = [System.Windows.Media.Colors]::Transparent
+        $ok = [NurGlass]::Enable($hwnd)
+    }
+    if (-not $ok) {
+        $script:Tint.Background = $script:window.FindResource('FallbackBg')
+        Write-Log 'Acrílico no disponible en esta versión de Windows: usando fondo de respaldo.'
+    }
+})
+
+Show-Page 'Optimizar'
+Write-Log 'Listo. Cada interruptor aplica o revierte el ajuste al instante.'
+[void]$script:window.ShowDialog()

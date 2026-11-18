@@ -59,6 +59,21 @@ function Set-RegValue($Path, $Name, $Type, $Value) {
     Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value (ConvertTo-RegValue $Type $Value) -Force
 }
 
+# Devuelve $true si el tweak ya está aplicado (para mostrar el interruptor en ON al abrir)
+function Test-TweakApplied($Tweak) {
+    if ($Tweak.registry) {
+        foreach ($r in $Tweak.registry) {
+            $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
+            if ($null -eq $p) { return $false }
+            if ("$($p.($r.Name))" -ne "$($r.Value)") { return $false }
+        }
+        return $true
+    }
+    # Tweaks solo de comandos: se considera aplicado si lo aplicamos nosotros
+    return (Get-Backup).ContainsKey($Tweak.Id)
+}
+
+# Devuelve $true si salió bien, $false si hubo error
 function Invoke-Tweak {
     param($Tweak, [switch]$Undo)
     $backup = Get-Backup
@@ -106,7 +121,9 @@ function Invoke-Tweak {
             if ($Tweak.commands.undo) { & ([scriptblock]::Create($Tweak.commands.undo)) | Out-Null }
         }
         Write-Log '  OK'
+        return $true
     } catch {
         Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
     }
 }
