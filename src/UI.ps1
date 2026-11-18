@@ -42,26 +42,31 @@ $script:RestoreSwitch = $script:window.FindName('RestoreSwitch')
 $script:PageUI = @{
     Optimizar    = $script:window.FindName('PageOptimizar')
     Personalizar = $script:window.FindName('PagePersonalizar')
+    Mantenimiento = $script:window.FindName('PageMantenimiento')
     Registro     = $script:window.FindName('PageRegistro')
 }
 $script:Nav = @{
     Optimizar    = $script:window.FindName('NavOptimizar')
     Personalizar = $script:window.FindName('NavPersonalizar')
+    Mantenimiento = $script:window.FindName('NavMantenimiento')
     Registro     = $script:window.FindName('NavRegistro')
 }
 $script:Panels = @{
     Optimizar    = $script:window.FindName('PanelOptimizar')
     Personalizar = $script:window.FindName('PanelPersonalizar')
+    Mantenimiento = $script:window.FindName('PanelMantenimiento')
 }
 $script:PageInfo = @{
     Optimizar    = @('Optimizar', 'Privacidad, rendimiento y limpieza de Windows')
     Personalizar = @('Personalizar', 'Cómo se ve y se comporta el Explorador y el sistema')
+    Mantenimiento = @('Mantenimiento', 'Limpieza y reparación del sistema')
     Registro     = @('Registro', 'Todo lo que hizo la app en esta sesión')
 }
 # Qué categoría del JSON va en qué página
 $script:CategoryPage = @{
     'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
     'Interfaz'   = 'Personalizar'
+    'Limpieza'   = 'Mantenimiento'; 'Reparación' = 'Mantenimiento'
 }
 $script:CurrentPage  = 'Optimizar'
 $script:RestoreDone  = $false
@@ -139,23 +144,50 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     [void]$left.Children.Add($desc)
     [void]$left.Children.Add($chip)
 
-    $sw = New-Object Windows.Controls.Primitives.ToggleButton
-    $sw.Style = $script:window.FindResource('Switch')
-    $sw.VerticalAlignment = 'Center'
-    $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
-    $sw.Tag = $Tweak
-    $sw.IsChecked = [bool](Test-TweakApplied $Tweak)   # antes de enganchar el evento Click
+    if ($Tweak.Kind -eq 'action') {
+        # Acción de un solo uso: botón en lugar de interruptor
+        $sw = New-Object Windows.Controls.Button
+        $sw.Style = $script:window.FindResource('GlassButton')
+        $sw.Content = 'Ejecutar'
+        $sw.MinWidth = 100
+        $sw.VerticalAlignment = 'Center'
+        $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+        $sw.Tag = $Tweak
+        $sw.Add_Click({
+            param($sender, $e)
+            $t = $sender.Tag
+            if ($t.Confirm) {
+                $ans = [Windows.MessageBox]::Show($t.Confirm, 'NurOptimizador', 'YesNo', 'Question')
+                if ($ans -ne 'Yes') { return }
+            }
+            $sender.IsEnabled = $false
+            $sender.Content = 'Trabajando...'
+            Update-UI
+            $res = Invoke-Action -Tweak $t
+            $ok = [bool]($res | Select-Object -Last 1)
+            $sender.Content = if ($ok) { 'Hecho' } else { 'Reintentar' }
+            $sender.IsEnabled = $true
+        })
+    }
+    else {
+        $sw = New-Object Windows.Controls.Primitives.ToggleButton
+        $sw.Style = $script:window.FindResource('Switch')
+        $sw.VerticalAlignment = 'Center'
+        $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+        $sw.Tag = $Tweak
+        $sw.IsChecked = [bool](Test-TweakApplied $Tweak)   # antes de enganchar el evento Click
 
-    # Click solo se dispara por acción del usuario: ON = aplicar, OFF = revertir
-    $sw.Add_Click({
-        param($sender, $e)
-        $t = $sender.Tag
-        $want = [bool]$sender.IsChecked
-        if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
-        $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
-        $ok = [bool]($res | Select-Object -Last 1)
-        if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
-    })
+        # Click solo se dispara por acción del usuario: ON = aplicar, OFF = revertir
+        $sw.Add_Click({
+            param($sender, $e)
+            $t = $sender.Tag
+            $want = [bool]$sender.IsChecked
+            if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
+            $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
+            $ok = [bool]($res | Select-Object -Last 1)
+            if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
+        })
+    }
 
     [Windows.Controls.Grid]::SetColumn($sw, 1)
     [void]$grid.Children.Add($left)
@@ -218,7 +250,7 @@ foreach ($k in @($script:Nav.Keys)) {
 $script:SearchBox.Add_TextChanged({
     $q = $script:SearchBox.Text.Trim().ToLower()
     $script:SearchHint.Visibility = if ($q) { 'Collapsed' } else { 'Visible' }
-    $hits = @{ Optimizar = 0; Personalizar = 0 }
+    $hits = @{ Optimizar = 0; Personalizar = 0; Mantenimiento = 0 }
     foreach ($s in $script:Sections) {
         $vis = 0
         foreach ($r in $s.Rows) {
@@ -261,6 +293,7 @@ $script:window.Add_SourceInitialized({
     }
 })
 
+$script:UiReady = $true
 Show-Page 'Optimizar'
 Write-Log 'Listo. Cada interruptor aplica o revierte el ajuste al instante.'
 [void]$script:window.ShowDialog()

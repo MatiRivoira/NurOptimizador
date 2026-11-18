@@ -35,6 +35,29 @@
     ]
   },
   {
+    "Id": "DisableLocation",
+    "Category": "Privacidad",
+    "Name": "Desactivar rastreo de ubicación",
+    "Description": "Bloquea el acceso de Windows y las apps a tu ubicación. Apps como Mapas o Clima dejan de ubicarte solas.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "Name": "Value", "Type": "String", "Value": "Deny", "OriginalValue": "Allow" }
+    ]
+  },
+  {
+    "Id": "DisableCopilotRecall",
+    "Category": "Privacidad",
+    "Name": "Desactivar Copilot y Recall",
+    "Description": "Aplica las políticas de Windows que apagan Copilot y el análisis de datos con IA (Recall), y oculta el botón de la barra. Según la compilación, Copilot como app aparte puede seguir instalado.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI", "Name": "DisableAIDataAnalysis", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "ShowCopilotButton", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+    ]
+  },
+  {
     "Id": "DisableConsumerFeatures",
     "Category": "Debloat",
     "Name": "Desactivar apps sugeridas / consumer features",
@@ -66,14 +89,15 @@
     ]
   },
   {
-    "Id": "HighPerformancePower",
+    "Id": "UltimatePerformance",
     "Category": "Rendimiento",
-    "Name": "Plan de energía: Alto rendimiento",
-    "Description": "Activa el plan de alto rendimiento. En notebooks aumenta el consumo de batería.",
+    "Name": "Plan de energía: Ultimate Performance",
+    "Description": "Activa el plan de máximo rendimiento de Windows (menos latencia). En notebooks consume más batería. Al apagarlo vuelve a Equilibrado.",
     "Risk": "Bajo",
     "commands": {
-      "apply": "powercfg /setactive SCHEME_MIN",
-      "undo": "powercfg /setactive SCHEME_BALANCED"
+      "apply": "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 | Out-Null; powercfg /setactive 99999999-9999-9999-9999-999999999999; if ($LASTEXITCODE -ne 0) { throw 'No se pudo activar Ultimate Performance en este equipo.' }",
+      "undo": "powercfg /setactive SCHEME_BALANCED",
+      "test": "[bool]((powercfg /getactivescheme) -match '99999999-9999-9999-9999-999999999999')"
     }
   },
   {
@@ -86,6 +110,40 @@
       "apply": "powercfg /hibernate off",
       "undo": "powercfg /hibernate on"
     }
+  },
+  {
+    "Id": "ClassicContextMenu",
+    "Category": "Interfaz",
+    "Name": "Menú contextual clásico",
+    "Description": "Vuelve el clic derecho completo de Windows 10, sin tener que tocar \"Mostrar más opciones\". Reinicia el Explorador (la barra parpadea un instante).",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
+      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
+      "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
+    }
+  },
+  {
+    "Id": "EndTaskRightClick",
+    "Category": "Interfaz",
+    "Name": "Finalizar tarea con clic derecho",
+    "Description": "Agrega \"Finalizar tarea\" al clic derecho de los íconos de la barra de tareas. Sirve para cerrar apps trabadas sin abrir el Administrador de tareas.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "Name": "TaskbarEndTask", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "DisableMouseAcceleration",
+    "Category": "Interfaz",
+    "Name": "Desactivar aceleración del mouse",
+    "Description": "El puntero responde siempre igual a tu movimiento (ideal para juegos y diseño). Se aplica al volver a iniciar sesión.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseSpeed", "Type": "String", "Value": "0", "OriginalValue": "1" },
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold1", "Type": "String", "Value": "0", "OriginalValue": "6" },
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold2", "Type": "String", "Value": "0", "OriginalValue": "10" }
+    ]
   },
   {
     "Id": "ShowFileExtensions",
@@ -106,5 +164,52 @@
     "registry": [
       { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "Hidden", "Type": "DWord", "Value": "1", "OriginalValue": "2" }
     ]
+  },
+  {
+    "Id": "CleanTempFiles",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Limpiar archivos temporales",
+    "Description": "Borra los temporales del usuario y de Windows y te dice cuánto espacio liberó. Los archivos en uso se saltean.",
+    "Risk": "Bajo",
+    "commands": { "apply": "Clear-TempFiles" }
+  },
+  {
+    "Id": "RemoveBloatApps",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Quitar apps preinstaladas innecesarias",
+    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Risk": "Medio",
+    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Getstarted",
+      "Microsoft.MicrosoftSolitaireCollection", "Microsoft.WindowsFeedbackHub", "Clipchamp.Clipchamp",
+      "Microsoft.MicrosoftOfficeHub", "Microsoft.People", "Microsoft.PowerAutomateDesktop",
+      "Microsoft.Todos", "Microsoft.549981C3F5F10"
+    ]
+  },
+  {
+    "Id": "RepairSystem",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reparar archivos del sistema (DISM + SFC)",
+    "Description": "Repara la imagen de Windows y verifica los archivos del sistema. Abre una ventana aparte y puede tardar 10 a 20 minutos.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "Start-Process powershell -ArgumentList '-NoExit','-Command','DISM /Online /Cleanup-Image /RestoreHealth; sfc /scannow'"
+    }
+  },
+  {
+    "Id": "ResetNetwork",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reiniciar la red",
+    "Description": "Limpia la caché DNS y restablece Winsock y la pila TCP/IP. Soluciona problemas de conexión. Requiere reiniciar la PC y puede borrar una IP fija configurada.",
+    "Risk": "Medio",
+    "Confirm": "Se va a restablecer la pila de red (DNS, Winsock y TCP/IP).\n\nSi usás IP fija, tendrás que configurarla de nuevo. Después hay que reiniciar la PC.\n\n¿Continuar?",
+    "commands": {
+      "apply": "ipconfig /flushdns | Out-Null; netsh winsock reset | Out-Null; netsh int ip reset | Out-Null; Write-Log '  Reiniciá la PC para completar el reseteo de red.'"
+    }
   }
 ]

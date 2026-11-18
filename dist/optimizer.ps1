@@ -46,6 +46,29 @@ $script:Tweaks = @'
     ]
   },
   {
+    "Id": "DisableLocation",
+    "Category": "Privacidad",
+    "Name": "Desactivar rastreo de ubicación",
+    "Description": "Bloquea el acceso de Windows y las apps a tu ubicación. Apps como Mapas o Clima dejan de ubicarte solas.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "Name": "Value", "Type": "String", "Value": "Deny", "OriginalValue": "Allow" }
+    ]
+  },
+  {
+    "Id": "DisableCopilotRecall",
+    "Category": "Privacidad",
+    "Name": "Desactivar Copilot y Recall",
+    "Description": "Aplica las políticas de Windows que apagan Copilot y el análisis de datos con IA (Recall), y oculta el botón de la barra. Según la compilación, Copilot como app aparte puede seguir instalado.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot", "Name": "TurnOffWindowsCopilotFeature", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI", "Name": "DisableAIDataAnalysis", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" },
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "ShowCopilotButton", "Type": "DWord", "Value": "0", "OriginalValue": "1" }
+    ]
+  },
+  {
     "Id": "DisableConsumerFeatures",
     "Category": "Debloat",
     "Name": "Desactivar apps sugeridas / consumer features",
@@ -77,14 +100,15 @@ $script:Tweaks = @'
     ]
   },
   {
-    "Id": "HighPerformancePower",
+    "Id": "UltimatePerformance",
     "Category": "Rendimiento",
-    "Name": "Plan de energía: Alto rendimiento",
-    "Description": "Activa el plan de alto rendimiento. En notebooks aumenta el consumo de batería.",
+    "Name": "Plan de energía: Ultimate Performance",
+    "Description": "Activa el plan de máximo rendimiento de Windows (menos latencia). En notebooks consume más batería. Al apagarlo vuelve a Equilibrado.",
     "Risk": "Bajo",
     "commands": {
-      "apply": "powercfg /setactive SCHEME_MIN",
-      "undo": "powercfg /setactive SCHEME_BALANCED"
+      "apply": "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 | Out-Null; powercfg /setactive 99999999-9999-9999-9999-999999999999; if ($LASTEXITCODE -ne 0) { throw 'No se pudo activar Ultimate Performance en este equipo.' }",
+      "undo": "powercfg /setactive SCHEME_BALANCED",
+      "test": "[bool]((powercfg /getactivescheme) -match '99999999-9999-9999-9999-999999999999')"
     }
   },
   {
@@ -97,6 +121,40 @@ $script:Tweaks = @'
       "apply": "powercfg /hibernate off",
       "undo": "powercfg /hibernate on"
     }
+  },
+  {
+    "Id": "ClassicContextMenu",
+    "Category": "Interfaz",
+    "Name": "Menú contextual clásico",
+    "Description": "Vuelve el clic derecho completo de Windows 10, sin tener que tocar \"Mostrar más opciones\". Reinicia el Explorador (la barra parpadea un instante).",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
+      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
+      "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
+    }
+  },
+  {
+    "Id": "EndTaskRightClick",
+    "Category": "Interfaz",
+    "Name": "Finalizar tarea con clic derecho",
+    "Description": "Agrega \"Finalizar tarea\" al clic derecho de los íconos de la barra de tareas. Sirve para cerrar apps trabadas sin abrir el Administrador de tareas.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings", "Name": "TaskbarEndTask", "Type": "DWord", "Value": "1", "OriginalValue": "<RemoveEntry>" }
+    ]
+  },
+  {
+    "Id": "DisableMouseAcceleration",
+    "Category": "Interfaz",
+    "Name": "Desactivar aceleración del mouse",
+    "Description": "El puntero responde siempre igual a tu movimiento (ideal para juegos y diseño). Se aplica al volver a iniciar sesión.",
+    "Risk": "Bajo",
+    "registry": [
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseSpeed", "Type": "String", "Value": "0", "OriginalValue": "1" },
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold1", "Type": "String", "Value": "0", "OriginalValue": "6" },
+      { "Path": "HKCU:\\Control Panel\\Mouse", "Name": "MouseThreshold2", "Type": "String", "Value": "0", "OriginalValue": "10" }
+    ]
   },
   {
     "Id": "ShowFileExtensions",
@@ -117,6 +175,53 @@ $script:Tweaks = @'
     "registry": [
       { "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "Name": "Hidden", "Type": "DWord", "Value": "1", "OriginalValue": "2" }
     ]
+  },
+  {
+    "Id": "CleanTempFiles",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Limpiar archivos temporales",
+    "Description": "Borra los temporales del usuario y de Windows y te dice cuánto espacio liberó. Los archivos en uso se saltean.",
+    "Risk": "Bajo",
+    "commands": { "apply": "Clear-TempFiles" }
+  },
+  {
+    "Id": "RemoveBloatApps",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Name": "Quitar apps preinstaladas innecesarias",
+    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Risk": "Medio",
+    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Getstarted",
+      "Microsoft.MicrosoftSolitaireCollection", "Microsoft.WindowsFeedbackHub", "Clipchamp.Clipchamp",
+      "Microsoft.MicrosoftOfficeHub", "Microsoft.People", "Microsoft.PowerAutomateDesktop",
+      "Microsoft.Todos", "Microsoft.549981C3F5F10"
+    ]
+  },
+  {
+    "Id": "RepairSystem",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reparar archivos del sistema (DISM + SFC)",
+    "Description": "Repara la imagen de Windows y verifica los archivos del sistema. Abre una ventana aparte y puede tardar 10 a 20 minutos.",
+    "Risk": "Bajo",
+    "commands": {
+      "apply": "Start-Process powershell -ArgumentList '-NoExit','-Command','DISM /Online /Cleanup-Image /RestoreHealth; sfc /scannow'"
+    }
+  },
+  {
+    "Id": "ResetNetwork",
+    "Kind": "action",
+    "Category": "Reparación",
+    "Name": "Reiniciar la red",
+    "Description": "Limpia la caché DNS y restablece Winsock y la pila TCP/IP. Soluciona problemas de conexión. Requiere reiniciar la PC y puede borrar una IP fija configurada.",
+    "Risk": "Medio",
+    "Confirm": "Se va a restablecer la pila de red (DNS, Winsock y TCP/IP).\n\nSi usás IP fija, tendrás que configurarla de nuevo. Después hay que reiniciar la PC.\n\n¿Continuar?",
+    "commands": {
+      "apply": "ipconfig /flushdns | Out-Null; netsh winsock reset | Out-Null; netsh int ip reset | Out-Null; Write-Log '  Reiniciá la PC para completar el reseteo de red.'"
+    }
   }
 ]
 
@@ -359,6 +464,7 @@ $script:Xaml = @'
             <StackPanel>
               <RadioButton x:Name="NavOptimizar" Style="{StaticResource NavItem}" Tag="&#xE945;" Content="Optimizar" IsChecked="True" GroupName="nav"/>
               <RadioButton x:Name="NavPersonalizar" Style="{StaticResource NavItem}" Tag="&#xE771;" Content="Personalizar" GroupName="nav"/>
+              <RadioButton x:Name="NavMantenimiento" Style="{StaticResource NavItem}" Tag="&#xE713;" Content="Mantenimiento" GroupName="nav"/>
               <RadioButton x:Name="NavRegistro" Style="{StaticResource NavItem}" Tag="&#xE8A5;" Content="Registro" GroupName="nav"/>
             </StackPanel>
           </DockPanel>
@@ -394,6 +500,9 @@ $script:Xaml = @'
             <ScrollViewer x:Name="PagePersonalizar" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
               <StackPanel x:Name="PanelPersonalizar" Margin="0,0,10,0"/>
             </ScrollViewer>
+            <ScrollViewer x:Name="PageMantenimiento" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+              <StackPanel x:Name="PanelMantenimiento" Margin="0,0,10,0"/>
+            </ScrollViewer>
             <Border x:Name="PageRegistro" Style="{StaticResource GlassCard}" Visibility="Collapsed" Padding="14">
               <TextBox x:Name="LogBox" IsReadOnly="True" Background="Transparent" BorderThickness="0"
                        Foreground="#A6E3A1" FontFamily="Consolas" FontSize="12.5"
@@ -412,6 +521,7 @@ $script:Xaml = @'
 $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
+$script:UiReady    = $false
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -421,6 +531,7 @@ function Write-Log {
     if ($script:LogBox) {
         $script:LogBox.AppendText($line + "`r`n")
         $script:LogBox.ScrollToEnd()
+        if ($script:UiReady) { Update-UI }   # refresca la ventana durante tareas largas
     }
 }
 
@@ -471,6 +582,9 @@ function Set-RegValue($Path, $Name, $Type, $Value) {
 
 # Devuelve $true si el tweak ya está aplicado (para mostrar el interruptor en ON al abrir)
 function Test-TweakApplied($Tweak) {
+    if ($Tweak.commands.test) {
+        try { return [bool](& ([scriptblock]::Create($Tweak.commands.test))) } catch { return $false }
+    }
     if ($Tweak.registry) {
         foreach ($r in $Tweak.registry) {
             $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
@@ -538,6 +652,49 @@ function Invoke-Tweak {
     }
 }
 
+# Borra temporales y devuelve los MB liberados
+function Clear-TempFiles {
+    $paths = @($env:TEMP, "$env:SystemRoot\Temp") | Select-Object -Unique
+    $before = 0
+    foreach ($p in $paths) {
+        $before += [long](Get-ChildItem $p -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+    }
+    foreach ($p in $paths) {
+        Write-Log "  Limpiando $p"
+        Get-ChildItem $p -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    $after = 0
+    foreach ($p in $paths) {
+        $after += [long](Get-ChildItem $p -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+    }
+    $mb = [math]::Round(($before - $after) / 1MB, 1)
+    Write-Log "  Espacio liberado: $mb MB"
+}
+
+# Acciones de un solo uso (limpieza, reparación): sin undo. Devuelve $true/$false
+function Invoke-Action {
+    param($Tweak)
+    Write-Log "Ejecutando: $($Tweak.Name)"
+    try {
+        foreach ($pkg in $Tweak.appx) {
+            $found = Get-AppxPackage -AllUsers -Name $pkg -ErrorAction SilentlyContinue
+            if ($found) {
+                $found | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+                Write-Log "  Quitada: $pkg"
+            }
+            Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
+                Where-Object { $_.DisplayName -eq $pkg } |
+                Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+        }
+        if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
+        Write-Log '  OK'
+        return $true
+    } catch {
+        Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
+    }
+}
+
 
 # ---------- UI: layout tipo Winhance con estilo glassmorphism ----------
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
@@ -583,26 +740,31 @@ $script:RestoreSwitch = $script:window.FindName('RestoreSwitch')
 $script:PageUI = @{
     Optimizar    = $script:window.FindName('PageOptimizar')
     Personalizar = $script:window.FindName('PagePersonalizar')
+    Mantenimiento = $script:window.FindName('PageMantenimiento')
     Registro     = $script:window.FindName('PageRegistro')
 }
 $script:Nav = @{
     Optimizar    = $script:window.FindName('NavOptimizar')
     Personalizar = $script:window.FindName('NavPersonalizar')
+    Mantenimiento = $script:window.FindName('NavMantenimiento')
     Registro     = $script:window.FindName('NavRegistro')
 }
 $script:Panels = @{
     Optimizar    = $script:window.FindName('PanelOptimizar')
     Personalizar = $script:window.FindName('PanelPersonalizar')
+    Mantenimiento = $script:window.FindName('PanelMantenimiento')
 }
 $script:PageInfo = @{
     Optimizar    = @('Optimizar', 'Privacidad, rendimiento y limpieza de Windows')
     Personalizar = @('Personalizar', 'Cómo se ve y se comporta el Explorador y el sistema')
+    Mantenimiento = @('Mantenimiento', 'Limpieza y reparación del sistema')
     Registro     = @('Registro', 'Todo lo que hizo la app en esta sesión')
 }
 # Qué categoría del JSON va en qué página
 $script:CategoryPage = @{
     'Privacidad' = 'Optimizar'; 'Rendimiento' = 'Optimizar'; 'Debloat' = 'Optimizar'
     'Interfaz'   = 'Personalizar'
+    'Limpieza'   = 'Mantenimiento'; 'Reparación' = 'Mantenimiento'
 }
 $script:CurrentPage  = 'Optimizar'
 $script:RestoreDone  = $false
@@ -680,23 +842,50 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     [void]$left.Children.Add($desc)
     [void]$left.Children.Add($chip)
 
-    $sw = New-Object Windows.Controls.Primitives.ToggleButton
-    $sw.Style = $script:window.FindResource('Switch')
-    $sw.VerticalAlignment = 'Center'
-    $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
-    $sw.Tag = $Tweak
-    $sw.IsChecked = [bool](Test-TweakApplied $Tweak)   # antes de enganchar el evento Click
+    if ($Tweak.Kind -eq 'action') {
+        # Acción de un solo uso: botón en lugar de interruptor
+        $sw = New-Object Windows.Controls.Button
+        $sw.Style = $script:window.FindResource('GlassButton')
+        $sw.Content = 'Ejecutar'
+        $sw.MinWidth = 100
+        $sw.VerticalAlignment = 'Center'
+        $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+        $sw.Tag = $Tweak
+        $sw.Add_Click({
+            param($sender, $e)
+            $t = $sender.Tag
+            if ($t.Confirm) {
+                $ans = [Windows.MessageBox]::Show($t.Confirm, 'NurOptimizador', 'YesNo', 'Question')
+                if ($ans -ne 'Yes') { return }
+            }
+            $sender.IsEnabled = $false
+            $sender.Content = 'Trabajando...'
+            Update-UI
+            $res = Invoke-Action -Tweak $t
+            $ok = [bool]($res | Select-Object -Last 1)
+            $sender.Content = if ($ok) { 'Hecho' } else { 'Reintentar' }
+            $sender.IsEnabled = $true
+        })
+    }
+    else {
+        $sw = New-Object Windows.Controls.Primitives.ToggleButton
+        $sw.Style = $script:window.FindResource('Switch')
+        $sw.VerticalAlignment = 'Center'
+        $sw.Margin = [Windows.Thickness]::new(20, 0, 0, 0)
+        $sw.Tag = $Tweak
+        $sw.IsChecked = [bool](Test-TweakApplied $Tweak)   # antes de enganchar el evento Click
 
-    # Click solo se dispara por acción del usuario: ON = aplicar, OFF = revertir
-    $sw.Add_Click({
-        param($sender, $e)
-        $t = $sender.Tag
-        $want = [bool]$sender.IsChecked
-        if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
-        $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
-        $ok = [bool]($res | Select-Object -Last 1)
-        if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
-    })
+        # Click solo se dispara por acción del usuario: ON = aplicar, OFF = revertir
+        $sw.Add_Click({
+            param($sender, $e)
+            $t = $sender.Tag
+            $want = [bool]$sender.IsChecked
+            if ($want -and $script:RestoreSwitch.IsChecked) { Initialize-RestorePoint }
+            $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
+            $ok = [bool]($res | Select-Object -Last 1)
+            if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
+        })
+    }
 
     [Windows.Controls.Grid]::SetColumn($sw, 1)
     [void]$grid.Children.Add($left)
@@ -759,7 +948,7 @@ foreach ($k in @($script:Nav.Keys)) {
 $script:SearchBox.Add_TextChanged({
     $q = $script:SearchBox.Text.Trim().ToLower()
     $script:SearchHint.Visibility = if ($q) { 'Collapsed' } else { 'Visible' }
-    $hits = @{ Optimizar = 0; Personalizar = 0 }
+    $hits = @{ Optimizar = 0; Personalizar = 0; Mantenimiento = 0 }
     foreach ($s in $script:Sections) {
         $vis = 0
         foreach ($r in $s.Rows) {
@@ -802,6 +991,7 @@ $script:window.Add_SourceInitialized({
     }
 })
 
+$script:UiReady = $true
 Show-Page 'Optimizar'
 Write-Log 'Listo. Cada interruptor aplica o revierte el ajuste al instante.'
 [void]$script:window.ShowDialog()

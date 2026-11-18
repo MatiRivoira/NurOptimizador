@@ -2,6 +2,7 @@
 $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
+$script:UiReady    = $false
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -11,6 +12,7 @@ function Write-Log {
     if ($script:LogBox) {
         $script:LogBox.AppendText($line + "`r`n")
         $script:LogBox.ScrollToEnd()
+        if ($script:UiReady) { Update-UI }   # refresca la ventana durante tareas largas
     }
 }
 
@@ -61,6 +63,9 @@ function Set-RegValue($Path, $Name, $Type, $Value) {
 
 # Devuelve $true si el tweak ya está aplicado (para mostrar el interruptor en ON al abrir)
 function Test-TweakApplied($Tweak) {
+    if ($Tweak.commands.test) {
+        try { return [bool](& ([scriptblock]::Create($Tweak.commands.test))) } catch { return $false }
+    }
     if ($Tweak.registry) {
         foreach ($r in $Tweak.registry) {
             $p = Get-ItemProperty -Path $r.Path -Name $r.Name -ErrorAction SilentlyContinue
@@ -120,6 +125,49 @@ function Invoke-Tweak {
             }
             if ($Tweak.commands.undo) { & ([scriptblock]::Create($Tweak.commands.undo)) | Out-Null }
         }
+        Write-Log '  OK'
+        return $true
+    } catch {
+        Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+# Borra temporales y devuelve los MB liberados
+function Clear-TempFiles {
+    $paths = @($env:TEMP, "$env:SystemRoot\Temp") | Select-Object -Unique
+    $before = 0
+    foreach ($p in $paths) {
+        $before += [long](Get-ChildItem $p -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+    }
+    foreach ($p in $paths) {
+        Write-Log "  Limpiando $p"
+        Get-ChildItem $p -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    $after = 0
+    foreach ($p in $paths) {
+        $after += [long](Get-ChildItem $p -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+    }
+    $mb = [math]::Round(($before - $after) / 1MB, 1)
+    Write-Log "  Espacio liberado: $mb MB"
+}
+
+# Acciones de un solo uso (limpieza, reparación): sin undo. Devuelve $true/$false
+function Invoke-Action {
+    param($Tweak)
+    Write-Log "Ejecutando: $($Tweak.Name)"
+    try {
+        foreach ($pkg in $Tweak.appx) {
+            $found = Get-AppxPackage -AllUsers -Name $pkg -ErrorAction SilentlyContinue
+            if ($found) {
+                $found | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+                Write-Log "  Quitada: $pkg"
+            }
+            Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
+                Where-Object { $_.DisplayName -eq $pkg } |
+                Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+        }
+        if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         Write-Log '  OK'
         return $true
     } catch {

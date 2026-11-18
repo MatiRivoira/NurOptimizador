@@ -234,6 +234,7 @@
             <StackPanel>
               <RadioButton x:Name="NavOptimizar" Style="{StaticResource NavItem}" Tag="&#xE945;" Content="Optimizar" IsChecked="True" GroupName="nav"/>
               <RadioButton x:Name="NavPersonalizar" Style="{StaticResource NavItem}" Tag="&#xE771;" Content="Personalizar" GroupName="nav"/>
+              <RadioButton x:Name="NavMantenimiento" Style="{StaticResource NavItem}" Tag="&#xE713;" Content="Mantenimiento" GroupName="nav"/>
               <RadioButton x:Name="NavRegistro" Style="{StaticResource NavItem}" Tag="&#xE8A5;" Content="Registro" GroupName="nav"/>
             </StackPanel>
           </DockPanel>
@@ -268,6 +269,9 @@
             </ScrollViewer>
             <ScrollViewer x:Name="PagePersonalizar" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
               <StackPanel x:Name="PanelPersonalizar" Margin="0,0,10,0"/>
+            </ScrollViewer>
+            <ScrollViewer x:Name="PageMantenimiento" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+              <StackPanel x:Name="PanelMantenimiento" Margin="0,0,10,0"/>
             </ScrollViewer>
             <Border x:Name="PageRegistro" Style="{StaticResource GlassCard}" Visibility="Collapsed" Padding="14">
               <TextBox x:Name="LogBox" IsReadOnly="True" Background="Transparent" BorderThickness="0"
