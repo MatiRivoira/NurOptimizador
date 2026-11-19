@@ -31,3 +31,21 @@ $content = @(
 
 [IO.File]::WriteAllText($out, $content, (New-Object Text.UTF8Encoding $false))
 Write-Host "Generado: $out"
+
+# Set-ItemProperty : Intento de realizar una operación no válida.
+# En línea: 1741 Carácter: 5                                                                                                  +     Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value (Conv ...                                                 +     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                                         + CategoryInfo          : PermissionDenied: (AllowNewsAndInterests:String) [Set-ItemProperty], UnauthorizedAccessExcep     tion                                                                                                                         + FullyQualifiedErrorId : System.UnauthorizedAccessException,Microsoft.PowerShell.Commands.SetItemPropertyCommand
+
+# Stop-Process : No se encuentra ningún proceso con el nombre "explorer". Compruebe el nombre del proceso y ejecute de nuevo
+# el cmdlet.
+# En línea: 1 Carácter: 1
+# + Stop-Process -Name explorer -ForceRR
+#     + CategoryInfo          : ObjectNotFound: (explorer:String) [Stop-Process], ProcessCommandException
+#     + FullyQualifiedErrorId : NoProcessFoundForGivenName,Microsoft.PowerShell.Commands.StopProcessCommand
+
+# Stop-Process : No se encuentra ningún proceso con el nombre "explorer". Compruebe el nombre del proceso y ejecute de nuevo
+# el cmdlet.
+# En línea: 1 Carácter: 280
+# + ... rce -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force
+# +                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : ObjectNotFound: (explorer:String) [Stop-Process], ProcessCommandException
+#     + FullyQualifiedErrorId : NoProcessFoundForGivenName,Microsoft.PowerShell.Commands.StopProcessCommand

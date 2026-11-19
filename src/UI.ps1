@@ -328,7 +328,7 @@ function Enter-Advanced {
 }
 
 # Aplica una lista de ajustes mostrando la barra de progreso
-function Start-Batch([string[]]$Ids) {
+function Invoke-BatchCore([string[]]$Ids) {
     $total = $Ids.Count
     $i = 0
     foreach ($id in $Ids) {
@@ -350,6 +350,19 @@ function Start-Batch([string[]]$Ids) {
     $script:WzProgBar.Value = 100
     $script:WzProgText.Text = 'Terminando...'
     Update-UI
+}
+
+function Start-Batch([string[]]$Ids) {
+    $script:DeferExplorer = $true      # varios ajustes reinician el Explorador: se hace una sola vez al final
+    try { Invoke-BatchCore $Ids }
+    finally {
+        $script:DeferExplorer = $false
+        if ($script:ExplorerPending) {
+            $script:WzProgText.Text = 'Reiniciando el Explorador...'
+            Update-UI
+            Invoke-ExplorerRestart
+        }
+    }
 }
 
 function Show-Done {

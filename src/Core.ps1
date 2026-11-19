@@ -66,8 +66,8 @@ function ConvertTo-RegValue($Type, $Value) {
 }
 
 function Set-RegValue($Path, $Name, $Type, $Value) {
-    if (-not (Test-Path $Path)) { New-Item -Path $Path -Force | Out-Null }
-    Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value (ConvertTo-RegValue $Type $Value) -Force
+    if (-not (Test-Path $Path)) { New-Item -Path $Path -Force -ErrorAction Stop | Out-Null }
+    Set-ItemProperty -Path $Path -Name $Name -Type $Type -Value (ConvertTo-RegValue $Type $Value) -Force -ErrorAction Stop
 }
 
 # Devuelve $true si el tweak ya está aplicado (para mostrar el interruptor en ON al abrir)
@@ -116,6 +116,7 @@ function Invoke-Tweak {
     param($Tweak, [switch]$Undo)
     $backup = Get-Backup
     $mode = if ($Undo) { 'Revirtiendo' } else { 'Aplicando' }
+    $regFail = 0
     Write-Log "${mode}: $($Tweak.Name)"
 
     try {
@@ -125,7 +126,10 @@ function Invoke-Tweak {
                 $backup[$Tweak.Id] = Get-Snapshot $Tweak
                 Save-Backup $backup
             }
-            foreach ($r in $Tweak.registry) { Set-RegValue $r.Path $r.Name $r.Type $r.Value }
+            foreach ($r in $Tweak.registry) {
+                try { Set-RegValue $r.Path $r.Name $r.Type $r.Value }
+                catch { $regFail++; Write-Log "  No se pudo escribir $($r.Name): $($_.Exception.Message)" }
+            }
             foreach ($s in $Tweak.service) {
                 $svc = Get-Service -Name $s.Name -ErrorAction SilentlyContinue
                 if (-not $svc) { Write-Log "  Servicio $($s.Name): no existe en este equipo, se omite"; continue }
@@ -173,6 +177,7 @@ function Invoke-Tweak {
             }
             if ($Tweak.commands.undo) { & ([scriptblock]::Create($Tweak.commands.undo)) | Out-Null }
         }
+        if ($regFail -gt 0) { Write-Log "  Terminó con $regFail error(es) de registro."; return $false }
         Write-Log '  OK'
         return $true
     } catch {
@@ -290,31 +295,42 @@ function Restore-StartMenuPins {
     Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
 }
 
-# Flecha de accesos directos: se reemplaza por un ícono transparente generado acá mismo
-function New-BlankIcon([string]$Path) {
+# Flecha de accesos directos: se reemplaza por un ícono 100% transparente generado acá mismo.
+# La máscara AND va en 1: si Windows ignora el canal alfa usa la máscara, y así no aparece el cuadrado negro.
+function New-BlankIcon([string]$Path, [int]$Size = 32) {
+    $pix  = $Size * $Size * 4
+    $mask = [int]([math]::Ceiling($Size / 32.0) * 4) * $Size      # filas alineadas a 32 bits
     $ms = New-Object System.IO.MemoryStream
     $bw = New-Object System.IO.BinaryWriter($ms)
-    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                     # cabecera ICO
-    $bw.Write([byte]16); $bw.Write([byte]16); $bw.Write([byte]0); $bw.Write([byte]0)    # 16x16
-    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]1128); $bw.Write([uint32]22)
-    $bw.Write([uint32]40); $bw.Write([int32]16); $bw.Write([int32]32)                     # BITMAPINFOHEADER
-    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]0); $bw.Write([uint32]1088)
+    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                          # cabecera ICO
+    $bw.Write([byte]$Size); $bw.Write([byte]$Size); $bw.Write([byte]0); $bw.Write([byte]0)
+    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32](40 + $pix + $mask)); $bw.Write([uint32]22)
+    $bw.Write([uint32]40); $bw.Write([int32]$Size); $bw.Write([int32]($Size * 2))              # BITMAPINFOHEADER
+    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]0); $bw.Write([uint32]($pix + $mask))
     $bw.Write([int32]0); $bw.Write([int32]0); $bw.Write([uint32]0); $bw.Write([uint32]0)
-    $bw.Write([byte[]](New-Object byte[] 1024))                                           # píxeles transparentes
-    $bw.Write([byte[]](New-Object byte[] 64))                                             # máscara
+    $bw.Write([byte[]]([byte[]]::new($pix)))                                                    # píxeles: alfa 0
+    $maskBytes = [byte[]]::new($mask)
+    for ($i = 0; $i -lt $mask; $i++) { $maskBytes[$i] = 255 }                                   # máscara: todo transparente
+    $bw.Write([byte[]]$maskBytes)
     [System.IO.File]::WriteAllBytes($Path, $ms.ToArray())
 }
 function Hide-ShortcutArrow {
-    $ico = Join-Path $script:AppDir 'blank.ico'
+    $dir = Join-Path $env:ProgramData 'NurOptimizador'        # legible para todos los usuarios
+    New-Item $dir -ItemType Directory -Force | Out-Null
+    $ico = Join-Path $dir 'blank.ico'
     New-BlankIcon $ico
     $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons'
     if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
-    Set-ItemProperty -Path $key -Name '29' -Value "$ico,0" -Type String -Force
-    Stop-Process -Name explorer -Force
+    Set-ItemProperty -Path $key -Name '29' -Value $ico -Type String -Force
+    Restart-Explorer -ClearIconCache
 }
 function Show-ShortcutArrow {
     Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons' -Name '29' -ErrorAction SilentlyContinue
-    Stop-Process -Name explorer -Force
+    Restart-Explorer -ClearIconCache
+}
+function Test-ShortcutArrowHidden {
+    $v = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons' -Name '29' -ErrorAction SilentlyContinue).'29'
+    return [bool]($v -and ($v -like '*NurOptimizador*blank.ico') -and (Test-Path $v))
 }
 
 # ---------- Efectos visuales: aplicar en vivo (como la ventana "Opciones de rendimiento") ----------
@@ -364,8 +380,8 @@ function Update-VisualEffectsLive {
     [void][NurSpi]::SetParam(0x0025, ($d.DragFullWindows -eq '1'))     # contenido de la ventana al arrastrar
     [void][NurSpi]::SetParam(0x004B, ($d.FontSmoothing -ne '0'))       # suavizar bordes de fuentes
     [void][NurSpi]::SetMinAnimate(($wm.MinAnimate -eq '1'))            # animar al minimizar/maximizar
-    Write-Log '  Efectos aplicados a la sesión actual. Reiniciando el Explorador...'
-    Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+    Write-Log '  Efectos aplicados a la sesión actual.'
+    Restart-Explorer
 }
 
 # Compara por lo que importa (no por los bytes exactos de la máscara, que Windows puede reescribir)
@@ -378,4 +394,32 @@ function Test-VisualEffects {
     if (($m[0] -band 0x0E) -ne 0 -or ($m[1] -band 0x2C) -ne 0 -or ($m[2] -band 0x04) -ne 0 -or ($m[4] -band 0x02) -ne 0) { return $false }
     return ($d.DragFullWindows -eq '1' -and $d.FontSmoothing -eq '2' -and $wm.MinAnimate -eq '0' -and
             $a.ListviewAlphaSelect -eq 1 -and $a.IconsOnly -eq 0 -and $a.ListviewShadow -eq 0 -and $a.TaskbarAnimations -eq 0)
+}
+
+# ---------- Reinicio del Explorador ----------
+$script:DeferExplorer     = $false   # en un lote (modo rápido) se pospone y se hace una sola vez al final
+$script:ExplorerPending   = $false
+$script:IconCachePending  = $false
+
+function Invoke-ExplorerRestart {
+    $clear = $script:IconCachePending
+    $script:ExplorerPending  = $false
+    $script:IconCachePending = $false
+    Write-Log '  Reiniciando el Explorador...'
+    Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+    if ($clear) {
+        Remove-Item "$env:LOCALAPPDATA\IconCache.db" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\iconcache_*.db" -Force -ErrorAction SilentlyContinue
+    }
+    # Windows relanza el shell solo. Si en 10 segundos no volvió, lo lanzamos nosotros.
+    $deadline = (Get-Date).AddSeconds(10)
+    do { Start-Sleep -Milliseconds 400 } while (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline)
+    if (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }
+}
+
+function Restart-Explorer {
+    param([switch]$ClearIconCache)
+    if ($ClearIconCache) { $script:IconCachePending = $true }
+    if ($script:DeferExplorer) { $script:ExplorerPending = $true; return }
+    Invoke-ExplorerRestart
 }

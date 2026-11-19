@@ -904,8 +904,8 @@
     "Description": "Vuelve el clic derecho completo de Windows 10, sin tener que tocar \"Mostrar más opciones\". Reinicia el Explorador (la barra parpadea un instante).",
     "Risk": "Bajo",
     "commands": {
-      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Stop-Process -Name explorer -Force",
-      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force",
+      "apply": "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Value '' -Force | Out-Null; Restart-Explorer",
+      "undo": "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Restart-Explorer",
       "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
     },
     "Optional": true,
@@ -1009,8 +1009,8 @@
       }
     ],
     "commands": {
-      "apply": "Stop-Process -Name explorer -Force",
-      "undo": "Stop-Process -Name explorer -Force"
+      "apply": "Restart-Explorer",
+      "undo": "Restart-Explorer"
     },
     "Quick": true
   },
@@ -1049,12 +1049,12 @@
     "Id": "HideShortcutArrow",
     "Category": "Interfaz",
     "Name": "Quitar flecha de los accesos directos",
-    "Description": "Saca la flechita que aparece sobre los íconos de accesos directos. Es solo estético. Si no se ve el cambio enseguida, cerrá sesión o reiniciá. Reinicia el Explorador.",
+    "Description": "Saca la flechita que aparece sobre los íconos de accesos directos, usando un ícono transparente propio. Limpia la caché de íconos y reinicia el Explorador (parpadea la barra). Se aplica a todos los usuarios de la PC.",
     "Risk": "Bajo",
     "commands": {
       "apply": "Hide-ShortcutArrow",
       "undo": "Show-ShortcutArrow",
-      "test": "[bool](Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons' -Name '29' -ErrorAction SilentlyContinue)"
+      "test": "Test-ShortcutArrowHidden"
     },
     "Optional": true,
     "OptionalGroup": "Personalización"
@@ -1063,7 +1063,7 @@
     "Id": "CleanTaskbar",
     "Category": "Barra de tareas",
     "Name": "Barra de tareas limpia",
-    "Description": "Oculta la búsqueda, la vista de tareas, los widgets y el chat. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Description": "Oculta la búsqueda, la vista de tareas y los widgets. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
     "Risk": "Bajo",
     "registry": [
       {
@@ -1071,7 +1071,7 @@
         "Name": "SearchboxTaskbarMode",
         "Type": "DWord",
         "Value": "0",
-        "OriginalValue": "1"
+        "OriginalValue": "3"
       },
       {
         "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
@@ -1081,23 +1081,16 @@
         "OriginalValue": "1"
       },
       {
-        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Dsh",
         "Name": "AllowNewsAndInterests",
         "Type": "DWord",
         "Value": "0",
         "OriginalValue": "<RemoveEntry>"
-      },
-      {
-        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Chat",
-        "Name": "ChatIcon",
-        "Type": "DWord",
-        "Value": "3",
-        "OriginalValue": "<RemoveEntry>"
       }
     ],
     "commands": {
-      "apply": "Stop-Process -Name explorer -Force",
-      "undo": "Stop-Process -Name explorer -Force"
+      "apply": "Restart-Explorer",
+      "undo": "Restart-Explorer"
     },
     "Quick": true
   },
@@ -1110,7 +1103,7 @@
     "Risk": "Bajo",
     "Confirm": "Se van a desanclar TODAS las apps de la barra de tareas de este usuario.\n\nEl Explorador se reinicia y la barra parpadea un instante. Podés volver a anclar apps cuando quieras.\n\n¿Continuar?",
     "commands": {
-      "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force"
+      "apply": "Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path (Join-Path $env:APPDATA 'Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar\\*') -Force -ErrorAction SilentlyContinue; Restart-Explorer"
     },
     "Quick": true
   },
