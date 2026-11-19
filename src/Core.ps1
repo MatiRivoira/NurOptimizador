@@ -296,22 +296,27 @@ function Restore-StartMenuPins {
 }
 
 # Flecha de accesos directos: se reemplaza por un ícono 100% transparente generado acá mismo.
-# La máscara AND va en 1: si Windows ignora el canal alfa usa la máscara, y así no aparece el cuadrado negro.
+# Es un ícono CLÁSICO de 4 bits, sin canal alfa: la transparencia sale solo de la máscara AND (todo en 1).
+# Así no depende de cómo Windows interprete el alfa (un alfa en cero hacía que apareciera un cuadrado negro).
 function New-BlankIcon([string]$Path, [int]$Size = 32) {
-    $pix  = $Size * $Size * 4
-    $mask = [int]([math]::Ceiling($Size / 32.0) * 4) * $Size      # filas alineadas a 32 bits
+    $stride = [int]([math]::Ceiling($Size * 4 / 32.0) * 4)     # bytes por fila del bitmap de 4 bits
+    $xor    = $stride * $Size
+    $andRow = [int]([math]::Ceiling($Size / 32.0) * 4)
+    $and    = $andRow * $Size
+    $img    = 40 + 64 + $xor + $and                            # cabecera + paleta de 16 colores + bitmap + máscara
     $ms = New-Object System.IO.MemoryStream
     $bw = New-Object System.IO.BinaryWriter($ms)
-    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                          # cabecera ICO
-    $bw.Write([byte]$Size); $bw.Write([byte]$Size); $bw.Write([byte]0); $bw.Write([byte]0)
-    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32](40 + $pix + $mask)); $bw.Write([uint32]22)
-    $bw.Write([uint32]40); $bw.Write([int32]$Size); $bw.Write([int32]($Size * 2))              # BITMAPINFOHEADER
-    $bw.Write([uint16]1); $bw.Write([uint16]32); $bw.Write([uint32]0); $bw.Write([uint32]($pix + $mask))
-    $bw.Write([int32]0); $bw.Write([int32]0); $bw.Write([uint32]0); $bw.Write([uint32]0)
-    $bw.Write([byte[]]([byte[]]::new($pix)))                                                    # píxeles: alfa 0
-    $maskBytes = [byte[]]::new($mask)
-    for ($i = 0; $i -lt $mask; $i++) { $maskBytes[$i] = 255 }                                   # máscara: todo transparente
-    $bw.Write([byte[]]$maskBytes)
+    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                            # cabecera ICO
+    $bw.Write([byte]$Size); $bw.Write([byte]$Size); $bw.Write([byte]16); $bw.Write([byte]0)     # tamaño, 16 colores
+    $bw.Write([uint16]1); $bw.Write([uint16]4); $bw.Write([uint32]$img); $bw.Write([uint32]22)
+    $bw.Write([uint32]40); $bw.Write([int32]$Size); $bw.Write([int32]($Size * 2))               # BITMAPINFOHEADER
+    $bw.Write([uint16]1); $bw.Write([uint16]4); $bw.Write([uint32]0); $bw.Write([uint32]($xor + $and))
+    $bw.Write([int32]0); $bw.Write([int32]0); $bw.Write([uint32]16); $bw.Write([uint32]0)
+    $bw.Write([byte[]]([byte[]]::new(64)))                                                      # paleta (negro)
+    $bw.Write([byte[]]([byte[]]::new($xor)))                                                    # píxeles: índice 0
+    $mask = [byte[]]::new($and)
+    for ($i = 0; $i -lt $and; $i++) { $mask[$i] = 255 }                                         # máscara: todo transparente
+    $bw.Write($mask)
     [System.IO.File]::WriteAllBytes($Path, $ms.ToArray())
 }
 function Hide-ShortcutArrow {
@@ -319,6 +324,16 @@ function Hide-ShortcutArrow {
     New-Item $dir -ItemType Directory -Force | Out-Null
     $ico = Join-Path $dir 'blank.ico'
     New-BlankIcon $ico
+
+    # Verificación: el ícono tiene que cargar y ser transparente ANTES de tocar el registro
+    Add-Type -AssemblyName System.Drawing
+    $icon = New-Object System.Drawing.Icon($ico)
+    $bmp  = $icon.ToBitmap()
+    $alpha = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
+    $bmp.Dispose(); $icon.Dispose()
+    if ($alpha -ne 0) { throw 'El ícono transparente no se generó bien. No se cambió nada.' }
+    Write-Log '  Ícono transparente verificado.'
+
     $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons'
     if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
     Set-ItemProperty -Path $key -Name '29' -Value $ico -Type String -Force
