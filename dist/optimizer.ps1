@@ -1959,44 +1959,49 @@ function Restore-StartMenuPins {
     Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
 }
 
-# Flecha de accesos directos: se reemplaza por un ícono 100% transparente generado acá mismo.
-# Es un ícono CLÁSICO de 4 bits, sin canal alfa: la transparencia sale solo de la máscara AND (todo en 1).
-# Así no depende de cómo Windows interprete el alfa (un alfa en cero hacía que apareciera un cuadrado negro).
-function New-BlankIcon([string]$Path, [int]$Size = 32) {
-    $stride = [int]([math]::Ceiling($Size * 4 / 32.0) * 4)     # bytes por fila del bitmap de 4 bits
-    $xor    = $stride * $Size
-    $andRow = [int]([math]::Ceiling($Size / 32.0) * 4)
-    $and    = $andRow * $Size
-    $img    = 40 + 64 + $xor + $and                            # cabecera + paleta de 16 colores + bitmap + máscara
-    $ms = New-Object System.IO.MemoryStream
-    $bw = New-Object System.IO.BinaryWriter($ms)
-    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]1)                            # cabecera ICO
-    $bw.Write([byte]$Size); $bw.Write([byte]$Size); $bw.Write([byte]16); $bw.Write([byte]0)     # tamaño, 16 colores
-    $bw.Write([uint16]1); $bw.Write([uint16]4); $bw.Write([uint32]$img); $bw.Write([uint32]22)
-    $bw.Write([uint32]40); $bw.Write([int32]$Size); $bw.Write([int32]($Size * 2))               # BITMAPINFOHEADER
-    $bw.Write([uint16]1); $bw.Write([uint16]4); $bw.Write([uint32]0); $bw.Write([uint32]($xor + $and))
-    $bw.Write([int32]0); $bw.Write([int32]0); $bw.Write([uint32]16); $bw.Write([uint32]0)
-    $bw.Write([byte[]]([byte[]]::new(64)))                                                      # paleta (negro)
-    $bw.Write([byte[]]([byte[]]::new($xor)))                                                    # píxeles: índice 0
-    $mask = [byte[]]::new($and)
-    for ($i = 0; $i -lt $and; $i++) { $mask[$i] = 255 }                                         # máscara: todo transparente
-    $bw.Write($mask)
-    [System.IO.File]::WriteAllBytes($Path, $ms.ToArray())
+# Flecha de accesos directos: se reemplaza por un ícono 100% transparente propio.
+# Mismo enfoque que usa Winhance: un .ico multitamaño con imágenes PNG transparentes, guardado en C:\Windows\blank.ico.
+# (Un ícono de un solo tamaño, no transparente o sacado de shell32.dll deja un cuadrado negro sobre los accesos directos.)
+function New-BlankIcon([string]$Path) {
+    Add-Type -AssemblyName System.Drawing
+    $sizes = 16, 24, 32, 48, 64, 128, 256
+    $pngs  = @()
+    foreach ($sz in $sizes) {
+        $bmp = New-Object System.Drawing.Bitmap($sz, $sz, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+        $g = [System.Drawing.Graphics]::FromImage($bmp)
+        $g.Clear([System.Drawing.Color]::Transparent)
+        $g.Dispose()
+        $ms = New-Object System.IO.MemoryStream
+        $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+        $pngs += ,($ms.ToArray())
+        $ms.Dispose(); $bmp.Dispose()
+    }
+    $out = New-Object System.IO.MemoryStream
+    $bw  = New-Object System.IO.BinaryWriter($out)
+    $bw.Write([uint16]0); $bw.Write([uint16]1); $bw.Write([uint16]$sizes.Count)           # cabecera ICO
+    $offset = 6 + 16 * $sizes.Count
+    for ($i = 0; $i -lt $sizes.Count; $i++) {
+        $dim = if ($sizes[$i] -ge 256) { 0 } else { $sizes[$i] }                           # 0 significa 256
+        $bw.Write([byte]$dim); $bw.Write([byte]$dim); $bw.Write([byte]0); $bw.Write([byte]0)
+        $bw.Write([uint16]1); $bw.Write([uint16]32)
+        $bw.Write([uint32]$pngs[$i].Length); $bw.Write([uint32]$offset)
+        $offset += $pngs[$i].Length
+    }
+    foreach ($png in $pngs) { $bw.Write([byte[]]$png) }
+    [System.IO.File]::WriteAllBytes($Path, $out.ToArray())
 }
 function Hide-ShortcutArrow {
-    $dir = Join-Path $env:ProgramData 'NurOptimizador'        # legible para todos los usuarios
-    New-Item $dir -ItemType Directory -Force | Out-Null
-    $ico = Join-Path $dir 'blank.ico'
+    $ico = Join-Path $env:SystemRoot 'blank.ico'
     New-BlankIcon $ico
 
     # Verificación: el ícono tiene que cargar y ser transparente ANTES de tocar el registro
     Add-Type -AssemblyName System.Drawing
-    $icon = New-Object System.Drawing.Icon($ico)
-    $bmp  = $icon.ToBitmap()
+    $icon  = New-Object System.Drawing.Icon($ico)
+    $bmp   = $icon.ToBitmap()
     $alpha = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
     $bmp.Dispose(); $icon.Dispose()
     if ($alpha -ne 0) { throw 'El ícono transparente no se generó bien. No se cambió nada.' }
-    Write-Log '  Ícono transparente verificado.'
+    Write-Log "  Ícono transparente verificado ($ico)."
 
     $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons'
     if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
@@ -2009,7 +2014,7 @@ function Show-ShortcutArrow {
 }
 function Test-ShortcutArrowHidden {
     $v = (Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons' -Name '29' -ErrorAction SilentlyContinue).'29'
-    return [bool]($v -and ($v -like '*NurOptimizador*blank.ico') -and (Test-Path $v))
+    return [bool]($v -and ($v -eq (Join-Path $env:SystemRoot 'blank.ico')) -and (Test-Path $v))
 }
 
 # ---------- Efectos visuales: aplicar en vivo (como la ventana "Opciones de rendimiento") ----------
