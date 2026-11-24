@@ -499,14 +499,13 @@ $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
 
-# Versión visible: barra de título, barra lateral, pantalla de inicio y Registro
+# Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
 function Set-AppText([string]$Name, [string]$Text) {
     $el = $script:window.FindName($Name)
     if ($el) { $el.Text = $Text }
 }
-Set-AppText 'TitleText'  "NurOptimizador  v$($script:AppVersion)"
-Set-AppText 'SideVersion' "Versión $($script:AppVersion)"
-Set-AppText 'WzVersion'   "Versión $($script:AppVersion)"
+Set-AppText 'SideVersion' "v$($script:AppVersion)"
+Set-AppText 'WzVersion'   "v$($script:AppVersion)"
 Write-Log "NurOptimizador v$($script:AppVersion)"
 
 $script:UiReady = $true

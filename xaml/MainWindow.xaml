@@ -238,11 +238,10 @@
           <DockPanel>
             <StackPanel DockPanel.Dock="Bottom">
               <Button x:Name="BtnRestore" Style="{StaticResource GlassButton}" Content="Crear punto ahora"/>
-              <TextBlock x:Name="SideVersion" Foreground="#80FFFFFF" FontSize="11.5" HorizontalAlignment="Center" Margin="0,12,0,0"/>
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
               <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
-              <TextBlock Text="Windows 11" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
+              <TextBlock x:Name="SideVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
             </StackPanel>
             <StackPanel>
               <RadioButton x:Name="NavOptimizar" Style="{StaticResource NavItem}" Tag="&#xE945;" Content="Optimizar" IsChecked="True" GroupName="nav"/>
@@ -371,7 +370,10 @@
 
             </Grid>
           </Border>
-          <TextBlock x:Name="WzVersion" Foreground="#80FFFFFF" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+          <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,0,0,0">
+            <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
+            <TextBlock x:Name="WzVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
+          </StackPanel>
         </Grid>
       </Grid>
     </Grid>
