@@ -3,7 +3,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.0.2'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.0.3'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -296,22 +296,42 @@ function Restore-StartMenuPins {
     Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue
 }
 
-# Flecha de accesos directos: se reemplaza por un ícono 100% transparente propio.
-# Mismo enfoque que usa Winhance: un .ico multitamaño con imágenes PNG transparentes, guardado en C:\Windows\blank.ico.
-# (Un ícono de un solo tamaño, no transparente o sacado de shell32.dll deja un cuadrado negro sobre los accesos directos.)
+# Flecha de accesos directos: se reemplaza por un ícono transparente propio, en C:\Windows\blank.ico (como Winhance).
+# Detalle importante: si TODOS los píxeles tienen alfa 0, Windows puede entender que el ícono "no tiene canal alfa"
+# y dibujarlo como un cuadrado negro. Por eso hay un único píxel con alfa 1 (invisible) en cada imagen.
+# Además las imágenes chicas (16 a 48) van como bitmaps de 32 bits con la máscara AND en "transparente",
+# y las grandes (64 a 256) como PNG, que es la combinación que usan los .ico modernos.
 function New-BlankIcon([string]$Path) {
     Add-Type -AssemblyName System.Drawing
-    $sizes = 16, 24, 32, 48, 64, 128, 256
-    $pngs  = @()
+    $sizes  = 16, 24, 32, 48, 64, 128, 256
+    $images = @()
     foreach ($sz in $sizes) {
-        $bmp = New-Object System.Drawing.Bitmap($sz, $sz, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
-        $g = [System.Drawing.Graphics]::FromImage($bmp)
-        $g.Clear([System.Drawing.Color]::Transparent)
-        $g.Dispose()
-        $ms = New-Object System.IO.MemoryStream
-        $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
-        $pngs += ,($ms.ToArray())
-        $ms.Dispose(); $bmp.Dispose()
+        if ($sz -le 48) {
+            $pix  = [byte[]]::new($sz * $sz * 4)
+            $pix[$pix.Length - 1] = 1                                   # un píxel con alfa 1 (casi invisible)
+            $row  = [int]([math]::Ceiling($sz / 32.0) * 4)
+            $mask = [byte[]]::new($row * $sz)
+            for ($i = 0; $i -lt $mask.Length; $i++) { $mask[$i] = 255 }  # máscara AND: todo transparente
+            $ms = New-Object System.IO.MemoryStream
+            $w  = New-Object System.IO.BinaryWriter($ms)
+            $w.Write([uint32]40); $w.Write([int32]$sz); $w.Write([int32]($sz * 2))
+            $w.Write([uint16]1); $w.Write([uint16]32); $w.Write([uint32]0); $w.Write([uint32]($pix.Length + $mask.Length))
+            $w.Write([int32]0); $w.Write([int32]0); $w.Write([uint32]0); $w.Write([uint32]0)
+            $w.Write([byte[]]$pix); $w.Write([byte[]]$mask)
+            $images += ,($ms.ToArray())
+            $ms.Dispose()
+        }
+        else {
+            $bmp = New-Object System.Drawing.Bitmap($sz, $sz, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.Clear([System.Drawing.Color]::Transparent)
+            $g.Dispose()
+            $bmp.SetPixel($sz - 1, 0, [System.Drawing.Color]::FromArgb(1, 0, 0, 0))   # un píxel con alfa 1
+            $ms = New-Object System.IO.MemoryStream
+            $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+            $images += ,($ms.ToArray())
+            $ms.Dispose(); $bmp.Dispose()
+        }
     }
     $out = New-Object System.IO.MemoryStream
     $bw  = New-Object System.IO.BinaryWriter($out)
@@ -321,12 +341,13 @@ function New-BlankIcon([string]$Path) {
         $dim = if ($sizes[$i] -ge 256) { 0 } else { $sizes[$i] }                           # 0 significa 256
         $bw.Write([byte]$dim); $bw.Write([byte]$dim); $bw.Write([byte]0); $bw.Write([byte]0)
         $bw.Write([uint16]1); $bw.Write([uint16]32)
-        $bw.Write([uint32]$pngs[$i].Length); $bw.Write([uint32]$offset)
-        $offset += $pngs[$i].Length
+        $bw.Write([uint32]$images[$i].Length); $bw.Write([uint32]$offset)
+        $offset += $images[$i].Length
     }
-    foreach ($png in $pngs) { $bw.Write([byte[]]$png) }
+    foreach ($img in $images) { $bw.Write([byte[]]$img) }
     [System.IO.File]::WriteAllBytes($Path, $out.ToArray())
 }
+
 # Verifica el .ico sin usar System.Drawing.Icon (esa clase no sabe leer íconos con PNG adentro)
 function Test-BlankIcon([string]$Path) {
     Add-Type -AssemblyName System.Drawing
@@ -340,13 +361,23 @@ function Test-BlankIcon([string]$Path) {
         $len = [int][BitConverter]::ToUInt32($b, $e + 8)
         $off = [int][BitConverter]::ToUInt32($b, $e + 12)
         if ($len -le 8 -or ($off + $len) -gt $b.Length) { return $false }                                     # entrada dentro del archivo
-        if ($b[$off] -ne 0x89 -or $b[$off + 1] -ne 0x50 -or $b[$off + 2] -ne 0x4E -or $b[$off + 3] -ne 0x47) { return $false }  # firma PNG
-        $ms  = [System.IO.MemoryStream]::new($b, $off, $len)
-        $img = [System.Drawing.Image]::FromStream($ms)
-        $bmp = New-Object System.Drawing.Bitmap($img)
-        $a   = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
-        $bmp.Dispose(); $img.Dispose(); $ms.Dispose()
-        if ($a -ne 0) { return $false }                                                                       # tiene que ser transparente
+        if ($b[$off] -eq 0x89 -and $b[$off + 1] -eq 0x50 -and $b[$off + 2] -eq 0x4E -and $b[$off + 3] -eq 0x47) {
+            # imagen PNG: se decodifica y el píxel central tiene que ser transparente
+            $ms  = [System.IO.MemoryStream]::new($b, $off, $len)
+            $img = [System.Drawing.Image]::FromStream($ms)
+            $bmp = New-Object System.Drawing.Bitmap($img)
+            $a   = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
+            $bmp.Dispose(); $img.Dispose(); $ms.Dispose()
+            if ($a -ne 0) { return $false }
+        }
+        else {
+            # imagen bitmap de 32 bits: cabecera de 40 bytes y píxel central con alfa 0
+            if ([BitConverter]::ToUInt32($b, $off) -ne 40 -or [BitConverter]::ToUInt16($b, $off + 14) -ne 32) { return $false }
+            $w = [BitConverter]::ToInt32($b, $off + 4)
+            $h = [int]([BitConverter]::ToInt32($b, $off + 8) / 2)
+            $idx = $off + 40 + ((([int]($h / 2)) * $w + [int]($w / 2)) * 4) + 3
+            if ($idx -ge $b.Length -or $b[$idx] -ne 0) { return $false }
+        }
     }
     return $true
 }
@@ -454,6 +485,10 @@ function Invoke-ExplorerRestart {
     $deadline = (Get-Date).AddSeconds(10)
     do { Start-Sleep -Milliseconds 400 } while (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline)
     if (-not (Get-Process -Name explorer -ErrorAction SilentlyContinue)) { Start-Process explorer.exe }
+    if ($clear) {
+        # le pide a Windows que vuelva a dibujar los íconos
+        Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\ie4uinit.exe') -ArgumentList '-show' -WindowStyle Hidden -ErrorAction SilentlyContinue
+    }
 }
 
 function Restart-Explorer {

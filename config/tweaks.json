@@ -1049,7 +1049,7 @@
     "Id": "HideShortcutArrow",
     "Category": "Interfaz",
     "Name": "Quitar flecha de los accesos directos",
-    "Description": "Saca la flechita que aparece sobre los íconos de accesos directos, usando un ícono transparente propio. Limpia la caché de íconos y reinicia el Explorador (parpadea la barra). Se aplica a todos los usuarios de la PC.",
+    "Description": "Saca la flechita que aparece sobre los íconos de accesos directos, con un ícono transparente propio guardado en C:\\Windows\\blank.ico. Limpia la caché de íconos y reinicia el Explorador. A veces hace falta cerrar sesión para que se vea bien.",
     "Risk": "Bajo",
     "commands": {
       "apply": "Hide-ShortcutArrow",
@@ -1057,7 +1057,8 @@
       "test": "Test-ShortcutArrowHidden"
     },
     "Optional": true,
-    "OptionalGroup": "Personalización"
+    "OptionalGroup": "Personalización",
+    "SignOutHint": true
   },
   {
     "Id": "CleanTaskbar",

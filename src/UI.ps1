@@ -178,6 +178,10 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
             $res = if ($want) { Invoke-Tweak -Tweak $t } else { Invoke-Tweak -Tweak $t -Undo }
             $ok = [bool]($res | Select-Object -Last 1)
             if (-not $ok) { $sender.IsChecked = -not $want }   # volver atrás si falló
+            elseif ($t.SignOutHint) {
+                $ans = [Windows.MessageBox]::Show("Para que se vea bien este cambio a veces hace falta cerrar sesión (o reiniciar).`n`n¿Cerrar sesión ahora?", 'NurOptimizador', 'YesNo', 'Question')
+                if ($ans -eq 'Yes') { shutdown.exe /l }
+            }
         })
     }
 
@@ -293,6 +297,7 @@ $script:BatchFail  = New-Object System.Collections.ArrayList
 $script:ActionDone = @{}
 $script:OptChecks  = @()
 $script:Dirty      = $false
+$script:SignOutNeeded = $false
 
 $script:Wizard      = $script:window.FindName('Wizard')
 $script:WzProgBar   = $script:window.FindName('WzProgBar')
@@ -341,6 +346,7 @@ function Invoke-BatchCore([string[]]$Ids) {
         $res = if ($t.Kind -eq 'action') { Invoke-Action -Tweak $t } else { Invoke-Tweak -Tweak $t }
         if ([bool]($res | Select-Object -Last 1)) {
             $script:BatchOk++
+            if ($t.SignOutHint) { $script:SignOutNeeded = $true }
             if ($t.Kind -eq 'action') { $script:ActionDone[$id] = $true }
         }
         else { [void]$script:BatchFail.Add($t.Name) }
@@ -371,6 +377,7 @@ function Show-Done {
         $txt += "`n`nNo se pudieron aplicar ($($script:BatchFail.Count)): " + ($script:BatchFail -join ', ') + ".`nMirá la pestaña Registro del modo avanzado para ver el motivo."
     }
     $txt += "`n`nAlgunos cambios se ven recién al cerrar sesión o reiniciar la PC."
+    if ($script:SignOutNeeded) { $txt += "`n`nPara que se vea bien la flecha de los accesos directos, cerrá sesión y volvé a entrar." }
     $script:WzDoneText.Text = $txt
     Show-WizardPage 'Done'
 }
