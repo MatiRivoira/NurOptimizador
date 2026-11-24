@@ -499,6 +499,16 @@ $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
 
+# Versión visible: barra de título, barra lateral, pantalla de inicio y Registro
+function Set-AppText([string]$Name, [string]$Text) {
+    $el = $script:window.FindName($Name)
+    if ($el) { $el.Text = $Text }
+}
+Set-AppText 'TitleText'  "NurOptimizador  v$($script:AppVersion)"
+Set-AppText 'SideVersion' "Versión $($script:AppVersion)"
+Set-AppText 'WzVersion'   "Versión $($script:AppVersion)"
+Write-Log "NurOptimizador v$($script:AppVersion)"
+
 $script:UiReady = $true
 Show-Page 'Optimizar'
 Write-Log 'Listo. Cada interruptor aplica o revierte el ajuste al instante.'
