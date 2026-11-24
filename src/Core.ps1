@@ -326,17 +326,35 @@ function New-BlankIcon([string]$Path) {
     foreach ($png in $pngs) { $bw.Write([byte[]]$png) }
     [System.IO.File]::WriteAllBytes($Path, $out.ToArray())
 }
+# Verifica el .ico sin usar System.Drawing.Icon (esa clase no sabe leer íconos con PNG adentro)
+function Test-BlankIcon([string]$Path) {
+    Add-Type -AssemblyName System.Drawing
+    $b = [System.IO.File]::ReadAllBytes($Path)
+    if ($b.Length -lt 22) { return $false }
+    if ([BitConverter]::ToUInt16($b, 0) -ne 0 -or [BitConverter]::ToUInt16($b, 2) -ne 1) { return $false }   # cabecera ICO
+    $count = [int][BitConverter]::ToUInt16($b, 4)
+    if ($count -lt 1) { return $false }
+    for ($i = 0; $i -lt $count; $i++) {
+        $e   = 6 + 16 * $i
+        $len = [int][BitConverter]::ToUInt32($b, $e + 8)
+        $off = [int][BitConverter]::ToUInt32($b, $e + 12)
+        if ($len -le 8 -or ($off + $len) -gt $b.Length) { return $false }                                     # entrada dentro del archivo
+        if ($b[$off] -ne 0x89 -or $b[$off + 1] -ne 0x50 -or $b[$off + 2] -ne 0x4E -or $b[$off + 3] -ne 0x47) { return $false }  # firma PNG
+        $ms  = [System.IO.MemoryStream]::new($b, $off, $len)
+        $img = [System.Drawing.Image]::FromStream($ms)
+        $bmp = New-Object System.Drawing.Bitmap($img)
+        $a   = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
+        $bmp.Dispose(); $img.Dispose(); $ms.Dispose()
+        if ($a -ne 0) { return $false }                                                                       # tiene que ser transparente
+    }
+    return $true
+}
 function Hide-ShortcutArrow {
     $ico = Join-Path $env:SystemRoot 'blank.ico'
     New-BlankIcon $ico
 
-    # Verificación: el ícono tiene que cargar y ser transparente ANTES de tocar el registro
-    Add-Type -AssemblyName System.Drawing
-    $icon  = New-Object System.Drawing.Icon($ico)
-    $bmp   = $icon.ToBitmap()
-    $alpha = $bmp.GetPixel([int]($bmp.Width / 2), [int]($bmp.Height / 2)).A
-    $bmp.Dispose(); $icon.Dispose()
-    if ($alpha -ne 0) { throw 'El ícono transparente no se generó bien. No se cambió nada.' }
+    # Verificación: el ícono tiene que ser válido y transparente ANTES de tocar el registro
+    if (-not (Test-BlankIcon $ico)) { throw 'El ícono transparente no se generó bien. No se cambió nada.' }
     Write-Log "  Ícono transparente verificado ($ico)."
 
     $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons'
