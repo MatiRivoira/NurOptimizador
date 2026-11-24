@@ -1510,7 +1510,7 @@ $script:Xaml = @'
 
         <!-- Barra de título -->
         <Grid x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent">
-          <TextBlock Text="NurOptimizador" Foreground="#B3FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="20,0,0,0"/>
+          <TextBlock x:Name="TitleText" Text="NurOptimizador" Foreground="#B3FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="20,0,0,0"/>
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,10,0" VerticalAlignment="Top">
             <Button x:Name="BtnMin" Style="{StaticResource TitleBtn}" Content="&#xE921;"/>
             <Button x:Name="BtnClose" Style="{StaticResource TitleBtn}" Content="&#xE8BB;"/>
@@ -1525,7 +1525,7 @@ $script:Xaml = @'
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
               <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
-              <TextBlock Text="Windows 11" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
+              <TextBlock x:Name="SideVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
             </StackPanel>
             <StackPanel>
               <RadioButton x:Name="NavOptimizar" Style="{StaticResource NavItem}" Tag="&#xE945;" Content="Optimizar" IsChecked="True" GroupName="nav"/>
@@ -1654,6 +1654,10 @@ $script:Xaml = @'
 
             </Grid>
           </Border>
+          <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,0,0,0">
+            <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
+            <TextBlock x:Name="WzVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
+          </StackPanel>
         </Grid>
       </Grid>
     </Grid>
@@ -1667,6 +1671,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
+$script:AppVersion = '1.0.2'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -2627,6 +2632,15 @@ $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
+
+# Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
+function Set-AppText([string]$Name, [string]$Text) {
+    $el = $script:window.FindName($Name)
+    if ($el) { $el.Text = $Text }
+}
+Set-AppText 'SideVersion' "v$($script:AppVersion)"
+Set-AppText 'WzVersion'   "v$($script:AppVersion)"
+Write-Log "NurOptimizador v$($script:AppVersion)"
 
 $script:UiReady = $true
 Show-Page 'Optimizar'
