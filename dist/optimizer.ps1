@@ -1072,6 +1072,35 @@ $script:Tweaks = @'
     "SignOutHint": true
   },
   {
+    "Id": "HideSleepOption",
+    "Category": "Interfaz",
+    "Name": "Quitar \"Suspender\" del menú de apagado",
+    "Description": "Saca la opción Suspender del menú de energía del Inicio, de Win+X, de Alt+F4 y de Ctrl+Alt+Supr. No desactiva la suspensión de la PC: solo la oculta de esos menús. Si no se ve el cambio enseguida, cerrá sesión.",
+    "Risk": "Bajo",
+    "Optional": true,
+    "OptionalGroup": "Personalización",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
+        "Name": "ShowSleepOption",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\default\\Start\\HideSleep",
+        "Name": "value",
+        "Type": "DWord",
+        "Value": "1",
+        "OriginalValue": "0"
+      }
+    ],
+    "commands": {
+      "apply": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue",
+      "undo": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue"
+    }
+  },
+  {
     "Id": "CleanTaskbar",
     "Category": "Barra de tareas",
     "Name": "Barra de tareas limpia",
@@ -1672,7 +1701,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.0.3'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.0.4'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
