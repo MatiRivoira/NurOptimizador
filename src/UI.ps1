@@ -117,9 +117,9 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     $desc.Margin = [Windows.Thickness]::new(0, 3, 0, 0)
 
     switch ($Tweak.Risk) {
-        'Bajo'  { $chipBg = '#3322C55E'; $chipFg = '#FF86EFAC' }
-        'Medio' { $chipBg = '#33F59E0B'; $chipFg = '#FFFCD34D' }
-        default { $chipBg = '#33EF4444'; $chipFg = '#FFFCA5A5' }
+        'Bajo'  { $chipBg = '#1AFFFFFF'; $chipFg = '#FFD0D0D0' }
+        'Medio' { $chipBg = '#33D9A441'; $chipFg = '#FFEBC66E' }
+        default { $chipBg = '#33E05555'; $chipFg = '#FFF29A9A' }
     }
     $chip = New-Object Windows.Controls.Border
     $chip.CornerRadius = [Windows.CornerRadius]::new(8)
@@ -127,6 +127,8 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     $chip.Margin = [Windows.Thickness]::new(0, 8, 0, 0)
     $chip.HorizontalAlignment = 'Left'
     $chip.Background = Get-Brush $chipBg
+    $chip.BorderBrush = Get-Brush '#33FFFFFF'
+    $chip.BorderThickness = [Windows.Thickness]::new(1)
     $chipText = New-Object Windows.Controls.TextBlock
     $chipText.Text = "Riesgo $($Tweak.Risk)"
     $chipText.FontSize = 11
@@ -505,6 +507,24 @@ $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
+
+# Textura de vidrio esmerilado: ruido fino y suave sobre toda la ventana
+try {
+    $gw = 96; $gh = 96
+    $rnd = New-Object System.Random 11
+    $px  = New-Object byte[] ($gw * $gh * 4)
+    for ($i = 0; $i -lt ($gw * $gh); $i++) {
+        $v = [byte]$rnd.Next(0, 256)
+        $px[4 * $i] = $v; $px[4 * $i + 1] = $v; $px[4 * $i + 2] = $v; $px[4 * $i + 3] = 255
+    }
+    $bs = [System.Windows.Media.Imaging.BitmapSource]::Create($gw, $gh, 96, 96, [System.Windows.Media.PixelFormats]::Bgra32, $null, $px, $gw * 4)
+    $ib = New-Object System.Windows.Media.ImageBrush($bs)
+    $ib.TileMode = 'Tile'; $ib.ViewportUnits = 'Absolute'; $ib.Stretch = 'Fill'
+    $ib.Viewport = New-Object System.Windows.Rect(0, 0, $gw, $gh)
+    $ib.Freeze()
+    $grain = $script:window.FindName('Grain')
+    if ($grain) { $grain.Background = $ib }
+} catch { }
 
 # Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
 function Set-AppText([string]$Name, [string]$Text) {

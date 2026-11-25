@@ -1322,64 +1322,82 @@ $script:Xaml = @'
 
     <!-- Fondo con tinte translúcido (sobre acrílico) y versión opaca de respaldo -->
     <LinearGradientBrush x:Key="GlassTint" StartPoint="0,0" EndPoint="1,1">
-      <GradientStop Color="#D01E1458" Offset="0"/>
-      <GradientStop Color="#D00C2457" Offset="0.55"/>
-      <GradientStop Color="#D0081426" Offset="1"/>
+      <GradientStop Color="#CC2B2B2B" Offset="0"/>
+      <GradientStop Color="#CC232323" Offset="0.5"/>
+      <GradientStop Color="#CC171717" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="FallbackBg" StartPoint="0,0" EndPoint="1,1">
-      <GradientStop Color="#FF1E1458" Offset="0"/>
-      <GradientStop Color="#FF0C2457" Offset="0.55"/>
-      <GradientStop Color="#FF081426" Offset="1"/>
+      <GradientStop Color="#FF2B2B2B" Offset="0"/>
+      <GradientStop Color="#FF232323" Offset="0.5"/>
+      <GradientStop Color="#FF151515" Offset="1"/>
     </LinearGradientBrush>
+    <!-- Borde finísimo de la ventana: más claro arriba, casi invisible abajo -->
+    <LinearGradientBrush x:Key="EdgeBrush" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="#55FFFFFF" Offset="0"/>
+      <GradientStop Color="#18FFFFFF" Offset="0.4"/>
+      <GradientStop Color="#0DFFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <!-- Botones de ventana brillantes -->
+    <RadialGradientBrush x:Key="DotRedBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
+      <GradientStop Color="#FFFFB8B0" Offset="0"/><GradientStop Color="#FFE5251A" Offset="0.42"/><GradientStop Color="#FF9E0D05" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="DotYellowBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
+      <GradientStop Color="#FFFFF3A8" Offset="0"/><GradientStop Color="#FFEBBB00" Offset="0.42"/><GradientStop Color="#FF9A7600" Offset="1"/>
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="DotGreenBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
+      <GradientStop Color="#FFBDFFB5" Offset="0"/><GradientStop Color="#FF2EC420" Offset="0.42"/><GradientStop Color="#FF118009" Offset="1"/>
+    </RadialGradientBrush>
 
-    <!-- Tarjeta de vidrio -->
+    <!-- Tarjeta de vidrio esmerilado oscuro -->
     <Style x:Key="GlassCard" TargetType="Border">
-      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="CornerRadius" Value="20"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Background">
         <Setter.Value>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#2EFFFFFF" Offset="0"/>
-            <GradientStop Color="#0DFFFFFF" Offset="1"/>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0.8,1">
+            <GradientStop Color="#26FFFFFF" Offset="0"/>
+            <GradientStop Color="#0EFFFFFF" Offset="1"/>
           </LinearGradientBrush>
         </Setter.Value>
       </Setter>
       <Setter Property="BorderBrush">
         <Setter.Value>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#70FFFFFF" Offset="0"/>
-            <GradientStop Color="#14FFFFFF" Offset="1"/>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#48FFFFFF" Offset="0"/>
+            <GradientStop Color="#14FFFFFF" Offset="0.5"/>
+            <GradientStop Color="#0AFFFFFF" Offset="1"/>
           </LinearGradientBrush>
         </Setter.Value>
       </Setter>
       <Setter Property="Effect">
         <Setter.Value>
-          <DropShadowEffect BlurRadius="28" ShadowDepth="8" Direction="270" Opacity="0.3" Color="Black"/>
+          <DropShadowEffect BlurRadius="34" ShadowDepth="10" Direction="270" Opacity="0.45" Color="Black"/>
         </Setter.Value>
       </Setter>
     </Style>
 
-    <!-- Interruptor estilo Winhance -->
+    <!-- Interruptor: perla cuando está encendido -->
     <Style x:Key="Switch" TargetType="ToggleButton">
       <Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="ToggleButton">
             <Grid Width="48" Height="26" Background="Transparent">
-              <Border x:Name="Track" CornerRadius="13" Background="#33FFFFFF" BorderBrush="#66FFFFFF" BorderThickness="1"/>
-              <Ellipse x:Name="Knob" Width="18" Height="18" Fill="White" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+              <Border x:Name="Track" CornerRadius="13" Background="#1FFFFFFF" BorderBrush="#55FFFFFF" BorderThickness="1"/>
+              <Ellipse x:Name="Knob" Width="18" Height="18" Fill="#FFD2D2D2" HorizontalAlignment="Left" Margin="4,0,0,0"/>
             </Grid>
             <ControlTemplate.Triggers>
               <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Track" Property="Background">
                   <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                      <GradientStop Color="#FF8B7CFF" Offset="0"/>
-                      <GradientStop Color="#FF38BDF8" Offset="1"/>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                      <GradientStop Color="#FFF7F7F7" Offset="0"/>
+                      <GradientStop Color="#FFBFC4CC" Offset="1"/>
                     </LinearGradientBrush>
                   </Setter.Value>
                 </Setter>
-                <Setter TargetName="Track" Property="BorderBrush" Value="#88FFFFFF"/>
+                <Setter TargetName="Track" Property="BorderBrush" Value="#99FFFFFF"/>
+                <Setter TargetName="Knob" Property="Fill" Value="#FF202020"/>
                 <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
                 <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0"/>
               </Trigger>
@@ -1394,13 +1412,13 @@ $script:Xaml = @'
 
     <!-- Item de navegación lateral -->
     <Style x:Key="NavItem" TargetType="RadioButton">
-      <Setter Property="Foreground" Value="#CCFFFFFF"/>
+      <Setter Property="Foreground" Value="#B3FFFFFF"/>
       <Setter Property="Margin" Value="0,3"/>
       <Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="RadioButton">
-            <Border x:Name="Bd" CornerRadius="10" Padding="12,10" Background="Transparent"
+            <Border x:Name="Bd" CornerRadius="12" Padding="12,10" Background="Transparent"
                     BorderThickness="1" BorderBrush="Transparent">
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1411,11 +1429,11 @@ $script:Xaml = @'
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="#1FFFFFFF"/>
+                <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
               </Trigger>
               <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="#38FFFFFF"/>
-                <Setter TargetName="Bd" Property="BorderBrush" Value="#66FFFFFF"/>
+                <Setter TargetName="Bd" Property="Background" Value="#26FFFFFF"/>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="#40FFFFFF"/>
                 <Setter Property="Foreground" Value="White"/>
               </Trigger>
             </ControlTemplate.Triggers>
@@ -1424,23 +1442,22 @@ $script:Xaml = @'
       </Setter>
     </Style>
 
-    <!-- Botones de la barra de título -->
-    <Style x:Key="TitleBtn" TargetType="Button">
-      <Setter Property="Width" Value="42"/>
-      <Setter Property="Height" Value="30"/>
-      <Setter Property="Foreground" Value="White"/>
-      <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-      <Setter Property="FontSize" Value="11"/>
+    <!-- Botones de ventana: puntos brillantes -->
+    <Style x:Key="Dot" TargetType="Button">
+      <Setter Property="Width" Value="14"/>
+      <Setter Property="Height" Value="14"/>
+      <Setter Property="Margin" Value="0,0,9,0"/>
       <Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Border x:Name="Bd" Background="Transparent" CornerRadius="8">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+            <Ellipse Fill="{TemplateBinding Background}" Stroke="#40000000" StrokeThickness="0.6"/>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="#33FFFFFF"/>
+                <Setter Property="Opacity" Value="0.8"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -1448,20 +1465,24 @@ $script:Xaml = @'
       </Setter>
     </Style>
 
-    <!-- Botón de vidrio -->
+    <!-- Botón de vidrio (borde fino, como las etiquetas 4K / PSD de la referencia) -->
     <Style x:Key="GlassButton" TargetType="Button">
       <Setter Property="Foreground" Value="White"/>
       <Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Border x:Name="Bd" CornerRadius="10" Padding="14,9" Background="#26FFFFFF"
-                    BorderBrush="#55FFFFFF" BorderThickness="1">
+            <Border x:Name="Bd" CornerRadius="12" Padding="14,9" Background="#1AFFFFFF"
+                    BorderBrush="#4DFFFFFF" BorderThickness="1">
               <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Bd" Property="Background" Value="#40FFFFFF"/>
+                <Setter TargetName="Bd" Property="Background" Value="#33FFFFFF"/>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="#80FFFFFF"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -1503,8 +1524,8 @@ $script:Xaml = @'
               <Border x:Name="PART_Indicator" CornerRadius="7" HorizontalAlignment="Left">
                 <Border.Background>
                   <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Color="#FF8B7CFF" Offset="0"/>
-                    <GradientStop Color="#FF38BDF8" Offset="1"/>
+                    <GradientStop Color="#FFF4F4F4" Offset="0"/>
+                    <GradientStop Color="#FFB7BDC8" Offset="1"/>
                   </LinearGradientBrush>
                 </Border.Background>
               </Border>
@@ -1515,22 +1536,25 @@ $script:Xaml = @'
     </Style>
   </Window.Resources>
 
-  <Border x:Name="Tint" Background="{StaticResource GlassTint}" ClipToBounds="True">
+  <Border x:Name="Tint" Background="{StaticResource GlassTint}" BorderBrush="{StaticResource EdgeBrush}" BorderThickness="1" ClipToBounds="True">
     <Grid>
-      <!-- Manchas de color: le dan al vidrio algo que "refractar" -->
-      <Ellipse Width="460" Height="460" Fill="#997C5CFF" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-120,-140,0,0" IsHitTestVisible="False">
+      <!-- Reflejos difusos (como los objetos cromados detrás del vidrio): perla, gris azulado y un toque dorado -->
+      <Ellipse Width="400" Height="400" Fill="#66E4EAF6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-170,-110,0" IsHitTestVisible="False">
         <Ellipse.Effect><BlurEffect Radius="110"/></Ellipse.Effect>
       </Ellipse>
-      <Ellipse Width="420" Height="420" Fill="#7700C2FF" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-110,-140" IsHitTestVisible="False">
-        <Ellipse.Effect><BlurEffect Radius="110"/></Ellipse.Effect>
-      </Ellipse>
-      <Ellipse Width="300" Height="300" Fill="#55FF4DA6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-60,140,0" IsHitTestVisible="False">
+      <Ellipse Width="320" Height="320" Fill="#55B9C4DA" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-170,160,0,0" IsHitTestVisible="False">
         <Ellipse.Effect><BlurEffect Radius="100"/></Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Width="560" Height="300" Fill="#55E2E8F2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,-170" IsHitTestVisible="False">
+        <Ellipse.Effect><BlurEffect Radius="120"/></Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Width="240" Height="240" Fill="#44D8C98F" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="40,0,0,-130" IsHitTestVisible="False">
+        <Ellipse.Effect><BlurEffect Radius="90"/></Ellipse.Effect>
       </Ellipse>
 
       <Grid>
         <Grid.RowDefinitions>
-          <RowDefinition Height="42"/>
+          <RowDefinition Height="44"/>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -1539,13 +1563,17 @@ $script:Xaml = @'
         </Grid.ColumnDefinitions>
 
         <!-- Barra de título -->
-        <Grid x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent">
-          <TextBlock x:Name="TitleText" Text="NurOptimizador" Foreground="#B3FFFFFF" FontSize="12" VerticalAlignment="Center" Margin="20,0,0,0"/>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,10,0" VerticalAlignment="Top">
-            <Button x:Name="BtnMin" Style="{StaticResource TitleBtn}" Content="&#xE921;"/>
-            <Button x:Name="BtnClose" Style="{StaticResource TitleBtn}" Content="&#xE8BB;"/>
-          </StackPanel>
-        </Grid>
+        <Border x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent" BorderBrush="#26FFFFFF" BorderThickness="0,0,0,1">
+          <Grid>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="22,0,0,0">
+              <Button x:Name="BtnClose" Style="{StaticResource Dot}" Background="{StaticResource DotRedBrush}" ToolTip="Cerrar"/>
+              <Button x:Name="BtnMin" Style="{StaticResource Dot}" Background="{StaticResource DotYellowBrush}" ToolTip="Minimizar"/>
+              <Button x:Name="BtnZoom" Style="{StaticResource Dot}" Background="{StaticResource DotGreenBrush}" IsEnabled="False"/>
+            </StackPanel>
+            <TextBlock x:Name="TitleText" Text="NurOptimizador" Foreground="#80FFFFFF" FontSize="12.5"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
+          </Grid>
+        </Border>
 
         <!-- Barra lateral -->
         <Border x:Name="Sidebar" Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Style="{StaticResource GlassCard}" Margin="16,0,12,16" Padding="14">
@@ -1554,7 +1582,7 @@ $script:Xaml = @'
               <Button x:Name="BtnRestore" Style="{StaticResource GlassButton}" Content="Crear punto ahora"/>
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="6,6,0,22">
-              <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
+              <TextBlock FontSize="22"><Run FontWeight="Bold" Foreground="#8E8E8E" Text="Nur"/><Run FontWeight="Light" Foreground="#F2F2F2" Text="Optimizador"/></TextBlock>
               <TextBlock x:Name="SideVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
             </StackPanel>
             <StackPanel>
@@ -1601,7 +1629,7 @@ $script:Xaml = @'
             </ScrollViewer>
             <Border x:Name="PageRegistro" Style="{StaticResource GlassCard}" Visibility="Collapsed" Padding="14">
               <TextBox x:Name="LogBox" IsReadOnly="True" Background="Transparent" BorderThickness="0"
-                       Foreground="#A6E3A1" FontFamily="Consolas" FontSize="12.5"
+                       Foreground="#CFCFCF" FontFamily="Consolas" FontSize="12.5"
                        VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
             </Border>
           </Grid>
@@ -1620,7 +1648,7 @@ $script:Xaml = @'
                   <Button x:Name="WzRestoreYes" Style="{StaticResource GlassButton}" Content="Sí, crear punto" MinWidth="170" Margin="0,0,12,0"/>
                   <Button x:Name="WzRestoreNo" Style="{StaticResource GlassButton}" Content="No, continuar" MinWidth="170"/>
                 </StackPanel>
-                <TextBlock x:Name="WzRestoreBusy" Visibility="Collapsed" Foreground="#A6E3A1" FontSize="14" TextWrapping="Wrap"
+                <TextBlock x:Name="WzRestoreBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
                            Text="Creando el punto de restauración... puede tardar unos segundos."/>
               </StackPanel>
 
@@ -1685,11 +1713,13 @@ $script:Xaml = @'
             </Grid>
           </Border>
           <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,0,0,0">
-            <TextBlock FontSize="22"><Run FontWeight="Bold" Text="Nur"/><Run FontWeight="Light" Text="Optimizador"/></TextBlock>
+            <TextBlock FontSize="22"><Run FontWeight="Bold" Foreground="#8E8E8E" Text="Nur"/><Run FontWeight="Light" Foreground="#F2F2F2" Text="Optimizador"/></TextBlock>
             <TextBlock x:Name="WzVersion" Foreground="#99FFFFFF" FontSize="12" Margin="1,2,0,0"/>
           </StackPanel>
         </Grid>
       </Grid>
+      <!-- Textura de vidrio esmerilado (el pincel se genera en UI.ps1) -->
+      <Border x:Name="Grain" IsHitTestVisible="False" Opacity="0.06"/>
     </Grid>
   </Border>
 </Window>
@@ -1701,7 +1731,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.0.4'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.1.0'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -2316,9 +2346,9 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     $desc.Margin = [Windows.Thickness]::new(0, 3, 0, 0)
 
     switch ($Tweak.Risk) {
-        'Bajo'  { $chipBg = '#3322C55E'; $chipFg = '#FF86EFAC' }
-        'Medio' { $chipBg = '#33F59E0B'; $chipFg = '#FFFCD34D' }
-        default { $chipBg = '#33EF4444'; $chipFg = '#FFFCA5A5' }
+        'Bajo'  { $chipBg = '#1AFFFFFF'; $chipFg = '#FFD0D0D0' }
+        'Medio' { $chipBg = '#33D9A441'; $chipFg = '#FFEBC66E' }
+        default { $chipBg = '#33E05555'; $chipFg = '#FFF29A9A' }
     }
     $chip = New-Object Windows.Controls.Border
     $chip.CornerRadius = [Windows.CornerRadius]::new(8)
@@ -2326,6 +2356,8 @@ function New-TweakRow($Tweak, [bool]$ShowSeparator) {
     $chip.Margin = [Windows.Thickness]::new(0, 8, 0, 0)
     $chip.HorizontalAlignment = 'Left'
     $chip.Background = Get-Brush $chipBg
+    $chip.BorderBrush = Get-Brush '#33FFFFFF'
+    $chip.BorderThickness = [Windows.Thickness]::new(1)
     $chipText = New-Object Windows.Controls.TextBlock
     $chipText.Text = "Riesgo $($Tweak.Risk)"
     $chipText.FontSize = 11
@@ -2704,6 +2736,24 @@ $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
+
+# Textura de vidrio esmerilado: ruido fino y suave sobre toda la ventana
+try {
+    $gw = 96; $gh = 96
+    $rnd = New-Object System.Random 11
+    $px  = New-Object byte[] ($gw * $gh * 4)
+    for ($i = 0; $i -lt ($gw * $gh); $i++) {
+        $v = [byte]$rnd.Next(0, 256)
+        $px[4 * $i] = $v; $px[4 * $i + 1] = $v; $px[4 * $i + 2] = $v; $px[4 * $i + 3] = 255
+    }
+    $bs = [System.Windows.Media.Imaging.BitmapSource]::Create($gw, $gh, 96, 96, [System.Windows.Media.PixelFormats]::Bgra32, $null, $px, $gw * 4)
+    $ib = New-Object System.Windows.Media.ImageBrush($bs)
+    $ib.TileMode = 'Tile'; $ib.ViewportUnits = 'Absolute'; $ib.Stretch = 'Fill'
+    $ib.Viewport = New-Object System.Windows.Rect(0, 0, $gw, $gh)
+    $ib.Freeze()
+    $grain = $script:window.FindName('Grain')
+    if ($grain) { $grain.Background = $ib }
+} catch { }
 
 # Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
 function Set-AppText([string]$Name, [string]$Text) {
