@@ -7,7 +7,7 @@ Estructura inspirada en WinUtil: tweaks definidos como datos (JSON), UI WPF, y u
     .\dist\optimizer.ps1        # se auto-eleva a administrador
 
 ## Uso final (una vez publicado en GitHub)
-    irm "https://raw.githubusercontent.com/TU_USUARIO/mi-optimizador/main/dist/optimizer.ps1" | iex
+    irm "https://raw.githubusercontent.com/MatiRivoira/NurOptimizador/main/dist/optimizer.ps1" | iex
 
 ## Agregar un tweak
 Sumá un objeto a `config/tweaks.json` (registry / service / commands) y corré `Build.ps1`.
