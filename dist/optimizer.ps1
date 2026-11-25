@@ -781,6 +781,23 @@ $script:Tweaks = @'
     ]
   },
   {
+    "Id": "DisableSecurityHealthTray",
+    "Category": "Rendimiento",
+    "Quick": true,
+    "Risk": "Bajo",
+    "Name": "Quitar SecurityHealthSystray.exe del arranque",
+    "Description": "Evita que el ícono de Seguridad de Windows (SecurityHealthSystray.exe) se cargue al iniciar sesión. Un proceso menos al arrancar. La protección de Windows sigue activa; lo que perdés es el ícono de la bandeja y sus avisos.",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run",
+        "Name": "SecurityHealth",
+        "Type": "Binary",
+        "Value": "03,00,00,00,00,00,00,00,00,00,00,00",
+        "OriginalValue": "02,00,00,00,00,00,00,00,00,00,00,00"
+      }
+    ]
+  },
+  {
     "Id": "DisableUselessServices",
     "Category": "Servicios",
     "Name": "Desactivar servicios innecesarios",
@@ -874,7 +891,8 @@ $script:Tweaks = @'
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
   },
   {
     "Id": "DisableSysMain",
@@ -890,23 +908,172 @@ $script:Tweaks = @'
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
   },
   {
     "Id": "DisablePrintSpooler",
     "Category": "Servicios",
-    "Name": "Desactivar servicio de impresión",
-    "Description": "Apaga la cola de impresión. Solo si no imprimís nunca: sin este servicio tampoco funciona \"Microsoft Print to PDF\".",
+    "Name": "Desactivar servicios de impresión",
+    "Description": "Apaga la cola de impresión, las extensiones y notificaciones de impresora, la configuración de dispositivos de impresión y el intermediario de impresión y escaneo. Solo si no imprimís nunca: sin esto tampoco funciona \"Microsoft Print to PDF\".",
     "Risk": "Medio",
     "service": [
       {
         "Name": "Spooler",
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
+      },
+      {
+        "Name": "PrintNotify",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "PrintDeviceConfigurationService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "PrintScanBrokerService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
+  },
+  {
+    "Id": "DisableExtraServices",
+    "Category": "Servicios",
+    "Quick": true,
+    "Risk": "Medio",
+    "Name": "Desactivar servicios extra (ubicación, tarjeta inteligente y Hyper-V de invitado)",
+    "Description": "Desactiva Geolocalización, Tarjeta inteligente y su directiva de extracción, y los servicios de integración de Hyper-V para máquinas virtuales invitadas (instantáneas de volumen, PowerShell Direct, virtualización de escritorio remoto, sincronización de hora, latido, intercambio de datos, cierre de invitado) más el servicio Host HV. No lo uses si corrés Windows dentro de una máquina virtual de Hyper-V ni si usás tarjetas inteligentes (token USB, DNI electrónico).",
+    "service": [
+      {
+        "Name": "lfsvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SCardSvr",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SCPolicySvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicvss",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicvmsession",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicrdv",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmictimesync",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicheartbeat",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmickvpexchange",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicshutdown",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "HvHost",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ]
+  },
+  {
+    "Id": "DisableConnectivityServices",
+    "Category": "Servicios",
+    "Quick": true,
+    "Risk": "Medio",
+    "Name": "Desactivar Escritorio remoto, zona móvil y administración de radio",
+    "Description": "Desactiva los servicios de Escritorio remoto (Servicios y Configuración), la zona con cobertura inalámbrica móvil y la administración de radio. Ojo: sin la administración de radio se pierde el modo avión y el interruptor de Bluetooth; sin la zona móvil no podés compartir tu conexión. No lo uses si te conectás a esta PC por Escritorio remoto.",
+    "service": [
+      {
+        "Name": "TermService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SessionEnv",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "icssvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "RmSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ]
+  },
+  {
+    "Id": "DisableEdgeUpdate",
+    "Category": "Servicios",
+    "Risk": "Medio",
+    "Name": "Desactivar las actualizaciones de Microsoft Edge",
+    "Description": "Apaga los servicios y las tareas programadas de actualización de Edge (edgeupdate, edgeupdatem y el servicio de elevación). Edge dejará de actualizarse solo y puede quedar con fallas de seguridad sin corregir: solo conviene si no lo usás.",
+    "service": [
+      {
+        "Name": "edgeupdate",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "edgeupdatem",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "MicrosoftEdgeElevationService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ],
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "Name": "Update{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Disable-EdgeUpdateTasks",
+      "undo": "Enable-EdgeUpdateTasks"
+    }
   },
   {
     "Id": "ClassicContextMenu",
@@ -920,7 +1087,8 @@ $script:Tweaks = @'
       "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
     },
     "Optional": true,
-    "OptionalGroup": "Personalización"
+    "OptionalGroup": "Personalización",
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "EndTaskRightClick",
@@ -1069,7 +1237,8 @@ $script:Tweaks = @'
     },
     "Optional": true,
     "OptionalGroup": "Personalización",
-    "SignOutHint": true
+    "SignOutHint": true,
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "HideSleepOption",
@@ -1098,13 +1267,14 @@ $script:Tweaks = @'
     "commands": {
       "apply": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue",
       "undo": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue"
-    }
+    },
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "CleanTaskbar",
     "Category": "Barra de tareas",
     "Name": "Barra de tareas limpia",
-    "Description": "Oculta la búsqueda, la vista de tareas y los widgets. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Description": "Oculta la búsqueda y la vista de tareas, y quita Widgets (desinstala su paquete). Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
     "Risk": "Bajo",
     "registry": [
       {
@@ -1130,8 +1300,8 @@ $script:Tweaks = @'
       }
     ],
     "commands": {
-      "apply": "Restart-Explorer",
-      "undo": "Restart-Explorer"
+      "apply": "Remove-Widgets; Restart-Explorer",
+      "undo": "Restore-Widgets; Restart-Explorer"
     },
     "Quick": true
   },
@@ -1240,9 +1410,9 @@ $script:Tweaks = @'
     "Kind": "action",
     "Category": "Limpieza",
     "Name": "Quitar apps preinstaladas innecesarias",
-    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do, Cortana, Cámara, Reloj, Family Safety, Teams, Outlook nuevo, Phone Link, Quick Assist, Grabadora de sonido y Notas rápidas. No toca la Store, Xbox, Fotos ni la Calculadora.",
     "Risk": "Medio",
-    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista (incluidas Cámara, Reloj, Teams, Outlook nuevo, Phone Link, Quick Assist, Grabadora y Notas rápidas) para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
     "appx": [
       "Microsoft.BingNews",
       "Microsoft.BingWeather",
@@ -1255,9 +1425,22 @@ $script:Tweaks = @'
       "Microsoft.People",
       "Microsoft.PowerAutomateDesktop",
       "Microsoft.Todos",
-      "Microsoft.549981C3F5F10"
+      "Microsoft.549981C3F5F10",
+      "Microsoft.WindowsCamera",
+      "Microsoft.WindowsAlarms",
+      "MicrosoftCorporationII.MicrosoftFamily",
+      "MSTeams",
+      "MicrosoftTeams",
+      "Microsoft.OutlookForWindows",
+      "Microsoft.YourPhone",
+      "MicrosoftCorporationII.QuickAssist",
+      "Microsoft.WindowsSoundRecorder",
+      "Microsoft.MicrosoftStickyNotes"
     ],
-    "Quick": true
+    "Quick": true,
+    "capabilities": [
+      "App.Support.QuickAssist"
+    ]
   },
   {
     "Id": "RemoveOneDrive",
@@ -1284,6 +1467,37 @@ $script:Tweaks = @'
       "apply": "Remove-LegacyFeatures"
     },
     "Quick": true
+  },
+  {
+    "Id": "RemoveGameBar",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Risk": "Medio",
+    "Optional": true,
+    "OptionalPage": "Optimizar",
+    "OptionalGroup": "Aplicaciones",
+    "Name": "Desinstalar Xbox Game Bar",
+    "Description": "Desinstala Game Bar (Win+G) y desactiva su integración con juegos y mandos, para que Windows no muestre los avisos de \"ms-gamebar\" y \"ms-gamingoverlay\". Ojo: con procesadores AMD Ryzen X3D, Windows usa Game Bar para decidir qué núcleos usar en juegos, y el atajo Win+Alt+B (HDR) también depende de él.",
+    "Confirm": "Se va a desinstalar Xbox Game Bar y desactivar su integración.\n\nSi tenés un procesador AMD Ryzen X3D o usás Win+Alt+B para el HDR, conviene dejarlo.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.XboxGamingOverlay",
+      "Microsoft.XboxGameOverlay"
+    ],
+    "commands": {
+      "apply": "Disable-GameBarIntegration"
+    }
+  },
+  {
+    "Id": "RemoveEdge",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Risk": "Alto",
+    "Name": "Quitar Microsoft Edge",
+    "Description": "Intenta desinstalar Edge con su propio desinstalador y bloquea que se reinstale solo. Windows lo protege: en versiones recientes (compilación 26300 o más nueva) puede no dejarlo. Si no se puede, no cambia nada.",
+    "Confirm": "Se va a intentar desinstalar Microsoft Edge.\n\nAlgunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Asegurate de tener otro navegador.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-Edge"
+    }
   },
   {
     "Id": "RepairSystem",
@@ -1689,8 +1903,8 @@ $script:Xaml = @'
               </StackPanel>
 
               <StackPanel x:Name="WzOptional" Visibility="Collapsed">
-                <TextBlock Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
-                <TextBlock Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
+                <TextBlock x:Name="WzOptTitle" Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzOptSub" Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
                            TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,16"/>
                 <ScrollViewer MaxHeight="330" VerticalScrollBarVisibility="Auto">
                   <StackPanel x:Name="WzOptList" Margin="0,0,10,0"/>
@@ -1699,6 +1913,41 @@ $script:Xaml = @'
                   <Button x:Name="WzOptApply" Style="{StaticResource GlassButton}" Content="Aplicar los marcados" MinWidth="190" Margin="0,0,12,0"/>
                   <Button x:Name="WzOptSkip" Style="{StaticResource GlassButton}" Content="Omitir" MinWidth="120"/>
                 </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzEdge" Visibility="Collapsed">
+                <TextBlock Text="Microsoft Edge" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="¿Querés eliminar Microsoft Edge de tu PC?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
+                           Text="Windows protege Edge y en las versiones más nuevas puede no dejar quitarlo; si no se puede, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzEdgeYes" Style="{StaticResource GlassButton}" Content="Sí, eliminar Edge" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzEdgeNo" Style="{StaticResource GlassButton}" Content="No, mantenerlo" MinWidth="170"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzEdgeUpd" Visibility="Collapsed">
+                <TextBlock Text="Actualizaciones de Edge" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzEdgeUpdNote" TextWrapping="Wrap" Foreground="#FFEBC66E" FontSize="13" Margin="0,10,0,0"/>
+                <TextBlock Text="¿Querés desactivar los servicios y tareas de actualización de Edge?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
+                           Text="Edge dejará de actualizarse solo y puede quedar con fallas de seguridad sin corregir. Solo conviene si no lo usás."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzEdgeUpdYes" Style="{StaticResource GlassButton}" Content="Sí, desactivar" MinWidth="170" Margin="0,0,12,0"/>
+                  <Button x:Name="WzEdgeUpdNo" Style="{StaticResource GlassButton}" Content="No, dejarlas" MinWidth="170"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzChrome" Visibility="Collapsed">
+                <TextBlock Text="Instalar un navegador" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"
+                           Text="Quitaste Edge y no se detectó Google Chrome en tu PC. Sin un navegador no vas a poder abrir páginas web. ¿Querés instalar Chrome ahora?"/>
+                <StackPanel x:Name="WzChromeButtons" Orientation="Horizontal">
+                  <Button x:Name="WzChromeInstall" Style="{StaticResource GlassButton}" Content="Instalar Google Chrome" MinWidth="200" Margin="0,0,12,0"/>
+                  <Button x:Name="WzChromeSkip" Style="{StaticResource GlassButton}" Content="Ahora no" MinWidth="130"/>
+                </StackPanel>
+                <TextBlock x:Name="WzChromeBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
+                           Text="Instalando Chrome... puede tardar un minuto."/>
               </StackPanel>
 
               <StackPanel x:Name="WzDone" Visibility="Collapsed">
@@ -1731,7 +1980,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.1.0'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.2.0'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -1754,7 +2003,7 @@ function Save-Backup($b) { $b | Export-Clixml -Path $script:BackupFile }
 function New-RestorePoint {
     try {
         Enable-ComputerRestore -Drive "$env:SystemDrive\" -ErrorAction SilentlyContinue
-        Checkpoint-Computer -Description 'MiOptimizador' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
+        Checkpoint-Computer -Description 'NurOptimizador' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
         Write-Log 'Punto de restauración creado.'
     } catch {
         # Windows limita a 1 punto cada 24h por defecto
@@ -1864,7 +2113,18 @@ function Invoke-Tweak {
                 if (-not $svc) { Write-Log "  Servicio $($s.Name): no existe en este equipo, se omite"; continue }
                 Set-Service -Name $s.Name -StartupType $s.StartupType -ErrorAction SilentlyContinue
                 if ($s.StartupType -eq 'Disabled') { Stop-Service -Name $s.Name -Force -ErrorAction SilentlyContinue }
-                Write-Log "  Servicio $($s.Name): $($s.StartupType)"
+                $now = [string](Get-Service -Name $s.Name -ErrorAction SilentlyContinue).StartType
+                if ($now -eq $s.StartupType) { Write-Log "  Servicio $($s.Name): $($s.StartupType)" }
+                else {
+                    # algunos servicios no dejan cambiarse con Set-Service: se prueba directo en el registro
+                    $val = switch ($s.StartupType) { 'Disabled' { 4 } 'Manual' { 3 } default { 2 } }
+                    $rk  = "HKLM:\SYSTEM\CurrentControlSet\Services\$($s.Name)"
+                    try {
+                        Set-ItemProperty -Path $rk -Name Start -Value $val -Type DWord -ErrorAction Stop
+                        Write-Log "  Servicio $($s.Name): $($s.StartupType) (se aplica al reiniciar)"
+                    }
+                    catch { Write-Log "  Servicio $($s.Name): no se pudo cambiar (Windows lo protege)" }
+                }
             }
             foreach ($t in $Tweak.task) {
                 $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
@@ -1948,6 +2208,12 @@ function Invoke-Action {
             Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
                 Where-Object { $_.DisplayName -eq $pkg } |
                 Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+        }
+        foreach ($cap in $Tweak.capabilities) {
+            Get-WindowsCapability -Online -Name "$cap*" -ErrorAction SilentlyContinue | Where-Object { $_.State -eq 'Installed' } | ForEach-Object {
+                Write-Log "  Quitando capacidad: $($_.Name)"
+                Remove-WindowsCapability -Online -Name $_.Name -ErrorAction SilentlyContinue | Out-Null
+            }
         }
         if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         Write-Log '  OK'
@@ -2224,6 +2490,142 @@ function Restart-Explorer {
     if ($ClearIconCache) { $script:IconCachePending = $true }
     if ($script:DeferExplorer) { $script:ExplorerPending = $true; return }
     Invoke-ExplorerRestart
+}
+
+# ---------- Widgets ----------
+# Ocultar el botón por registro/política no alcanza en las versiones nuevas de Windows 11 (sale "acceso denegado").
+# Lo que sí funciona es desinstalar el paquete de Widgets, como hace WinUtil.
+function Remove-Widgets {
+    Write-Log '  Quitando Widgets...'
+    Get-Process -Name 'Widgets', 'WidgetService' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    foreach ($n in 'MicrosoftWindows.Client.WebExperience', 'Microsoft.WidgetsPlatformRuntime') {
+        $p = Get-AppxPackage -AllUsers -Name $n -ErrorAction SilentlyContinue
+        if ($p) {
+            $p | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+            Write-Log "  Quitado: $n"
+        }
+    }
+    try { Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name TaskbarDa -Type DWord -Value 0 -ErrorAction Stop } catch { }
+}
+function Restore-Widgets {
+    try { Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name TaskbarDa -Type DWord -Value 1 -ErrorAction Stop } catch { }
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Log '  Reinstalando Widgets (Windows Web Experience Pack)...'
+        winget install --id 9MSSGKG348SP --source msstore --silent --accept-package-agreements --accept-source-agreements | Out-Null
+        if ($LASTEXITCODE -ne 0) { Write-Log '  No se pudo reinstalar solo: instalá "Windows Web Experience Pack" desde la Microsoft Store.' }
+    }
+    else { Write-Log '  Para recuperar Widgets, instalá "Windows Web Experience Pack" desde la Microsoft Store.' }
+}
+
+# ---------- Microsoft Edge ----------
+function Test-EdgeInstalled {
+    foreach ($b in "${env:ProgramFiles(x86)}", $env:ProgramFiles) {
+        if ($b -and (Test-Path (Join-Path $b 'Microsoft\Edge\Application\msedge.exe'))) { return $true }
+    }
+    return $false
+}
+
+function Remove-Edge {
+    if (-not (Test-EdgeInstalled)) { Write-Log '  Edge no está instalado.'; return }
+    $guid = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}'          # Microsoft Edge (canal estable)
+    Write-Log '  Cerrando Edge...'
+    Get-Process -Name msedge, MicrosoftEdgeUpdate -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+
+    # 1) Desinstalador propio de Edge
+    $roots  = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application", "$env:ProgramFiles\Microsoft\Edge\Application") | Where-Object { Test-Path $_ }
+    $setups = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -Filter setup.exe -ErrorAction SilentlyContinue | Where-Object { $_.DirectoryName -like '*\Installer' } })
+    foreach ($st in $setups) {
+        Write-Log "  Ejecutando el desinstalador de Edge ($($st.Directory.Parent.Name))..."
+        Start-Process -FilePath $st.FullName -ArgumentList '--uninstall', '--system-level', '--verbose-logging', '--force-uninstall' -Wait -WindowStyle Hidden
+    }
+
+    # 2) Si no alcanzó, política oficial de Edge Update
+    $pol = 'HKLM:\SOFTWARE\Policies\Microsoft\EdgeUpdate'
+    if (Test-EdgeInstalled) {
+        Write-Log '  Primer intento sin éxito; probando con Edge Update...'
+        if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
+        Set-ItemProperty -Path $pol -Name "Uninstall$guid" -Value 1 -Type DWord -Force
+        $mu = "${env:ProgramFiles(x86)}\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"
+        if (Test-Path $mu) { Start-Process -FilePath $mu -ArgumentList '/ua', '/installsource', 'scheduler' -Wait -WindowStyle Hidden; Start-Sleep -Seconds 5 }
+        Remove-ItemProperty -Path $pol -Name "Uninstall$guid" -ErrorAction SilentlyContinue
+    }
+
+    if (Test-EdgeInstalled) {
+        throw 'Windows protege Edge en esta versión y no permitió quitarlo. No se cambió nada más.'
+    }
+
+    # 3) Quitado: que no vuelva solo. No se toca InstallDefault para no bloquear el runtime de WebView2.
+    if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
+    Set-ItemProperty -Path $pol -Name "Install$guid" -Value 0 -Type DWord -Force
+    $upd = 'HKLM:\SOFTWARE\Microsoft\EdgeUpdate'
+    if (-not (Test-Path $upd)) { New-Item -Path $upd -Force | Out-Null }
+    Set-ItemProperty -Path $upd -Name 'DoNotUpdateToEdgeWithChromium' -Value 1 -Type DWord -Force
+    Write-Log '  Edge desinstalado. Se bloqueó su reinstalación automática.'
+}
+
+function Disable-EdgeUpdateTasks {
+    Get-ScheduledTask -TaskName 'MicrosoftEdgeUpdate*' -ErrorAction SilentlyContinue | ForEach-Object {
+        Disable-ScheduledTask -InputObject $_ -ErrorAction SilentlyContinue | Out-Null
+        Write-Log "  Tarea $($_.TaskName): desactivada"
+    }
+}
+function Enable-EdgeUpdateTasks {
+    Get-ScheduledTask -TaskName 'MicrosoftEdgeUpdate*' -ErrorAction SilentlyContinue | ForEach-Object {
+        Enable-ScheduledTask -InputObject $_ -ErrorAction SilentlyContinue | Out-Null
+    }
+}
+
+# ---------- Google Chrome ----------
+function Test-ChromeInstalled {
+    $files = @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe")
+    foreach ($f in $files) { if (Test-Path $f) { return $true } }
+    foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe', 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe') {
+        if (Test-Path $k) { return $true }
+    }
+    return $false
+}
+
+function Install-Chrome {
+    Write-Log 'Instalando Google Chrome...'
+    try {
+        if (Get-Command winget -ErrorAction SilentlyContinue) {
+            winget install -e --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements | Out-Null
+            if ($LASTEXITCODE -eq 0 -and (Test-ChromeInstalled)) { Write-Log '  Chrome instalado (winget).'; return $true }
+            Write-Log "  winget no pudo instalarlo (código $LASTEXITCODE). Probando la descarga directa..."
+        }
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $tmp = Join-Path $env:TEMP 'ChromeStandaloneSetup64.exe'
+        Invoke-WebRequest -Uri 'https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe' -OutFile $tmp -UseBasicParsing
+        Start-Process -FilePath $tmp -ArgumentList '/silent', '/install' -Wait
+        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado (descarga directa).'; return $true }
+        throw 'La instalación terminó pero Chrome no aparece instalado.'
+    }
+    catch {
+        Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+# ---------- Game Bar: integración ----------
+# Al desinstalar Game Bar, juegos y mandos siguen intentando abrirlo y Windows muestra "necesitás una app nueva
+# para abrir este enlace ms-gamebar / ms-gamingoverlay". Se apunta esos enlaces a un ejecutable inofensivo.
+function Disable-GameBarIntegration {
+    New-Item -Path 'HKCU:\SOFTWARE\Microsoft\GameBar' -Force | Out-Null
+    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\GameBar' -Name UseNexusForGameBarEnabled -Type DWord -Value 0
+    New-Item -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Force | Out-Null
+    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name AppCaptureEnabled -Type DWord -Value 0
+    $cmd = '"' + (Join-Path $env:SystemRoot 'System32\systray.exe') + '"'
+    foreach ($proto in 'ms-gamebar', 'ms-gamebarservices', 'ms-gamingoverlay') {
+        $root = "Registry::HKEY_CLASSES_ROOT\$proto"
+        New-Item -Path $root -Force | Out-Null
+        Set-ItemProperty -Path $root -Name '(default)' -Value "URL:$proto"
+        New-ItemProperty -Path $root -Name 'URL Protocol' -Value '' -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $root -Name 'NoOpenWith' -Value '' -PropertyType String -Force | Out-Null
+        New-Item -Path "$root\shell\open\command" -Force | Out-Null
+        Set-ItemProperty -Path "$root\shell\open\command" -Name '(default)' -Value $cmd
+    }
+    Write-Log '  Integración de Game Bar desactivada (sin avisos de ms-gamebar).'
 }
 
 
@@ -2536,9 +2938,13 @@ $script:WzProgText  = $script:window.FindName('WzProgText')
 $script:WzProgCount = $script:window.FindName('WzProgCount')
 $script:WzProgTitle = $script:window.FindName('WzProgTitle')
 $script:WzOptList   = $script:window.FindName('WzOptList')
+$script:WzOptTitle  = $script:window.FindName('WzOptTitle')
+$script:WzOptSub    = $script:window.FindName('WzOptSub')
+$script:WzEdgeUpdNote = $script:window.FindName('WzEdgeUpdNote')
+$script:OptStage    = 'Optimizar'
 $script:WzDoneText  = $script:window.FindName('WzDoneText')
 $script:WzPages = @{}
-foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
+foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Chrome', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
 
 function Show-WizardPage([string]$Name) {
     foreach ($k in $script:WzPages.Keys) {
@@ -2659,9 +3065,19 @@ function New-OptionRow($Tweak, [bool]$ShowSeparator) {
     return $row
 }
 
-function Show-OptionalPage {
-    $opt = @($script:Tweaks | Where-Object { $_.Optional })
-    if ($opt.Count -eq 0) { Show-Done; return }
+# Etapas del final del modo rápido: Optimización opcional -> Personalización opcional -> pregunta de Edge
+function Show-OptionalPage([string]$Stage) {
+    $script:OptStage = $Stage
+    $opt = @($script:Tweaks | Where-Object { $_.Optional -and $_.OptionalPage -eq $Stage })
+    if ($opt.Count -eq 0) { Complete-OptionalStage; return }
+    if ($Stage -eq 'Optimizar') {
+        $script:WzOptTitle.Text = 'Optimización opcional'
+        $script:WzOptSub.Text   = 'Estos ajustes dependen de cómo uses tu PC, por eso no se aplicaron solos. Marcá los que quieras.'
+    }
+    else {
+        $script:WzOptTitle.Text = 'Personalización opcional'
+        $script:WzOptSub.Text   = 'Cambios de aspecto y de comportamiento que son cuestión de gusto. Marcá los que quieras.'
+    }
     $script:WzOptList.Children.Clear()
     $script:OptChecks = @()
     foreach ($g in ($opt | Group-Object OptionalGroup)) {
@@ -2689,12 +3105,22 @@ function Show-OptionalPage {
     Show-WizardPage 'Optional'
 }
 
+function Complete-OptionalStage {
+    if ($script:OptStage -eq 'Optimizar') { Show-OptionalPage 'Personalizar' }
+    else { Show-EdgeQuestion }
+}
+
+function Show-EdgeQuestion {
+    if (Test-EdgeInstalled) { Show-WizardPage 'Edge' } else { Show-Done }
+}
+
 function Start-QuickMode {
     $ids = @($script:Tweaks | Where-Object { $_.Quick } | ForEach-Object { $_.Id })
     $msg = "El modo rápido va a aplicar $($ids.Count) ajustes, entre ellos:`n`n" +
            "  - Quitar OneDrive, apps preinstaladas y características heredadas`n" +
            "  - Quitar IA de Windows, Edge y Office`n" +
-           "  - Desanclar todo de la barra de tareas y del menú Inicio`n`n" +
+           "  - Desanclar todo de la barra de tareas y del menú Inicio, y quitar Widgets`n" +
+           "  - Desactivar servicios como Escritorio remoto, zona móvil y administración de radio (modo avión)`n`n" +
            "Casi todo se puede revertir desde el modo avanzado, pero quitar apps y OneDrive no.`n`n¿Continuar?"
     $ans = [Windows.MessageBox]::Show($msg, 'NurOptimizador', 'YesNo', 'Question')
     if ($ans -ne 'Yes') { return }
@@ -2702,11 +3128,11 @@ function Start-QuickMode {
     Show-WizardPage 'Progress'
     Update-UI
     Start-Batch $ids
-    Show-OptionalPage
+    Show-OptionalPage 'Optimizar'
 }
 
 $quickCount = @($script:Tweaks | Where-Object { $_.Quick }).Count
-$script:window.FindName('WzQuickDesc').Text = "Aplica $quickCount ajustes recomendados de una vez, con una barra de progreso. Al final te pregunta por algunos opcionales."
+$script:window.FindName('WzQuickDesc').Text = "Aplica $quickCount ajustes recomendados de una vez, con una barra de progreso. Al final te pregunta por los opcionales y por Edge."
 $script:window.FindName('WzAdvDesc').Text   = 'Elegí ajuste por ajuste con interruptores, viendo qué hace cada uno. Cada uno se puede revertir.'
 
 $script:window.FindName('WzRestoreYes').Add_Click({
@@ -2729,9 +3155,48 @@ $script:window.FindName('WzOptApply').Add_Click({
         Update-UI
         Start-Batch $ids
     }
+    Complete-OptionalStage
+})
+$script:window.FindName('WzOptSkip').Add_Click({ Complete-OptionalStage })
+
+# Edge: si se elige quitarlo no se pregunta por sus actualizaciones (salvo que Windows no lo deje quitar)
+$script:window.FindName('WzEdgeYes').Add_Click({
+    $script:WzProgTitle.Text = 'Quitando Microsoft Edge...'
+    Show-WizardPage 'Progress'
+    Update-UI
+    Start-Batch @('RemoveEdge')
+    if (Test-EdgeInstalled) {
+        $script:WzEdgeUpdNote.Text = 'No se pudo quitar Edge: Windows lo protege en esta versión.'
+        $script:WzEdgeUpdNote.Visibility = 'Visible'
+        Show-WizardPage 'EdgeUpd'
+    }
+    elseif (-not (Test-ChromeInstalled)) { Show-WizardPage 'Chrome' }
+    else { Show-Done }
+})
+$script:window.FindName('WzEdgeNo').Add_Click({
+    $script:WzEdgeUpdNote.Text = ''
+    $script:WzEdgeUpdNote.Visibility = 'Collapsed'
+    Show-WizardPage 'EdgeUpd'
+})
+$script:window.FindName('WzEdgeUpdYes').Add_Click({
+    $script:WzProgTitle.Text = 'Desactivando las actualizaciones de Edge...'
+    Show-WizardPage 'Progress'
+    Update-UI
+    Start-Batch @('DisableEdgeUpdate')
     Show-Done
 })
-$script:window.FindName('WzOptSkip').Add_Click({ Show-Done })
+$script:window.FindName('WzEdgeUpdNo').Add_Click({ Show-Done })
+
+# Chrome: solo aparece si se quitó Edge y no se detecta Chrome
+$script:window.FindName('WzChromeInstall').Add_Click({
+    $script:window.FindName('WzChromeButtons').Visibility = 'Collapsed'
+    $script:window.FindName('WzChromeBusy').Visibility = 'Visible'
+    Update-UI
+    $res = Install-Chrome
+    if ([bool]($res | Select-Object -Last 1)) { $script:BatchOk++ } else { [void]$script:BatchFail.Add('Instalar Google Chrome') }
+    Show-Done
+})
+$script:window.FindName('WzChromeSkip').Add_Click({ Show-Done })
 $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 

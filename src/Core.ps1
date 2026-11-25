@@ -3,7 +3,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.1.0'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.2.0'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -26,7 +26,7 @@ function Save-Backup($b) { $b | Export-Clixml -Path $script:BackupFile }
 function New-RestorePoint {
     try {
         Enable-ComputerRestore -Drive "$env:SystemDrive\" -ErrorAction SilentlyContinue
-        Checkpoint-Computer -Description 'MiOptimizador' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
+        Checkpoint-Computer -Description 'NurOptimizador' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
         Write-Log 'Punto de restauración creado.'
     } catch {
         # Windows limita a 1 punto cada 24h por defecto
@@ -136,7 +136,18 @@ function Invoke-Tweak {
                 if (-not $svc) { Write-Log "  Servicio $($s.Name): no existe en este equipo, se omite"; continue }
                 Set-Service -Name $s.Name -StartupType $s.StartupType -ErrorAction SilentlyContinue
                 if ($s.StartupType -eq 'Disabled') { Stop-Service -Name $s.Name -Force -ErrorAction SilentlyContinue }
-                Write-Log "  Servicio $($s.Name): $($s.StartupType)"
+                $now = [string](Get-Service -Name $s.Name -ErrorAction SilentlyContinue).StartType
+                if ($now -eq $s.StartupType) { Write-Log "  Servicio $($s.Name): $($s.StartupType)" }
+                else {
+                    # algunos servicios no dejan cambiarse con Set-Service: se prueba directo en el registro
+                    $val = switch ($s.StartupType) { 'Disabled' { 4 } 'Manual' { 3 } default { 2 } }
+                    $rk  = "HKLM:\SYSTEM\CurrentControlSet\Services\$($s.Name)"
+                    try {
+                        Set-ItemProperty -Path $rk -Name Start -Value $val -Type DWord -ErrorAction Stop
+                        Write-Log "  Servicio $($s.Name): $($s.StartupType) (se aplica al reiniciar)"
+                    }
+                    catch { Write-Log "  Servicio $($s.Name): no se pudo cambiar (Windows lo protege)" }
+                }
             }
             foreach ($t in $Tweak.task) {
                 $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
@@ -220,6 +231,12 @@ function Invoke-Action {
             Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
                 Where-Object { $_.DisplayName -eq $pkg } |
                 Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+        }
+        foreach ($cap in $Tweak.capabilities) {
+            Get-WindowsCapability -Online -Name "$cap*" -ErrorAction SilentlyContinue | Where-Object { $_.State -eq 'Installed' } | ForEach-Object {
+                Write-Log "  Quitando capacidad: $($_.Name)"
+                Remove-WindowsCapability -Online -Name $_.Name -ErrorAction SilentlyContinue | Out-Null
+            }
         }
         if ($Tweak.commands.apply) { & ([scriptblock]::Create($Tweak.commands.apply)) | Out-Null }
         Write-Log '  OK'
@@ -496,4 +513,140 @@ function Restart-Explorer {
     if ($ClearIconCache) { $script:IconCachePending = $true }
     if ($script:DeferExplorer) { $script:ExplorerPending = $true; return }
     Invoke-ExplorerRestart
+}
+
+# ---------- Widgets ----------
+# Ocultar el botón por registro/política no alcanza en las versiones nuevas de Windows 11 (sale "acceso denegado").
+# Lo que sí funciona es desinstalar el paquete de Widgets, como hace WinUtil.
+function Remove-Widgets {
+    Write-Log '  Quitando Widgets...'
+    Get-Process -Name 'Widgets', 'WidgetService' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    foreach ($n in 'MicrosoftWindows.Client.WebExperience', 'Microsoft.WidgetsPlatformRuntime') {
+        $p = Get-AppxPackage -AllUsers -Name $n -ErrorAction SilentlyContinue
+        if ($p) {
+            $p | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+            Write-Log "  Quitado: $n"
+        }
+    }
+    try { Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name TaskbarDa -Type DWord -Value 0 -ErrorAction Stop } catch { }
+}
+function Restore-Widgets {
+    try { Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name TaskbarDa -Type DWord -Value 1 -ErrorAction Stop } catch { }
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Log '  Reinstalando Widgets (Windows Web Experience Pack)...'
+        winget install --id 9MSSGKG348SP --source msstore --silent --accept-package-agreements --accept-source-agreements | Out-Null
+        if ($LASTEXITCODE -ne 0) { Write-Log '  No se pudo reinstalar solo: instalá "Windows Web Experience Pack" desde la Microsoft Store.' }
+    }
+    else { Write-Log '  Para recuperar Widgets, instalá "Windows Web Experience Pack" desde la Microsoft Store.' }
+}
+
+# ---------- Microsoft Edge ----------
+function Test-EdgeInstalled {
+    foreach ($b in "${env:ProgramFiles(x86)}", $env:ProgramFiles) {
+        if ($b -and (Test-Path (Join-Path $b 'Microsoft\Edge\Application\msedge.exe'))) { return $true }
+    }
+    return $false
+}
+
+function Remove-Edge {
+    if (-not (Test-EdgeInstalled)) { Write-Log '  Edge no está instalado.'; return }
+    $guid = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}'          # Microsoft Edge (canal estable)
+    Write-Log '  Cerrando Edge...'
+    Get-Process -Name msedge, MicrosoftEdgeUpdate -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+
+    # 1) Desinstalador propio de Edge
+    $roots  = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application", "$env:ProgramFiles\Microsoft\Edge\Application") | Where-Object { Test-Path $_ }
+    $setups = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -Filter setup.exe -ErrorAction SilentlyContinue | Where-Object { $_.DirectoryName -like '*\Installer' } })
+    foreach ($st in $setups) {
+        Write-Log "  Ejecutando el desinstalador de Edge ($($st.Directory.Parent.Name))..."
+        Start-Process -FilePath $st.FullName -ArgumentList '--uninstall', '--system-level', '--verbose-logging', '--force-uninstall' -Wait -WindowStyle Hidden
+    }
+
+    # 2) Si no alcanzó, política oficial de Edge Update
+    $pol = 'HKLM:\SOFTWARE\Policies\Microsoft\EdgeUpdate'
+    if (Test-EdgeInstalled) {
+        Write-Log '  Primer intento sin éxito; probando con Edge Update...'
+        if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
+        Set-ItemProperty -Path $pol -Name "Uninstall$guid" -Value 1 -Type DWord -Force
+        $mu = "${env:ProgramFiles(x86)}\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"
+        if (Test-Path $mu) { Start-Process -FilePath $mu -ArgumentList '/ua', '/installsource', 'scheduler' -Wait -WindowStyle Hidden; Start-Sleep -Seconds 5 }
+        Remove-ItemProperty -Path $pol -Name "Uninstall$guid" -ErrorAction SilentlyContinue
+    }
+
+    if (Test-EdgeInstalled) {
+        throw 'Windows protege Edge en esta versión y no permitió quitarlo. No se cambió nada más.'
+    }
+
+    # 3) Quitado: que no vuelva solo. No se toca InstallDefault para no bloquear el runtime de WebView2.
+    if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
+    Set-ItemProperty -Path $pol -Name "Install$guid" -Value 0 -Type DWord -Force
+    $upd = 'HKLM:\SOFTWARE\Microsoft\EdgeUpdate'
+    if (-not (Test-Path $upd)) { New-Item -Path $upd -Force | Out-Null }
+    Set-ItemProperty -Path $upd -Name 'DoNotUpdateToEdgeWithChromium' -Value 1 -Type DWord -Force
+    Write-Log '  Edge desinstalado. Se bloqueó su reinstalación automática.'
+}
+
+function Disable-EdgeUpdateTasks {
+    Get-ScheduledTask -TaskName 'MicrosoftEdgeUpdate*' -ErrorAction SilentlyContinue | ForEach-Object {
+        Disable-ScheduledTask -InputObject $_ -ErrorAction SilentlyContinue | Out-Null
+        Write-Log "  Tarea $($_.TaskName): desactivada"
+    }
+}
+function Enable-EdgeUpdateTasks {
+    Get-ScheduledTask -TaskName 'MicrosoftEdgeUpdate*' -ErrorAction SilentlyContinue | ForEach-Object {
+        Enable-ScheduledTask -InputObject $_ -ErrorAction SilentlyContinue | Out-Null
+    }
+}
+
+# ---------- Google Chrome ----------
+function Test-ChromeInstalled {
+    $files = @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe")
+    foreach ($f in $files) { if (Test-Path $f) { return $true } }
+    foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe', 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe') {
+        if (Test-Path $k) { return $true }
+    }
+    return $false
+}
+
+function Install-Chrome {
+    Write-Log 'Instalando Google Chrome...'
+    try {
+        if (Get-Command winget -ErrorAction SilentlyContinue) {
+            winget install -e --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements | Out-Null
+            if ($LASTEXITCODE -eq 0 -and (Test-ChromeInstalled)) { Write-Log '  Chrome instalado (winget).'; return $true }
+            Write-Log "  winget no pudo instalarlo (código $LASTEXITCODE). Probando la descarga directa..."
+        }
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $tmp = Join-Path $env:TEMP 'ChromeStandaloneSetup64.exe'
+        Invoke-WebRequest -Uri 'https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe' -OutFile $tmp -UseBasicParsing
+        Start-Process -FilePath $tmp -ArgumentList '/silent', '/install' -Wait
+        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado (descarga directa).'; return $true }
+        throw 'La instalación terminó pero Chrome no aparece instalado.'
+    }
+    catch {
+        Write-Log "  ERROR: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+# ---------- Game Bar: integración ----------
+# Al desinstalar Game Bar, juegos y mandos siguen intentando abrirlo y Windows muestra "necesitás una app nueva
+# para abrir este enlace ms-gamebar / ms-gamingoverlay". Se apunta esos enlaces a un ejecutable inofensivo.
+function Disable-GameBarIntegration {
+    New-Item -Path 'HKCU:\SOFTWARE\Microsoft\GameBar' -Force | Out-Null
+    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\GameBar' -Name UseNexusForGameBarEnabled -Type DWord -Value 0
+    New-Item -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Force | Out-Null
+    Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR' -Name AppCaptureEnabled -Type DWord -Value 0
+    $cmd = '"' + (Join-Path $env:SystemRoot 'System32\systray.exe') + '"'
+    foreach ($proto in 'ms-gamebar', 'ms-gamebarservices', 'ms-gamingoverlay') {
+        $root = "Registry::HKEY_CLASSES_ROOT\$proto"
+        New-Item -Path $root -Force | Out-Null
+        Set-ItemProperty -Path $root -Name '(default)' -Value "URL:$proto"
+        New-ItemProperty -Path $root -Name 'URL Protocol' -Value '' -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $root -Name 'NoOpenWith' -Value '' -PropertyType String -Force | Out-Null
+        New-Item -Path "$root\shell\open\command" -Force | Out-Null
+        Set-ItemProperty -Path "$root\shell\open\command" -Name '(default)' -Value $cmd
+    }
+    Write-Log '  Integración de Game Bar desactivada (sin avisos de ms-gamebar).'
 }

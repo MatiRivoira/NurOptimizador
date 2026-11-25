@@ -7,3 +7,7 @@ CUANDO SE CREA EL PUNTO DE RESTAURACION, QUE DIGA NurOptimizador como nombre,
 en el modo rapido tiene que preguntar por separado lo opcional, por una parte la personalizacion y por otra lo de optimizar,
 y por separado preguntar si se quiere eliminar el edge, si se selecciona no se pregunta si se quieren desactivar sus servicios de actualizacion y los que tenga.
 Y SI NO SE DETECTA CHROME INSTALADO QUE TE PONGA UNA FORMA DE INSTALARLO AUTOMATICAMENTE CON UN BOTON despues de eliminar edge.
+
+
+CAMBIOS UI
+tiene un granulado el fondo que hay que sacar, los botones de cerrara la derecha como windows, que no tenga el nombre nuroptimizador arriba con los botones de cerrar, agregar un icono a la aplicacion para que se vea en la barra de tareas.

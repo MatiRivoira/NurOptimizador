@@ -375,8 +375,8 @@
               </StackPanel>
 
               <StackPanel x:Name="WzOptional" Visibility="Collapsed">
-                <TextBlock Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
-                <TextBlock Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
+                <TextBlock x:Name="WzOptTitle" Text="Ajustes opcionales" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzOptSub" Text="Estos no se aplican solos porque dependen de cómo uses tu PC. Marcá los que quieras."
                            TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,16"/>
                 <ScrollViewer MaxHeight="330" VerticalScrollBarVisibility="Auto">
                   <StackPanel x:Name="WzOptList" Margin="0,0,10,0"/>
@@ -385,6 +385,41 @@
                   <Button x:Name="WzOptApply" Style="{StaticResource GlassButton}" Content="Aplicar los marcados" MinWidth="190" Margin="0,0,12,0"/>
                   <Button x:Name="WzOptSkip" Style="{StaticResource GlassButton}" Content="Omitir" MinWidth="120"/>
                 </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzEdge" Visibility="Collapsed">
+                <TextBlock Text="Microsoft Edge" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock Text="¿Querés eliminar Microsoft Edge de tu PC?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
+                           Text="Windows protege Edge y en las versiones más nuevas puede no dejar quitarlo; si no se puede, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzEdgeYes" Style="{StaticResource GlassButton}" Content="Sí, eliminar Edge" MinWidth="190" Margin="0,0,12,0"/>
+                  <Button x:Name="WzEdgeNo" Style="{StaticResource GlassButton}" Content="No, mantenerlo" MinWidth="170"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzEdgeUpd" Visibility="Collapsed">
+                <TextBlock Text="Actualizaciones de Edge" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock x:Name="WzEdgeUpdNote" TextWrapping="Wrap" Foreground="#FFEBC66E" FontSize="13" Margin="0,10,0,0"/>
+                <TextBlock Text="¿Querés desactivar los servicios y tareas de actualización de Edge?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
+                           Text="Edge dejará de actualizarse solo y puede quedar con fallas de seguridad sin corregir. Solo conviene si no lo usás."/>
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="WzEdgeUpdYes" Style="{StaticResource GlassButton}" Content="Sí, desactivar" MinWidth="170" Margin="0,0,12,0"/>
+                  <Button x:Name="WzEdgeUpdNo" Style="{StaticResource GlassButton}" Content="No, dejarlas" MinWidth="170"/>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel x:Name="WzChrome" Visibility="Collapsed">
+                <TextBlock Text="Instalar un navegador" FontSize="28" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"
+                           Text="Quitaste Edge y no se detectó Google Chrome en tu PC. Sin un navegador no vas a poder abrir páginas web. ¿Querés instalar Chrome ahora?"/>
+                <StackPanel x:Name="WzChromeButtons" Orientation="Horizontal">
+                  <Button x:Name="WzChromeInstall" Style="{StaticResource GlassButton}" Content="Instalar Google Chrome" MinWidth="200" Margin="0,0,12,0"/>
+                  <Button x:Name="WzChromeSkip" Style="{StaticResource GlassButton}" Content="Ahora no" MinWidth="130"/>
+                </StackPanel>
+                <TextBlock x:Name="WzChromeBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
+                           Text="Instalando Chrome... puede tardar un minuto."/>
               </StackPanel>
 
               <StackPanel x:Name="WzDone" Visibility="Collapsed">

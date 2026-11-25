@@ -307,9 +307,13 @@ $script:WzProgText  = $script:window.FindName('WzProgText')
 $script:WzProgCount = $script:window.FindName('WzProgCount')
 $script:WzProgTitle = $script:window.FindName('WzProgTitle')
 $script:WzOptList   = $script:window.FindName('WzOptList')
+$script:WzOptTitle  = $script:window.FindName('WzOptTitle')
+$script:WzOptSub    = $script:window.FindName('WzOptSub')
+$script:WzEdgeUpdNote = $script:window.FindName('WzEdgeUpdNote')
+$script:OptStage    = 'Optimizar'
 $script:WzDoneText  = $script:window.FindName('WzDoneText')
 $script:WzPages = @{}
-foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
+foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Chrome', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
 
 function Show-WizardPage([string]$Name) {
     foreach ($k in $script:WzPages.Keys) {
@@ -430,9 +434,19 @@ function New-OptionRow($Tweak, [bool]$ShowSeparator) {
     return $row
 }
 
-function Show-OptionalPage {
-    $opt = @($script:Tweaks | Where-Object { $_.Optional })
-    if ($opt.Count -eq 0) { Show-Done; return }
+# Etapas del final del modo rápido: Optimización opcional -> Personalización opcional -> pregunta de Edge
+function Show-OptionalPage([string]$Stage) {
+    $script:OptStage = $Stage
+    $opt = @($script:Tweaks | Where-Object { $_.Optional -and $_.OptionalPage -eq $Stage })
+    if ($opt.Count -eq 0) { Complete-OptionalStage; return }
+    if ($Stage -eq 'Optimizar') {
+        $script:WzOptTitle.Text = 'Optimización opcional'
+        $script:WzOptSub.Text   = 'Estos ajustes dependen de cómo uses tu PC, por eso no se aplicaron solos. Marcá los que quieras.'
+    }
+    else {
+        $script:WzOptTitle.Text = 'Personalización opcional'
+        $script:WzOptSub.Text   = 'Cambios de aspecto y de comportamiento que son cuestión de gusto. Marcá los que quieras.'
+    }
     $script:WzOptList.Children.Clear()
     $script:OptChecks = @()
     foreach ($g in ($opt | Group-Object OptionalGroup)) {
@@ -460,12 +474,22 @@ function Show-OptionalPage {
     Show-WizardPage 'Optional'
 }
 
+function Complete-OptionalStage {
+    if ($script:OptStage -eq 'Optimizar') { Show-OptionalPage 'Personalizar' }
+    else { Show-EdgeQuestion }
+}
+
+function Show-EdgeQuestion {
+    if (Test-EdgeInstalled) { Show-WizardPage 'Edge' } else { Show-Done }
+}
+
 function Start-QuickMode {
     $ids = @($script:Tweaks | Where-Object { $_.Quick } | ForEach-Object { $_.Id })
     $msg = "El modo rápido va a aplicar $($ids.Count) ajustes, entre ellos:`n`n" +
            "  - Quitar OneDrive, apps preinstaladas y características heredadas`n" +
            "  - Quitar IA de Windows, Edge y Office`n" +
-           "  - Desanclar todo de la barra de tareas y del menú Inicio`n`n" +
+           "  - Desanclar todo de la barra de tareas y del menú Inicio, y quitar Widgets`n" +
+           "  - Desactivar servicios como Escritorio remoto, zona móvil y administración de radio (modo avión)`n`n" +
            "Casi todo se puede revertir desde el modo avanzado, pero quitar apps y OneDrive no.`n`n¿Continuar?"
     $ans = [Windows.MessageBox]::Show($msg, 'NurOptimizador', 'YesNo', 'Question')
     if ($ans -ne 'Yes') { return }
@@ -473,11 +497,11 @@ function Start-QuickMode {
     Show-WizardPage 'Progress'
     Update-UI
     Start-Batch $ids
-    Show-OptionalPage
+    Show-OptionalPage 'Optimizar'
 }
 
 $quickCount = @($script:Tweaks | Where-Object { $_.Quick }).Count
-$script:window.FindName('WzQuickDesc').Text = "Aplica $quickCount ajustes recomendados de una vez, con una barra de progreso. Al final te pregunta por algunos opcionales."
+$script:window.FindName('WzQuickDesc').Text = "Aplica $quickCount ajustes recomendados de una vez, con una barra de progreso. Al final te pregunta por los opcionales y por Edge."
 $script:window.FindName('WzAdvDesc').Text   = 'Elegí ajuste por ajuste con interruptores, viendo qué hace cada uno. Cada uno se puede revertir.'
 
 $script:window.FindName('WzRestoreYes').Add_Click({
@@ -500,9 +524,48 @@ $script:window.FindName('WzOptApply').Add_Click({
         Update-UI
         Start-Batch $ids
     }
+    Complete-OptionalStage
+})
+$script:window.FindName('WzOptSkip').Add_Click({ Complete-OptionalStage })
+
+# Edge: si se elige quitarlo no se pregunta por sus actualizaciones (salvo que Windows no lo deje quitar)
+$script:window.FindName('WzEdgeYes').Add_Click({
+    $script:WzProgTitle.Text = 'Quitando Microsoft Edge...'
+    Show-WizardPage 'Progress'
+    Update-UI
+    Start-Batch @('RemoveEdge')
+    if (Test-EdgeInstalled) {
+        $script:WzEdgeUpdNote.Text = 'No se pudo quitar Edge: Windows lo protege en esta versión.'
+        $script:WzEdgeUpdNote.Visibility = 'Visible'
+        Show-WizardPage 'EdgeUpd'
+    }
+    elseif (-not (Test-ChromeInstalled)) { Show-WizardPage 'Chrome' }
+    else { Show-Done }
+})
+$script:window.FindName('WzEdgeNo').Add_Click({
+    $script:WzEdgeUpdNote.Text = ''
+    $script:WzEdgeUpdNote.Visibility = 'Collapsed'
+    Show-WizardPage 'EdgeUpd'
+})
+$script:window.FindName('WzEdgeUpdYes').Add_Click({
+    $script:WzProgTitle.Text = 'Desactivando las actualizaciones de Edge...'
+    Show-WizardPage 'Progress'
+    Update-UI
+    Start-Batch @('DisableEdgeUpdate')
     Show-Done
 })
-$script:window.FindName('WzOptSkip').Add_Click({ Show-Done })
+$script:window.FindName('WzEdgeUpdNo').Add_Click({ Show-Done })
+
+# Chrome: solo aparece si se quitó Edge y no se detecta Chrome
+$script:window.FindName('WzChromeInstall').Add_Click({
+    $script:window.FindName('WzChromeButtons').Visibility = 'Collapsed'
+    $script:window.FindName('WzChromeBusy').Visibility = 'Visible'
+    Update-UI
+    $res = Install-Chrome
+    if ([bool]($res | Select-Object -Last 1)) { $script:BatchOk++ } else { [void]$script:BatchFail.Add('Instalar Google Chrome') }
+    Show-Done
+})
+$script:window.FindName('WzChromeSkip').Add_Click({ Show-Done })
 $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 

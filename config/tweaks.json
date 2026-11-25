@@ -770,6 +770,23 @@
     ]
   },
   {
+    "Id": "DisableSecurityHealthTray",
+    "Category": "Rendimiento",
+    "Quick": true,
+    "Risk": "Bajo",
+    "Name": "Quitar SecurityHealthSystray.exe del arranque",
+    "Description": "Evita que el ícono de Seguridad de Windows (SecurityHealthSystray.exe) se cargue al iniciar sesión. Un proceso menos al arrancar. La protección de Windows sigue activa; lo que perdés es el ícono de la bandeja y sus avisos.",
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run",
+        "Name": "SecurityHealth",
+        "Type": "Binary",
+        "Value": "03,00,00,00,00,00,00,00,00,00,00,00",
+        "OriginalValue": "02,00,00,00,00,00,00,00,00,00,00,00"
+      }
+    ]
+  },
+  {
     "Id": "DisableUselessServices",
     "Category": "Servicios",
     "Name": "Desactivar servicios innecesarios",
@@ -863,7 +880,8 @@
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
   },
   {
     "Id": "DisableSysMain",
@@ -879,23 +897,172 @@
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
   },
   {
     "Id": "DisablePrintSpooler",
     "Category": "Servicios",
-    "Name": "Desactivar servicio de impresión",
-    "Description": "Apaga la cola de impresión. Solo si no imprimís nunca: sin este servicio tampoco funciona \"Microsoft Print to PDF\".",
+    "Name": "Desactivar servicios de impresión",
+    "Description": "Apaga la cola de impresión, las extensiones y notificaciones de impresora, la configuración de dispositivos de impresión y el intermediario de impresión y escaneo. Solo si no imprimís nunca: sin esto tampoco funciona \"Microsoft Print to PDF\".",
     "Risk": "Medio",
     "service": [
       {
         "Name": "Spooler",
         "StartupType": "Disabled",
         "OriginalType": "Automatic"
+      },
+      {
+        "Name": "PrintNotify",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "PrintDeviceConfigurationService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "PrintScanBrokerService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
       }
     ],
     "Optional": true,
-    "OptionalGroup": "Servicios"
+    "OptionalGroup": "Servicios",
+    "OptionalPage": "Optimizar"
+  },
+  {
+    "Id": "DisableExtraServices",
+    "Category": "Servicios",
+    "Quick": true,
+    "Risk": "Medio",
+    "Name": "Desactivar servicios extra (ubicación, tarjeta inteligente y Hyper-V de invitado)",
+    "Description": "Desactiva Geolocalización, Tarjeta inteligente y su directiva de extracción, y los servicios de integración de Hyper-V para máquinas virtuales invitadas (instantáneas de volumen, PowerShell Direct, virtualización de escritorio remoto, sincronización de hora, latido, intercambio de datos, cierre de invitado) más el servicio Host HV. No lo uses si corrés Windows dentro de una máquina virtual de Hyper-V ni si usás tarjetas inteligentes (token USB, DNI electrónico).",
+    "service": [
+      {
+        "Name": "lfsvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SCardSvr",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SCPolicySvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicvss",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicvmsession",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicrdv",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmictimesync",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicheartbeat",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmickvpexchange",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "vmicshutdown",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "HvHost",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ]
+  },
+  {
+    "Id": "DisableConnectivityServices",
+    "Category": "Servicios",
+    "Quick": true,
+    "Risk": "Medio",
+    "Name": "Desactivar Escritorio remoto, zona móvil y administración de radio",
+    "Description": "Desactiva los servicios de Escritorio remoto (Servicios y Configuración), la zona con cobertura inalámbrica móvil y la administración de radio. Ojo: sin la administración de radio se pierde el modo avión y el interruptor de Bluetooth; sin la zona móvil no podés compartir tu conexión. No lo uses si te conectás a esta PC por Escritorio remoto.",
+    "service": [
+      {
+        "Name": "TermService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "SessionEnv",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "icssvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "RmSvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ]
+  },
+  {
+    "Id": "DisableEdgeUpdate",
+    "Category": "Servicios",
+    "Risk": "Medio",
+    "Name": "Desactivar las actualizaciones de Microsoft Edge",
+    "Description": "Apaga los servicios y las tareas programadas de actualización de Edge (edgeupdate, edgeupdatem y el servicio de elevación). Edge dejará de actualizarse solo y puede quedar con fallas de seguridad sin corregir: solo conviene si no lo usás.",
+    "service": [
+      {
+        "Name": "edgeupdate",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "edgeupdatem",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "MicrosoftEdgeElevationService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ],
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "Name": "Update{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}",
+        "Type": "DWord",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "commands": {
+      "apply": "Disable-EdgeUpdateTasks",
+      "undo": "Enable-EdgeUpdateTasks"
+    }
   },
   {
     "Id": "ClassicContextMenu",
@@ -909,7 +1076,8 @@
       "test": "Test-Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'"
     },
     "Optional": true,
-    "OptionalGroup": "Personalización"
+    "OptionalGroup": "Personalización",
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "EndTaskRightClick",
@@ -1058,7 +1226,8 @@
     },
     "Optional": true,
     "OptionalGroup": "Personalización",
-    "SignOutHint": true
+    "SignOutHint": true,
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "HideSleepOption",
@@ -1087,13 +1256,14 @@
     "commands": {
       "apply": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue",
       "undo": "Stop-Process -Name StartMenuExperienceHost -Force -ErrorAction SilentlyContinue"
-    }
+    },
+    "OptionalPage": "Personalizar"
   },
   {
     "Id": "CleanTaskbar",
     "Category": "Barra de tareas",
     "Name": "Barra de tareas limpia",
-    "Description": "Oculta la búsqueda, la vista de tareas y los widgets. Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
+    "Description": "Oculta la búsqueda y la vista de tareas, y quita Widgets (desinstala su paquete). Deja la barra solo con tus apps. Reinicia el Explorador (la barra parpadea un instante).",
     "Risk": "Bajo",
     "registry": [
       {
@@ -1119,8 +1289,8 @@
       }
     ],
     "commands": {
-      "apply": "Restart-Explorer",
-      "undo": "Restart-Explorer"
+      "apply": "Remove-Widgets; Restart-Explorer",
+      "undo": "Restore-Widgets; Restart-Explorer"
     },
     "Quick": true
   },
@@ -1229,9 +1399,9 @@
     "Kind": "action",
     "Category": "Limpieza",
     "Name": "Quitar apps preinstaladas innecesarias",
-    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do y Cortana. No toca la Store, Xbox, Fotos ni la Calculadora.",
+    "Description": "Desinstala Noticias, Clima, Obtener ayuda, Consejos, Solitario, Feedback Hub, Clipchamp, Office Hub, Contactos, Power Automate, To Do, Cortana, Cámara, Reloj, Family Safety, Teams, Outlook nuevo, Phone Link, Quick Assist, Grabadora de sonido y Notas rápidas. No toca la Store, Xbox, Fotos ni la Calculadora.",
     "Risk": "Medio",
-    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
+    "Confirm": "Se van a desinstalar las apps preinstaladas de la lista (incluidas Cámara, Reloj, Teams, Outlook nuevo, Phone Link, Quick Assist, Grabadora y Notas rápidas) para todos los usuarios.\n\nSe pueden volver a instalar desde la Microsoft Store, pero este botón no las restaura.\n\n¿Continuar?",
     "appx": [
       "Microsoft.BingNews",
       "Microsoft.BingWeather",
@@ -1244,9 +1414,22 @@
       "Microsoft.People",
       "Microsoft.PowerAutomateDesktop",
       "Microsoft.Todos",
-      "Microsoft.549981C3F5F10"
+      "Microsoft.549981C3F5F10",
+      "Microsoft.WindowsCamera",
+      "Microsoft.WindowsAlarms",
+      "MicrosoftCorporationII.MicrosoftFamily",
+      "MSTeams",
+      "MicrosoftTeams",
+      "Microsoft.OutlookForWindows",
+      "Microsoft.YourPhone",
+      "MicrosoftCorporationII.QuickAssist",
+      "Microsoft.WindowsSoundRecorder",
+      "Microsoft.MicrosoftStickyNotes"
     ],
-    "Quick": true
+    "Quick": true,
+    "capabilities": [
+      "App.Support.QuickAssist"
+    ]
   },
   {
     "Id": "RemoveOneDrive",
@@ -1273,6 +1456,37 @@
       "apply": "Remove-LegacyFeatures"
     },
     "Quick": true
+  },
+  {
+    "Id": "RemoveGameBar",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Risk": "Medio",
+    "Optional": true,
+    "OptionalPage": "Optimizar",
+    "OptionalGroup": "Aplicaciones",
+    "Name": "Desinstalar Xbox Game Bar",
+    "Description": "Desinstala Game Bar (Win+G) y desactiva su integración con juegos y mandos, para que Windows no muestre los avisos de \"ms-gamebar\" y \"ms-gamingoverlay\". Ojo: con procesadores AMD Ryzen X3D, Windows usa Game Bar para decidir qué núcleos usar en juegos, y el atajo Win+Alt+B (HDR) también depende de él.",
+    "Confirm": "Se va a desinstalar Xbox Game Bar y desactivar su integración.\n\nSi tenés un procesador AMD Ryzen X3D o usás Win+Alt+B para el HDR, conviene dejarlo.\n\n¿Continuar?",
+    "appx": [
+      "Microsoft.XboxGamingOverlay",
+      "Microsoft.XboxGameOverlay"
+    ],
+    "commands": {
+      "apply": "Disable-GameBarIntegration"
+    }
+  },
+  {
+    "Id": "RemoveEdge",
+    "Kind": "action",
+    "Category": "Limpieza",
+    "Risk": "Alto",
+    "Name": "Quitar Microsoft Edge",
+    "Description": "Intenta desinstalar Edge con su propio desinstalador y bloquea que se reinstale solo. Windows lo protege: en versiones recientes (compilación 26300 o más nueva) puede no dejarlo. Si no se puede, no cambia nada.",
+    "Confirm": "Se va a intentar desinstalar Microsoft Edge.\n\nAlgunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Asegurate de tener otro navegador.\n\n¿Continuar?",
+    "commands": {
+      "apply": "Remove-Edge"
+    }
   },
   {
     "Id": "RepairSystem",
