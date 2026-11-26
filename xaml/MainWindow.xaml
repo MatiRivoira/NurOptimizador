@@ -23,17 +23,6 @@
       <GradientStop Color="#18FFFFFF" Offset="0.4"/>
       <GradientStop Color="#0DFFFFFF" Offset="1"/>
     </LinearGradientBrush>
-    <!-- Botones de ventana brillantes -->
-    <RadialGradientBrush x:Key="DotRedBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFFFB8B0" Offset="0"/><GradientStop Color="#FFE5251A" Offset="0.42"/><GradientStop Color="#FF9E0D05" Offset="1"/>
-    </RadialGradientBrush>
-    <RadialGradientBrush x:Key="DotYellowBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFFFF3A8" Offset="0"/><GradientStop Color="#FFEBBB00" Offset="0.42"/><GradientStop Color="#FF9A7600" Offset="1"/>
-    </RadialGradientBrush>
-    <RadialGradientBrush x:Key="DotGreenBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFBDFFB5" Offset="0"/><GradientStop Color="#FF2EC420" Offset="0.42"/><GradientStop Color="#FF118009" Offset="1"/>
-    </RadialGradientBrush>
-
     <!-- Tarjeta de vidrio esmerilado oscuro -->
     <Style x:Key="GlassCard" TargetType="Border">
       <Setter Property="CornerRadius" Value="20"/>
@@ -128,22 +117,45 @@
       </Setter>
     </Style>
 
-    <!-- Botones de ventana: puntos brillantes -->
-    <Style x:Key="Dot" TargetType="Button">
-      <Setter Property="Width" Value="14"/>
-      <Setter Property="Height" Value="14"/>
-      <Setter Property="Margin" Value="0,0,9,0"/>
-      <Setter Property="Cursor" Value="Hand"/>
+    <!-- Botones de ventana estilo Windows: minimizar y cerrar -->
+    <Style x:Key="CaptionBtn" TargetType="Button">
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="Cursor" Value="Arrow"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Ellipse Fill="{TemplateBinding Background}" Stroke="#40000000" StrokeThickness="0.6"/>
+            <Border x:Name="Bd" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Opacity" Value="0.8"/>
+                <Setter TargetName="Bd" Property="Background" Value="#26FFFFFF"/>
               </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.35"/>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="CloseBtn" TargetType="Button" BasedOn="{StaticResource CaptionBtn}">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#FFC42B1C"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#FF9E1F14"/>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -240,7 +252,7 @@
 
       <Grid>
         <Grid.RowDefinitions>
-          <RowDefinition Height="44"/>
+          <RowDefinition Height="36"/>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -248,17 +260,12 @@
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Barra de título -->
-        <Border x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent" BorderBrush="#26FFFFFF" BorderThickness="0,0,0,1">
-          <Grid>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="22,0,0,0">
-              <Button x:Name="BtnClose" Style="{StaticResource Dot}" Background="{StaticResource DotRedBrush}" ToolTip="Cerrar"/>
-              <Button x:Name="BtnMin" Style="{StaticResource Dot}" Background="{StaticResource DotYellowBrush}" ToolTip="Minimizar"/>
-              <Button x:Name="BtnZoom" Style="{StaticResource Dot}" Background="{StaticResource DotGreenBrush}" IsEnabled="False"/>
-            </StackPanel>
-            <TextBlock x:Name="TitleText" Text="NurOptimizador" Foreground="#80FFFFFF" FontSize="12.5"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
-          </Grid>
+        <!-- Barra de título: solo los botones de ventana, a la derecha como en Windows -->
+        <Border x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button x:Name="BtnMin" Style="{StaticResource CaptionBtn}" Content="&#xE921;" ToolTip="Minimizar"/>
+            <Button x:Name="BtnClose" Style="{StaticResource CloseBtn}" Content="&#xE8BB;" ToolTip="Cerrar"/>
+          </StackPanel>
         </Border>
 
         <!-- Barra lateral -->
@@ -439,8 +446,6 @@
           </StackPanel>
         </Grid>
       </Grid>
-      <!-- Textura de vidrio esmerilado (el pincel se genera en UI.ps1) -->
-      <Border x:Name="Grain" IsHitTestVisible="False" Opacity="0.06"/>
     </Grid>
   </Border>
 </Window>

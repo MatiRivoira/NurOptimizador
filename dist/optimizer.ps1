@@ -1551,17 +1551,6 @@ $script:Xaml = @'
       <GradientStop Color="#18FFFFFF" Offset="0.4"/>
       <GradientStop Color="#0DFFFFFF" Offset="1"/>
     </LinearGradientBrush>
-    <!-- Botones de ventana brillantes -->
-    <RadialGradientBrush x:Key="DotRedBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFFFB8B0" Offset="0"/><GradientStop Color="#FFE5251A" Offset="0.42"/><GradientStop Color="#FF9E0D05" Offset="1"/>
-    </RadialGradientBrush>
-    <RadialGradientBrush x:Key="DotYellowBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFFFF3A8" Offset="0"/><GradientStop Color="#FFEBBB00" Offset="0.42"/><GradientStop Color="#FF9A7600" Offset="1"/>
-    </RadialGradientBrush>
-    <RadialGradientBrush x:Key="DotGreenBrush" GradientOrigin="0.35,0.3" Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
-      <GradientStop Color="#FFBDFFB5" Offset="0"/><GradientStop Color="#FF2EC420" Offset="0.42"/><GradientStop Color="#FF118009" Offset="1"/>
-    </RadialGradientBrush>
-
     <!-- Tarjeta de vidrio esmerilado oscuro -->
     <Style x:Key="GlassCard" TargetType="Border">
       <Setter Property="CornerRadius" Value="20"/>
@@ -1656,22 +1645,45 @@ $script:Xaml = @'
       </Setter>
     </Style>
 
-    <!-- Botones de ventana: puntos brillantes -->
-    <Style x:Key="Dot" TargetType="Button">
-      <Setter Property="Width" Value="14"/>
-      <Setter Property="Height" Value="14"/>
-      <Setter Property="Margin" Value="0,0,9,0"/>
-      <Setter Property="Cursor" Value="Hand"/>
+    <!-- Botones de ventana estilo Windows: minimizar y cerrar -->
+    <Style x:Key="CaptionBtn" TargetType="Button">
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="Cursor" Value="Arrow"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Ellipse Fill="{TemplateBinding Background}" Stroke="#40000000" StrokeThickness="0.6"/>
+            <Border x:Name="Bd" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Opacity" Value="0.8"/>
+                <Setter TargetName="Bd" Property="Background" Value="#26FFFFFF"/>
               </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.35"/>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="CloseBtn" TargetType="Button" BasedOn="{StaticResource CaptionBtn}">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="Transparent">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#FFC42B1C"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#FF9E1F14"/>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -1768,7 +1780,7 @@ $script:Xaml = @'
 
       <Grid>
         <Grid.RowDefinitions>
-          <RowDefinition Height="44"/>
+          <RowDefinition Height="36"/>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -1776,17 +1788,12 @@ $script:Xaml = @'
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Barra de título -->
-        <Border x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent" BorderBrush="#26FFFFFF" BorderThickness="0,0,0,1">
-          <Grid>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="22,0,0,0">
-              <Button x:Name="BtnClose" Style="{StaticResource Dot}" Background="{StaticResource DotRedBrush}" ToolTip="Cerrar"/>
-              <Button x:Name="BtnMin" Style="{StaticResource Dot}" Background="{StaticResource DotYellowBrush}" ToolTip="Minimizar"/>
-              <Button x:Name="BtnZoom" Style="{StaticResource Dot}" Background="{StaticResource DotGreenBrush}" IsEnabled="False"/>
-            </StackPanel>
-            <TextBlock x:Name="TitleText" Text="NurOptimizador" Foreground="#80FFFFFF" FontSize="12.5"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
-          </Grid>
+        <!-- Barra de título: solo los botones de ventana, a la derecha como en Windows -->
+        <Border x:Name="TitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button x:Name="BtnMin" Style="{StaticResource CaptionBtn}" Content="&#xE921;" ToolTip="Minimizar"/>
+            <Button x:Name="BtnClose" Style="{StaticResource CloseBtn}" Content="&#xE8BB;" ToolTip="Cerrar"/>
+          </StackPanel>
         </Border>
 
         <!-- Barra lateral -->
@@ -1967,8 +1974,6 @@ $script:Xaml = @'
           </StackPanel>
         </Grid>
       </Grid>
-      <!-- Textura de vidrio esmerilado (el pincel se genera en UI.ps1) -->
-      <Border x:Name="Grain" IsHitTestVisible="False" Opacity="0.06"/>
     </Grid>
   </Border>
 </Window>
@@ -1980,7 +1985,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.2.0'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.2.1'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -2658,8 +2663,60 @@ public static class NurGlass {
 '@
 }
 
+# ---------- Ícono de la aplicación (barra de tareas) ----------
+# Se dibuja acá mismo, así no hace falta un archivo aparte.
+function New-AppIcon {
+    $S = 256
+    $dv = New-Object System.Windows.Media.DrawingVisual
+    $dc = $dv.RenderOpen()
+
+    $body = New-Object System.Windows.Media.LinearGradientBrush
+    $body.StartPoint = [Windows.Point]::new(0, 0); $body.EndPoint = [Windows.Point]::new(1, 1)
+    [void]$body.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromRgb(0x46, 0x46, 0x4A), 0))
+    [void]$body.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromRgb(0x1A, 0x1A, 0x1C), 1))
+
+    $edge = New-Object System.Windows.Media.LinearGradientBrush
+    $edge.StartPoint = [Windows.Point]::new(0, 0); $edge.EndPoint = [Windows.Point]::new(0, 1)
+    [void]$edge.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0xCC, 255, 255, 255), 0))
+    [void]$edge.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x22, 255, 255, 255), 1))
+    $pen = New-Object System.Windows.Media.Pen($edge, 6)
+    $dc.DrawRoundedRectangle($body, $pen, [Windows.Rect]::new(10, 10, 236, 236), 60, 60)
+
+    # brillo de vidrio en la mitad de arriba
+    $gloss = New-Object System.Windows.Media.LinearGradientBrush
+    $gloss.StartPoint = [Windows.Point]::new(0, 0); $gloss.EndPoint = [Windows.Point]::new(0, 1)
+    [void]$gloss.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x40, 255, 255, 255), 0))
+    [void]$gloss.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x00, 255, 255, 255), 1))
+    $dc.DrawRoundedRectangle($gloss, $null, [Windows.Rect]::new(10, 10, 236, 120), 60, 60)
+
+    # la "N"
+    $face = New-Object System.Windows.Media.FontFamily('Segoe UI')
+    $tf = New-Object System.Windows.Media.Typeface($face, [Windows.FontStyles]::Normal, [Windows.FontWeights]::Bold, [Windows.FontStretches]::Normal)
+    $ft = New-Object System.Windows.Media.FormattedText('N', [System.Globalization.CultureInfo]::InvariantCulture, [Windows.FlowDirection]::LeftToRight, $tf, 176, [Windows.Media.Brushes]::White)
+    $dc.DrawText($ft, [Windows.Point]::new(($S - $ft.Width) / 2, ($S - $ft.Height) / 2))
+    $dc.Close()
+
+    $bmp = New-Object System.Windows.Media.Imaging.RenderTargetBitmap($S, $S, 96, 96, [System.Windows.Media.PixelFormats]::Pbgra32)
+    $bmp.Render($dv)
+    $bmp.Freeze()
+    return $bmp
+}
+
+# Identidad propia: sin esto Windows agrupa la ventana con PowerShell y muestra el ícono de PowerShell en la barra de tareas
+if (-not ('NurShell' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System.Runtime.InteropServices;
+public static class NurShell {
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    public static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
+}
+'@
+}
+try { [void][NurShell]::SetCurrentProcessExplicitAppUserModelID('MatiRivoira.NurOptimizador') } catch { }
+
 $reader = New-Object System.Xml.XmlNodeReader ([xml]$script:Xaml)
 $script:window = [Windows.Markup.XamlReader]::Load($reader)
+try { $script:window.Icon = New-AppIcon } catch { }
 
 $script:Tint         = $script:window.FindName('Tint')
 $script:LogBox       = $script:window.FindName('LogBox')
@@ -3201,24 +3258,6 @@ $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
-
-# Textura de vidrio esmerilado: ruido fino y suave sobre toda la ventana
-try {
-    $gw = 96; $gh = 96
-    $rnd = New-Object System.Random 11
-    $px  = New-Object byte[] ($gw * $gh * 4)
-    for ($i = 0; $i -lt ($gw * $gh); $i++) {
-        $v = [byte]$rnd.Next(0, 256)
-        $px[4 * $i] = $v; $px[4 * $i + 1] = $v; $px[4 * $i + 2] = $v; $px[4 * $i + 3] = 255
-    }
-    $bs = [System.Windows.Media.Imaging.BitmapSource]::Create($gw, $gh, 96, 96, [System.Windows.Media.PixelFormats]::Bgra32, $null, $px, $gw * 4)
-    $ib = New-Object System.Windows.Media.ImageBrush($bs)
-    $ib.TileMode = 'Tile'; $ib.ViewportUnits = 'Absolute'; $ib.Stretch = 'Fill'
-    $ib.Viewport = New-Object System.Windows.Rect(0, 0, $gw, $gh)
-    $ib.Freeze()
-    $grain = $script:window.FindName('Grain')
-    if ($grain) { $grain.Background = $ib }
-} catch { }
 
 # Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
 function Set-AppText([string]$Name, [string]$Text) {

@@ -27,8 +27,60 @@ public static class NurGlass {
 '@
 }
 
+# ---------- Ícono de la aplicación (barra de tareas) ----------
+# Se dibuja acá mismo, así no hace falta un archivo aparte.
+function New-AppIcon {
+    $S = 256
+    $dv = New-Object System.Windows.Media.DrawingVisual
+    $dc = $dv.RenderOpen()
+
+    $body = New-Object System.Windows.Media.LinearGradientBrush
+    $body.StartPoint = [Windows.Point]::new(0, 0); $body.EndPoint = [Windows.Point]::new(1, 1)
+    [void]$body.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromRgb(0x46, 0x46, 0x4A), 0))
+    [void]$body.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromRgb(0x1A, 0x1A, 0x1C), 1))
+
+    $edge = New-Object System.Windows.Media.LinearGradientBrush
+    $edge.StartPoint = [Windows.Point]::new(0, 0); $edge.EndPoint = [Windows.Point]::new(0, 1)
+    [void]$edge.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0xCC, 255, 255, 255), 0))
+    [void]$edge.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x22, 255, 255, 255), 1))
+    $pen = New-Object System.Windows.Media.Pen($edge, 6)
+    $dc.DrawRoundedRectangle($body, $pen, [Windows.Rect]::new(10, 10, 236, 236), 60, 60)
+
+    # brillo de vidrio en la mitad de arriba
+    $gloss = New-Object System.Windows.Media.LinearGradientBrush
+    $gloss.StartPoint = [Windows.Point]::new(0, 0); $gloss.EndPoint = [Windows.Point]::new(0, 1)
+    [void]$gloss.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x40, 255, 255, 255), 0))
+    [void]$gloss.GradientStops.Add([System.Windows.Media.GradientStop]::new([System.Windows.Media.Color]::FromArgb(0x00, 255, 255, 255), 1))
+    $dc.DrawRoundedRectangle($gloss, $null, [Windows.Rect]::new(10, 10, 236, 120), 60, 60)
+
+    # la "N"
+    $face = New-Object System.Windows.Media.FontFamily('Segoe UI')
+    $tf = New-Object System.Windows.Media.Typeface($face, [Windows.FontStyles]::Normal, [Windows.FontWeights]::Bold, [Windows.FontStretches]::Normal)
+    $ft = New-Object System.Windows.Media.FormattedText('N', [System.Globalization.CultureInfo]::InvariantCulture, [Windows.FlowDirection]::LeftToRight, $tf, 176, [Windows.Media.Brushes]::White)
+    $dc.DrawText($ft, [Windows.Point]::new(($S - $ft.Width) / 2, ($S - $ft.Height) / 2))
+    $dc.Close()
+
+    $bmp = New-Object System.Windows.Media.Imaging.RenderTargetBitmap($S, $S, 96, 96, [System.Windows.Media.PixelFormats]::Pbgra32)
+    $bmp.Render($dv)
+    $bmp.Freeze()
+    return $bmp
+}
+
+# Identidad propia: sin esto Windows agrupa la ventana con PowerShell y muestra el ícono de PowerShell en la barra de tareas
+if (-not ('NurShell' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System.Runtime.InteropServices;
+public static class NurShell {
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    public static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
+}
+'@
+}
+try { [void][NurShell]::SetCurrentProcessExplicitAppUserModelID('MatiRivoira.NurOptimizador') } catch { }
+
 $reader = New-Object System.Xml.XmlNodeReader ([xml]$script:Xaml)
 $script:window = [Windows.Markup.XamlReader]::Load($reader)
+try { $script:window.Icon = New-AppIcon } catch { }
 
 $script:Tint         = $script:window.FindName('Tint')
 $script:LogBox       = $script:window.FindName('LogBox')
@@ -570,24 +622,6 @@ $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
 Show-WizardPage 'Restore'
-
-# Textura de vidrio esmerilado: ruido fino y suave sobre toda la ventana
-try {
-    $gw = 96; $gh = 96
-    $rnd = New-Object System.Random 11
-    $px  = New-Object byte[] ($gw * $gh * 4)
-    for ($i = 0; $i -lt ($gw * $gh); $i++) {
-        $v = [byte]$rnd.Next(0, 256)
-        $px[4 * $i] = $v; $px[4 * $i + 1] = $v; $px[4 * $i + 2] = $v; $px[4 * $i + 3] = 255
-    }
-    $bs = [System.Windows.Media.Imaging.BitmapSource]::Create($gw, $gh, 96, 96, [System.Windows.Media.PixelFormats]::Bgra32, $null, $px, $gw * 4)
-    $ib = New-Object System.Windows.Media.ImageBrush($bs)
-    $ib.TileMode = 'Tile'; $ib.ViewportUnits = 'Absolute'; $ib.Stretch = 'Fill'
-    $ib.Viewport = New-Object System.Windows.Rect(0, 0, $gw, $gh)
-    $ib.Freeze()
-    $grain = $script:window.FindName('Grain')
-    if ($grain) { $grain.Background = $ib }
-} catch { }
 
 # Versión visible: debajo del nombre (barra lateral y pantalla de inicio) y en el Registro
 function Set-AppText([string]$Name, [string]$Text) {

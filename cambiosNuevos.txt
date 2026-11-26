@@ -11,3 +11,6 @@ Y SI NO SE DETECTA CHROME INSTALADO QUE TE PONGA UNA FORMA DE INSTALARLO AUTOMAT
 
 CAMBIOS UI
 tiene un granulado el fondo que hay que sacar, los botones de cerrara la derecha como windows, que no tenga el nombre nuroptimizador arriba con los botones de cerrar, agregar un icono a la aplicacion para que se vea en la barra de tareas.
+
+V1.2.0
+No pudo desinstalar edge, el registro mostro: ERROR: Windows protege Edge en esta version y no permitio quitarlo.
