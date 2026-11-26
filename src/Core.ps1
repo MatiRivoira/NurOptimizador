@@ -3,7 +3,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.2.1'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.2.2'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -548,24 +548,103 @@ function Test-EdgeInstalled {
     return $false
 }
 
+# Comando de desinstalación de Edge: el que Windows guarda en el registro (lleva --msedge --channel=stable) o, si no está, el setup.exe de la carpeta
+function Get-EdgeUninstallCommand {
+    $k  = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge'
+    $us = (Get-ItemProperty -Path $k -Name UninstallString -ErrorAction SilentlyContinue).UninstallString
+    if ($us) { return $us }
+    $roots = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application", "$env:ProgramFiles\Microsoft\Edge\Application") | Where-Object { Test-Path $_ }
+    $st = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -Filter setup.exe -ErrorAction SilentlyContinue | Where-Object { $_.DirectoryName -like '*\Installer' } }) |
+          Sort-Object FullName -Descending | Select-Object -First 1
+    if ($st) { return ('"{0}" --uninstall --msedge --channel=stable --system-level --verbose-logging' -f $st.FullName) }
+    return $null
+}
+
+# Corre el desinstalador con --force-uninstall y devuelve su código de salida
+function Invoke-EdgeSetup {
+    $cmd = Get-EdgeUninstallCommand
+    if (-not $cmd) { Write-Log '    No encontré el desinstalador de Edge.'; return -1 }
+    if ($cmd -notmatch '--force-uninstall') { $cmd += ' --force-uninstall' }
+    $p = Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\cmd.exe') -ArgumentList '/c', ('"' + $cmd + '"') -Wait -PassThru -WindowStyle Hidden
+    Start-Sleep -Seconds 2
+    Write-Log "    El desinstalador terminó con código $($p.ExitCode)."
+    return $p.ExitCode
+}
+
+# Truco conocido: el desinstalador de Edge se deja usar si existe el viejo MicrosoftEdge.exe en SystemApps
+function Invoke-EdgeSetupWithLegacyStub {
+    $dir  = Join-Path $env:SystemRoot 'SystemApps\Microsoft.MicrosoftEdge_8wekyb3d8bbwe'
+    $exe  = Join-Path $dir 'MicrosoftEdge.exe'
+    $made = -not (Test-Path $dir)
+    try {
+        if ($made) { New-Item -Path $dir -ItemType Directory -Force -ErrorAction Stop | Out-Null }
+        if (-not (Test-Path $exe)) { New-Item -Path $exe -ItemType File -Force -ErrorAction Stop | Out-Null }
+        [void](Invoke-EdgeSetup)
+    }
+    finally {
+        Remove-Item $exe -Force -ErrorAction SilentlyContinue
+        if ($made) { Remove-Item $dir -Force -ErrorAction SilentlyContinue }
+    }
+}
+
+# Política regional de Windows: es la que habilita "Desinstalar Edge" en la Unión Europea.
+# Es un archivo protegido del sistema: se hace copia de seguridad y SIEMPRE se restaura después.
+function Get-EdgeRegionPolicyFile { return (Join-Path $env:SystemRoot 'System32\IntegratedServicesRegionPolicySet.json') }
+
+function Enable-EdgeUninstallRegionPolicy {
+    $f = Get-EdgeRegionPolicyFile
+    if (-not (Test-Path $f)) { Write-Log '    Este Windows no tiene IntegratedServicesRegionPolicySet.json.'; return $false }
+    $bkDir = Join-Path $env:ProgramData 'NurOptimizador'
+    New-Item $bkDir -ItemType Directory -Force | Out-Null
+    $bk = Join-Path $bkDir 'IntegratedServicesRegionPolicySet.json.bak'
+    & takeown.exe /f $f 2>&1 | Out-Null
+    & icacls.exe $f /grant '*S-1-5-32-544:(F)' 2>&1 | Out-Null     # grupo Administradores por SID: funciona en cualquier idioma de Windows
+    if (-not (Test-Path $bk)) { Copy-Item $f $bk -Force }
+    $json   = (Get-Content $f -Raw -Encoding UTF8) | ConvertFrom-Json
+    $region = (Get-ItemProperty 'HKCU:\Control Panel\International\Geo' -ErrorAction SilentlyContinue).Name
+    $changed = $false
+    foreach ($pol in $json.policies) {
+        $label = "$($pol.'$comment') $($pol.name)"
+        if ($label -match 'Edge' -and $label -match 'uninstall') {
+            $pol.defaultState = 'enabled'
+            if ($region -and $pol.conditions.region.enabled -and ($pol.conditions.region.enabled -notcontains $region)) {
+                $pol.conditions.region.enabled += $region
+            }
+            $changed = $true
+        }
+    }
+    if (-not $changed) { Write-Log '    No encontré la política "Edge is uninstallable" (Windows cambió el formato del archivo).'; return $false }
+    [System.IO.File]::WriteAllText($f, ($json | ConvertTo-Json -Depth 32), (New-Object System.Text.UTF8Encoding $false))   # sin BOM
+    Write-Log '    Política regional habilitada (se restaura al terminar).'
+    return $true
+}
+
+function Restore-EdgeRegionPolicy {
+    $f  = Get-EdgeRegionPolicyFile
+    $bk = Join-Path $env:ProgramData 'NurOptimizador\IntegratedServicesRegionPolicySet.json.bak'
+    if (Test-Path $bk) { Copy-Item $bk $f -Force -ErrorAction SilentlyContinue }
+    & icacls.exe $f /setowner 'NT SERVICE\TrustedInstaller' 2>&1 | Out-Null
+    & icacls.exe $f /reset 2>&1 | Out-Null
+    Write-Log '    Archivo de política regional restaurado.'
+}
+
 function Remove-Edge {
     if (-not (Test-EdgeInstalled)) { Write-Log '  Edge no está instalado.'; return }
     $guid = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}'          # Microsoft Edge (canal estable)
-    Write-Log '  Cerrando Edge...'
+    $pol  = 'HKLM:\SOFTWARE\Policies\Microsoft\EdgeUpdate'
+    Write-Log '  Cerrando Edge (incluido el arranque anticipado)...'
     Get-Process -Name msedge, MicrosoftEdgeUpdate -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 
-    # 1) Desinstalador propio de Edge
-    $roots  = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application", "$env:ProgramFiles\Microsoft\Edge\Application") | Where-Object { Test-Path $_ }
-    $setups = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -Filter setup.exe -ErrorAction SilentlyContinue | Where-Object { $_.DirectoryName -like '*\Installer' } })
-    foreach ($st in $setups) {
-        Write-Log "  Ejecutando el desinstalador de Edge ($($st.Directory.Parent.Name))..."
-        Start-Process -FilePath $st.FullName -ArgumentList '--uninstall', '--system-level', '--verbose-logging', '--force-uninstall' -Wait -WindowStyle Hidden
+    Write-Log '  Intento 1: desinstalador de Edge...'
+    [void](Invoke-EdgeSetup)
+
+    if (Test-EdgeInstalled) {
+        Write-Log '  Intento 2: truco del Edge heredado...'
+        try { Invoke-EdgeSetupWithLegacyStub } catch { Write-Log "    No se pudo preparar el truco: $($_.Exception.Message)" }
     }
 
-    # 2) Si no alcanzó, política oficial de Edge Update
-    $pol = 'HKLM:\SOFTWARE\Policies\Microsoft\EdgeUpdate'
     if (Test-EdgeInstalled) {
-        Write-Log '  Primer intento sin éxito; probando con Edge Update...'
+        Write-Log '  Intento 3: política de Edge Update...'
         if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
         Set-ItemProperty -Path $pol -Name "Uninstall$guid" -Value 1 -Type DWord -Force
         $mu = "${env:ProgramFiles(x86)}\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe"
@@ -574,10 +653,30 @@ function Remove-Edge {
     }
 
     if (Test-EdgeInstalled) {
-        throw 'Windows protege Edge en esta versión y no permitió quitarlo. No se cambió nada más.'
+        Write-Log '  Intento 4: política regional de Windows (la de la Unión Europea)...'
+        $patched = $false
+        try { $patched = [bool](Enable-EdgeUninstallRegionPolicy | Select-Object -Last 1) }
+        catch { Write-Log "    No se pudo preparar la política regional: $($_.Exception.Message)" }
+        if ($patched) {
+            try {
+                Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge' -Name NoRemove -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                Get-Process -Name msedge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+                [void](Invoke-EdgeSetup)
+                if ((Test-EdgeInstalled) -and (Get-Command winget -ErrorAction SilentlyContinue)) {
+                    Write-Log '    Probando también con winget...'
+                    winget uninstall --id Microsoft.Edge --silent --force --accept-source-agreements | Out-Null
+                    Start-Sleep -Seconds 3
+                }
+            }
+            finally { Restore-EdgeRegionPolicy }
+        }
     }
 
-    # 3) Quitado: que no vuelva solo. No se toca InstallDefault para no bloquear el runtime de WebView2.
+    if (Test-EdgeInstalled) {
+        throw 'Windows protege Edge y no dejó quitarlo con ninguno de los 4 métodos (mirá los códigos en el Registro).'
+    }
+
+    # Quitado: que no vuelva solo. No se toca InstallDefault para no bloquear el runtime de WebView2.
     if (-not (Test-Path $pol)) { New-Item -Path $pol -Force | Out-Null }
     Set-ItemProperty -Path $pol -Name "Install$guid" -Value 0 -Type DWord -Force
     $upd = 'HKLM:\SOFTWARE\Microsoft\EdgeUpdate'

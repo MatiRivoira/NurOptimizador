@@ -398,7 +398,7 @@
                 <TextBlock Text="Microsoft Edge" FontSize="28" FontWeight="SemiBold"/>
                 <TextBlock Text="¿Querés eliminar Microsoft Edge de tu PC?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
                 <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
-                           Text="Windows protege Edge y en las versiones más nuevas puede no dejar quitarlo; si no se puede, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome."/>
+                           Text="Windows protege Edge, así que la app prueba 4 métodos; el último modifica temporalmente un archivo protegido del sistema (con copia de seguridad) y lo restaura. Si ninguno funciona, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome."/>
                 <StackPanel Orientation="Horizontal">
                   <Button x:Name="WzEdgeYes" Style="{StaticResource GlassButton}" Content="Sí, eliminar Edge" MinWidth="190" Margin="0,0,12,0"/>
                   <Button x:Name="WzEdgeNo" Style="{StaticResource GlassButton}" Content="No, mantenerlo" MinWidth="170"/>

@@ -1482,8 +1482,8 @@
     "Category": "Limpieza",
     "Risk": "Alto",
     "Name": "Quitar Microsoft Edge",
-    "Description": "Intenta desinstalar Edge con su propio desinstalador y bloquea que se reinstale solo. Windows lo protege: en versiones recientes (compilación 26300 o más nueva) puede no dejarlo. Si no se puede, no cambia nada.",
-    "Confirm": "Se va a intentar desinstalar Microsoft Edge.\n\nAlgunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Asegurate de tener otro navegador.\n\n¿Continuar?",
+    "Description": "Intenta desinstalar Edge con 4 métodos, del más suave al más fuerte: el desinstalador propio, el truco del Edge heredado, la política de Edge Update y la política regional de Windows (la que habilita la desinstalación en la Unión Europea; toca temporalmente un archivo protegido del sistema, con copia de seguridad, y lo restaura). Si ninguno funciona, no cambia nada.",
+    "Confirm": "Se va a intentar desinstalar Microsoft Edge con varios métodos.\n\nEl último modifica temporalmente un archivo protegido de Windows (con copia de seguridad) y lo restaura al terminar. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge, así que asegurate de tener otro navegador.\n\n¿Continuar?",
     "commands": {
       "apply": "Remove-Edge"
     }
