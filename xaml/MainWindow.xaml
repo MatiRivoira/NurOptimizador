@@ -426,7 +426,7 @@
                   <Button x:Name="WzChromeSkip" Style="{StaticResource GlassButton}" Content="Ahora no" MinWidth="130"/>
                 </StackPanel>
                 <TextBlock x:Name="WzChromeBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
-                           Text="Instalando Chrome... puede tardar un minuto."/>
+                           Text="Instalando Chrome... descarga unos 140 MB y puede tardar unos minutos. No cierres la ventana."/>
               </StackPanel>
 
               <StackPanel x:Name="WzDone" Visibility="Collapsed">

@@ -1954,7 +1954,7 @@ $script:Xaml = @'
                   <Button x:Name="WzChromeSkip" Style="{StaticResource GlassButton}" Content="Ahora no" MinWidth="130"/>
                 </StackPanel>
                 <TextBlock x:Name="WzChromeBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
-                           Text="Instalando Chrome... puede tardar un minuto."/>
+                           Text="Instalando Chrome... descarga unos 140 MB y puede tardar unos minutos. No cierres la ventana."/>
               </StackPanel>
 
               <StackPanel x:Name="WzDone" Visibility="Collapsed">
@@ -1985,7 +1985,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.2.2'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.2.3'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -2239,7 +2239,7 @@ function Remove-OneDrive {
         Write-Log '  Desinstalando OneDrive...'
         Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait
     }
-    elseif (Get-Command winget -ErrorAction SilentlyContinue) {
+    elseif (Test-WingetWorks) {
         Write-Log '  Desinstalando OneDrive con winget...'
         winget uninstall --id Microsoft.OneDrive --silent --accept-source-agreements | Out-Null
     }
@@ -2514,7 +2514,7 @@ function Remove-Widgets {
 }
 function Restore-Widgets {
     try { Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name TaskbarDa -Type DWord -Value 1 -ErrorAction Stop } catch { }
-    if (Get-Command winget -ErrorAction SilentlyContinue) {
+    if (Test-WingetWorks) {
         Write-Log '  Reinstalando Widgets (Windows Web Experience Pack)...'
         winget install --id 9MSSGKG348SP --source msstore --silent --accept-package-agreements --accept-source-agreements | Out-Null
         if ($LASTEXITCODE -ne 0) { Write-Log '  No se pudo reinstalar solo: instalá "Windows Web Experience Pack" desde la Microsoft Store.' }
@@ -2644,7 +2644,7 @@ function Remove-Edge {
                 Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge' -Name NoRemove -Value 0 -Type DWord -ErrorAction SilentlyContinue
                 Get-Process -Name msedge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
                 [void](Invoke-EdgeSetup)
-                if ((Test-EdgeInstalled) -and (Get-Command winget -ErrorAction SilentlyContinue)) {
+                if ((Test-EdgeInstalled) -and (Test-WingetWorks)) {
                     Write-Log '    Probando también con winget...'
                     winget uninstall --id Microsoft.Edge --silent --force --accept-source-agreements | Out-Null
                     Start-Sleep -Seconds 3
@@ -2689,26 +2689,76 @@ function Test-ChromeInstalled {
     return $false
 }
 
+# winget puede existir como acceso directo y aun así no arrancar ("no se puede iniciar la aplicación")
+function Test-WingetWorks {
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { return $false }
+    try { $null = & winget --version 2>&1; return ($LASTEXITCODE -eq 0) }
+    catch { return $false }
+}
+
+# Descarga un archivo mostrando avance y sin congelar la ventana
+function Save-WebFile([string]$Url, [string]$Path) {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Remove-Item $Path -Force -ErrorAction SilentlyContinue
+    $wc = New-Object System.Net.WebClient
+    try {
+        $task = $wc.DownloadFileTaskAsync($Url, $Path)
+        $last = 0
+        while (-not $task.IsCompleted) {
+            Start-Sleep -Milliseconds 400
+            if ($script:UiReady) { Update-UI }
+            if (Test-Path $Path) {
+                $mb = [int]((Get-Item $Path).Length / 1MB)
+                if ($mb -ge ($last + 20)) { Write-Log "    Descargado: $mb MB"; $last = $mb }
+            }
+        }
+        if ($task.IsFaulted) { throw $task.Exception.InnerException }
+    }
+    finally { $wc.Dispose() }
+}
+
 function Install-Chrome {
     Write-Log 'Instalando Google Chrome...'
-    try {
-        if (Get-Command winget -ErrorAction SilentlyContinue) {
+
+    # 1) winget, solo si de verdad funciona
+    if (Test-WingetWorks) {
+        try {
+            Write-Log '  Probando con winget...'
             winget install -e --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements | Out-Null
             if ($LASTEXITCODE -eq 0 -and (Test-ChromeInstalled)) { Write-Log '  Chrome instalado (winget).'; return $true }
-            Write-Log "  winget no pudo instalarlo (código $LASTEXITCODE). Probando la descarga directa..."
+            Write-Log "    winget no pudo instalarlo (código $LASTEXITCODE)."
         }
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        $tmp = Join-Path $env:TEMP 'ChromeStandaloneSetup64.exe'
-        Invoke-WebRequest -Uri 'https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe' -OutFile $tmp -UseBasicParsing
-        Start-Process -FilePath $tmp -ArgumentList '/silent', '/install' -Wait
-        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
-        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado (descarga directa).'; return $true }
-        throw 'La instalación terminó pero Chrome no aparece instalado.'
+        catch { Write-Log "    winget falló: $($_.Exception.Message)" }
     }
-    catch {
-        Write-Log "  ERROR: $($_.Exception.Message)"
-        return $false
+    else { Write-Log '  winget no está disponible o no arranca en este equipo: se usa la descarga directa de Google.' }
+
+    # 2) Instalador MSI de Google (el recomendado por Google para instalaciones silenciosas)
+    try {
+        $msi = Join-Path $env:TEMP 'googlechromestandaloneenterprise64.msi'
+        Write-Log '  Descargando el instalador de Google (unos 140 MB)...'
+        Save-WebFile 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi' $msi
+        Write-Log '  Instalando Chrome...'
+        $p = Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\msiexec.exe') -ArgumentList '/i', ('"' + $msi + '"'), 'ALLUSERS=1', 'NOGOOGLEUPDATEPING=1', '/qn', '/norestart' -Wait -PassThru
+        Remove-Item $msi -Force -ErrorAction SilentlyContinue
+        Write-Log "    El instalador terminó con código $($p.ExitCode)."
+        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado.'; return $true }
     }
+    catch { Write-Log "    La instalación con MSI falló: $($_.Exception.Message)" }
+
+    # 3) Instalador EXE de Google
+    try {
+        $exe = Join-Path $env:TEMP 'ChromeStandaloneSetup64.exe'
+        Write-Log '  Probando con el instalador EXE de Google...'
+        Save-WebFile 'https://dl.google.com/chrome/direct/ChromeStandaloneSetup64.exe' $exe
+        $p = Start-Process -FilePath $exe -ArgumentList '/silent', '/install' -Wait -PassThru
+        Remove-Item $exe -Force -ErrorAction SilentlyContinue
+        Write-Log "    El instalador terminó con código $($p.ExitCode)."
+        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado.'; return $true }
+    }
+    catch { Write-Log "    La instalación con EXE falló: $($_.Exception.Message)" }
+
+    Write-Log '  ERROR: no se pudo instalar Chrome. Descargalo desde google.com/chrome.'
+    return $false
 }
 
 # ---------- Game Bar: integración ----------
