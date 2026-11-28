@@ -363,9 +363,12 @@ $script:WzOptTitle  = $script:window.FindName('WzOptTitle')
 $script:WzOptSub    = $script:window.FindName('WzOptSub')
 $script:WzEdgeUpdNote = $script:window.FindName('WzEdgeUpdNote')
 $script:OptStage    = 'Optimizar'
+$script:AppChecks    = @()
+$script:InstalledNames = New-Object System.Collections.ArrayList
+$script:WzAppsList  = $script:window.FindName('WzAppsList')
 $script:WzDoneText  = $script:window.FindName('WzDoneText')
 $script:WzPages = @{}
-foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Chrome', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
+foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Apps', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
 
 function Show-WizardPage([string]$Name) {
     foreach ($k in $script:WzPages.Keys) {
@@ -435,6 +438,7 @@ function Show-Done {
         $txt += "`n`nNo se pudieron aplicar ($($script:BatchFail.Count)): " + ($script:BatchFail -join ', ') + ".`nMirá la pestaña Registro del modo avanzado para ver el motivo."
     }
     $txt += "`n`nAlgunos cambios se ven recién al cerrar sesión o reiniciar la PC."
+    if ($script:InstalledNames.Count -gt 0) { $txt += "`n`nProgramas instalados: " + ($script:InstalledNames -join ', ') + "." }
     if ($script:SignOutNeeded) { $txt += "`n`nPara que se vea bien la flecha de los accesos directos, cerrá sesión y volvé a entrar." }
     $script:WzDoneText.Text = $txt
     Show-WizardPage 'Done'
@@ -535,6 +539,54 @@ function Show-EdgeQuestion {
     if (Test-EdgeInstalled) { Show-WizardPage 'Edge' } else { Show-Done }
 }
 
+# Pantalla de selección: navegadores arriba y programas opcionales abajo (solo lo que no está instalado)
+function Show-AppsPage {
+    $script:WzAppsList.Children.Clear()
+    $script:AppChecks = @()
+    foreach ($grp in 'Navegadores', 'Programas opcionales') {
+        $apps = @($script:AppCatalog | Where-Object { $_.Group -eq $grp -and -not (& $_.Detect) })
+        if ($apps.Count -eq 0) { continue }
+        $title = New-Object Windows.Controls.TextBlock
+        $title.Text = $grp
+        $title.FontSize = 15
+        $title.FontWeight = [Windows.FontWeights]::SemiBold
+        $title.Foreground = [Windows.Media.Brushes]::White
+        $title.Margin = [Windows.Thickness]::new(4, 8, 0, 6)
+        [void]$script:WzAppsList.Children.Add($title)
+
+        $card = New-Object Windows.Controls.Border
+        $card.Style = $script:window.FindResource('GlassCard')
+        $card.Margin = [Windows.Thickness]::new(0, 0, 0, 8)
+        $stack = New-Object Windows.Controls.StackPanel
+        $card.Child = $stack
+        for ($k = 0; $k -lt $apps.Count; $k++) {
+            $row = New-OptionRow $apps[$k] ($k -lt $apps.Count - 1)
+            [void]$stack.Children.Add($row)
+            $script:AppChecks += $row.Tag
+        }
+        [void]$script:WzAppsList.Children.Add($card)
+    }
+    Show-WizardPage 'Apps'
+}
+
+# Instala los programas elegidos mostrando la barra de progreso
+function Start-AppInstalls($Apps) {
+    $total = @($Apps).Count
+    $n = 0
+    foreach ($a in $Apps) {
+        $script:WzProgBar.Value  = [math]::Round(100 * $n / $total)
+        $script:WzProgText.Text  = "Instalando $($a.Name)..."
+        $script:WzProgCount.Text = "$($n + 1) de $total"
+        Update-UI
+        $res = Install-App $a
+        if ([bool]($res | Select-Object -Last 1)) { [void]$script:InstalledNames.Add($a.Name) }
+        else { [void]$script:BatchFail.Add("Instalar $($a.Name)") }
+        $n++
+    }
+    $script:WzProgBar.Value = 100
+    Update-UI
+}
+
 function Start-QuickMode {
     $ids = @($script:Tweaks | Where-Object { $_.Quick } | ForEach-Object { $_.Id })
     $msg = "El modo rápido va a aplicar $($ids.Count) ajustes, entre ellos:`n`n" +
@@ -591,7 +643,7 @@ $script:window.FindName('WzEdgeYes').Add_Click({
         $script:WzEdgeUpdNote.Visibility = 'Visible'
         Show-WizardPage 'EdgeUpd'
     }
-    elseif (-not (Test-ChromeInstalled)) { Show-WizardPage 'Chrome' }
+    elseif (-not ((Test-ChromeInstalled) -or (Test-BraveInstalled))) { Show-AppsPage }
     else { Show-Done }
 })
 $script:window.FindName('WzEdgeNo').Add_Click({
@@ -608,16 +660,18 @@ $script:window.FindName('WzEdgeUpdYes').Add_Click({
 })
 $script:window.FindName('WzEdgeUpdNo').Add_Click({ Show-Done })
 
-# Chrome: solo aparece si se quitó Edge y no se detecta Chrome
-$script:window.FindName('WzChromeInstall').Add_Click({
-    $script:window.FindName('WzChromeButtons').Visibility = 'Collapsed'
-    $script:window.FindName('WzChromeBusy').Visibility = 'Visible'
-    Update-UI
-    $res = Install-Chrome
-    if ([bool]($res | Select-Object -Last 1)) { $script:BatchOk++ } else { [void]$script:BatchFail.Add('Instalar Google Chrome') }
+# Pantalla de navegadores y programas opcionales (aparece si se quitó Edge y no hay Chrome ni Brave)
+$script:window.FindName('WzAppsInstall').Add_Click({
+    $sel = @($script:AppChecks | Where-Object { $_.IsChecked } | ForEach-Object { $_.Tag })
+    if ($sel.Count -gt 0) {
+        $script:WzProgTitle.Text = 'Instalando programas...'
+        Show-WizardPage 'Progress'
+        Update-UI
+        Start-AppInstalls $sel
+    }
     Show-Done
 })
-$script:window.FindName('WzChromeSkip').Add_Click({ Show-Done })
+$script:window.FindName('WzAppsSkip').Add_Click({ Show-Done })
 $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 

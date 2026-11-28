@@ -1926,7 +1926,7 @@ $script:Xaml = @'
                 <TextBlock Text="Microsoft Edge" FontSize="28" FontWeight="SemiBold"/>
                 <TextBlock Text="¿Querés eliminar Microsoft Edge de tu PC?" TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="15" Margin="0,10,0,10"/>
                 <TextBlock TextWrapping="Wrap" Foreground="#99FFFFFF" FontSize="12.5" Margin="0,0,0,24"
-                           Text="Windows protege Edge, así que la app prueba 4 métodos; el último modifica temporalmente un archivo protegido del sistema (con copia de seguridad) y lo restaura. Si ninguno funciona, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome."/>
+                           Text="Windows protege Edge, así que la app prueba 4 métodos; el último modifica temporalmente un archivo protegido del sistema (con copia de seguridad) y lo restaura. Si ninguno funciona, no se cambia nada y te ofrezco desactivar sus actualizaciones. Algunas funciones de Windows (enlaces de ayuda, resultados web) abren Edge. Si lo quitás y no tenés otro navegador, te ofrezco instalar Chrome o Brave."/>
                 <StackPanel Orientation="Horizontal">
                   <Button x:Name="WzEdgeYes" Style="{StaticResource GlassButton}" Content="Sí, eliminar Edge" MinWidth="190" Margin="0,0,12,0"/>
                   <Button x:Name="WzEdgeNo" Style="{StaticResource GlassButton}" Content="No, mantenerlo" MinWidth="170"/>
@@ -1945,16 +1945,17 @@ $script:Xaml = @'
                 </StackPanel>
               </StackPanel>
 
-              <StackPanel x:Name="WzChrome" Visibility="Collapsed">
+              <StackPanel x:Name="WzApps" Visibility="Collapsed">
                 <TextBlock Text="Instalar un navegador" FontSize="28" FontWeight="SemiBold"/>
-                <TextBlock TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,26"
-                           Text="Quitaste Edge y no se detectó Google Chrome en tu PC. Sin un navegador no vas a poder abrir páginas web. ¿Querés instalar Chrome ahora?"/>
-                <StackPanel x:Name="WzChromeButtons" Orientation="Horizontal">
-                  <Button x:Name="WzChromeInstall" Style="{StaticResource GlassButton}" Content="Instalar Google Chrome" MinWidth="200" Margin="0,0,12,0"/>
-                  <Button x:Name="WzChromeSkip" Style="{StaticResource GlassButton}" Content="Ahora no" MinWidth="130"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#CCFFFFFF" FontSize="14" Margin="0,10,0,14"
+                           Text="No se detectó Google Chrome ni Brave en tu PC. Sin un navegador no vas a poder abrir páginas web, así que marcá al menos uno. Más abajo tenés programas opcionales."/>
+                <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                  <StackPanel x:Name="WzAppsList" Margin="0,0,10,0"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                  <Button x:Name="WzAppsInstall" Style="{StaticResource GlassButton}" Content="Instalar los marcados" MinWidth="200" Margin="0,0,12,0"/>
+                  <Button x:Name="WzAppsSkip" Style="{StaticResource GlassButton}" Content="Omitir" MinWidth="120"/>
                 </StackPanel>
-                <TextBlock x:Name="WzChromeBusy" Visibility="Collapsed" Foreground="#CFCFCF" FontSize="14" TextWrapping="Wrap"
-                           Text="Instalando Chrome... descarga unos 140 MB y puede tardar unos minutos. No cierres la ventana."/>
               </StackPanel>
 
               <StackPanel x:Name="WzDone" Visibility="Collapsed">
@@ -1985,7 +1986,7 @@ $script:AppDir     = Join-Path $env:LOCALAPPDATA 'MiOptimizador'
 $script:BackupFile = Join-Path $script:AppDir 'backup.clixml'
 $script:LogBox     = $null
 $script:UiReady    = $false
-$script:AppVersion = '1.2.3'   # se sube con cada cambio, así se ve si la app se actualizó
+$script:AppVersion = '1.3.0'   # se sube con cada cambio, así se ve si la app se actualizó
 New-Item $script:AppDir -ItemType Directory -Force | Out-Null
 
 function Write-Log {
@@ -2717,47 +2718,103 @@ function Save-WebFile([string]$Url, [string]$Path) {
     finally { $wc.Dispose() }
 }
 
-function Install-Chrome {
-    Write-Log 'Instalando Google Chrome...'
+# ---------- Detección de programas ----------
+function Test-BraveInstalled {
+    $files = @("$env:ProgramFiles\BraveSoftware\Brave-Browser\Application\brave.exe", "${env:ProgramFiles(x86)}\BraveSoftware\Brave-Browser\Application\brave.exe", "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\Application\brave.exe")
+    foreach ($f in $files) { if (Test-Path $f) { return $true } }
+    foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\brave.exe', 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\brave.exe') {
+        if (Test-Path $k) { return $true }
+    }
+    return $false
+}
+function Test-DiscordInstalled {
+    if (Test-Path "$env:LOCALAPPDATA\Discord\Update.exe") { return $true }
+    return [bool](Get-ChildItem "$env:LOCALAPPDATA\Discord\app-*\Discord.exe" -ErrorAction SilentlyContinue)
+}
+function Test-SteamInstalled {
+    foreach ($f in "${env:ProgramFiles(x86)}\Steam\steam.exe", "$env:ProgramFiles\Steam\steam.exe") { if (Test-Path $f) { return $true } }
+    return (Test-Path 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam')
+}
+function Test-EpicInstalled {
+    foreach ($f in "${env:ProgramFiles(x86)}\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe", "${env:ProgramFiles(x86)}\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe") {
+        if (Test-Path $f) { return $true }
+    }
+    return $false
+}
 
-    # 1) winget, solo si de verdad funciona
-    if (Test-WingetWorks) {
+# ---------- Catálogo: navegadores y programas opcionales (direcciones oficiales de cada fabricante) ----------
+$script:AppCatalog = @(
+    @{ Id = 'Chrome'; Name = 'Google Chrome'; Group = 'Navegadores'; Winget = 'Google.Chrome'; Detect = { Test-ChromeInstalled }
+       Description = 'El navegador de Google. Se instala para todos los usuarios y se actualiza solo.'
+       Installers = @(
+           @{ Url = 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi'; File = 'googlechromestandaloneenterprise64.msi'; Type = 'msi'; Args = @('ALLUSERS=1', 'NOGOOGLEUPDATEPING=1') },
+           @{ Url = 'https://dl.google.com/chrome/direct/ChromeStandaloneSetup64.exe'; File = 'ChromeStandaloneSetup64.exe'; Type = 'exe'; Args = @('/silent', '/install') }
+       ) },
+    @{ Id = 'Brave'; Name = 'Brave'; Group = 'Navegadores'; Winget = 'Brave.Brave'; Detect = { Test-BraveInstalled }
+       Description = 'Navegador basado en Chromium con bloqueo de anuncios y rastreadores incluido. Instalador completo de unos 160 MB.'
+       Installers = @(
+           @{ Url = 'https://github.com/brave/brave-browser/releases/latest/download/BraveBrowserStandaloneSetup.exe'; File = 'BraveBrowserStandaloneSetup.exe'; Type = 'exe'; Args = @('/silent', '/install') }
+       ) },
+    @{ Id = 'Discord'; Name = 'Discord'; Group = 'Programas opcionales'; Winget = 'Discord.Discord'; Detect = { Test-DiscordInstalled }
+       Description = 'Chat de voz y texto. Se instala solo para tu usuario. Si el instalador no acepta el modo silencioso, se abre su ventana normal.'
+       Installers = @(
+           @{ Url = 'https://discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x64'; File = 'DiscordSetup.exe'; Type = 'exe'; Args = @('-s') },
+           @{ Url = 'https://discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x64'; File = 'DiscordSetup.exe'; Type = 'exe'; Args = @() }
+       ) },
+    @{ Id = 'Steam'; Name = 'Steam'; Group = 'Programas opcionales'; Winget = 'Valve.Steam'; Detect = { Test-SteamInstalled }
+       Description = 'La tienda y biblioteca de juegos de Valve.'
+       Installers = @(
+           @{ Url = 'https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe'; File = 'SteamSetup.exe'; Type = 'exe'; Args = @('/S') }
+       ) },
+    @{ Id = 'Epic'; Name = 'Epic Games Launcher'; Group = 'Programas opcionales'; Winget = 'EpicGames.EpicGamesLauncher'; Detect = { Test-EpicInstalled }
+       Description = 'La tienda y el lanzador de juegos de Epic (Fortnite, juegos gratis de cada semana).'
+       Installers = @(
+           @{ Url = 'https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi'; File = 'EpicGamesLauncherInstaller.msi'; Type = 'msi'; Args = @() }
+       ) }
+)
+
+# Instala un programa del catálogo: winget (si funciona) y, si no, descarga directa del fabricante. Devuelve $true/$false
+function Install-App($App) {
+    Write-Log "Instalando $($App.Name)..."
+    if ($App.Winget -and (Test-WingetWorks)) {
         try {
             Write-Log '  Probando con winget...'
-            winget install -e --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements | Out-Null
-            if ($LASTEXITCODE -eq 0 -and (Test-ChromeInstalled)) { Write-Log '  Chrome instalado (winget).'; return $true }
+            winget install -e --id $App.Winget --silent --accept-package-agreements --accept-source-agreements | Out-Null
+            if (& $App.Detect) { Write-Log "  $($App.Name) instalado (winget)."; return $true }
             Write-Log "    winget no pudo instalarlo (código $LASTEXITCODE)."
         }
         catch { Write-Log "    winget falló: $($_.Exception.Message)" }
     }
-    else { Write-Log '  winget no está disponible o no arranca en este equipo: se usa la descarga directa de Google.' }
+    elseif ($App.Winget) { Write-Log '  winget no está disponible o no arranca en este equipo: se usa la descarga directa.' }
 
-    # 2) Instalador MSI de Google (el recomendado por Google para instalaciones silenciosas)
-    try {
-        $msi = Join-Path $env:TEMP 'googlechromestandaloneenterprise64.msi'
-        Write-Log '  Descargando el instalador de Google (unos 140 MB)...'
-        Save-WebFile 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi' $msi
-        Write-Log '  Instalando Chrome...'
-        $p = Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\msiexec.exe') -ArgumentList '/i', ('"' + $msi + '"'), 'ALLUSERS=1', 'NOGOOGLEUPDATEPING=1', '/qn', '/norestart' -Wait -PassThru
-        Remove-Item $msi -Force -ErrorAction SilentlyContinue
-        Write-Log "    El instalador terminó con código $($p.ExitCode)."
-        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado.'; return $true }
+    $downloaded = @{}
+    foreach ($inst in $App.Installers) {
+        try {
+            $file = Join-Path $env:TEMP $inst.File
+            if (-not $downloaded.ContainsKey($inst.Url)) {
+                Write-Log "  Descargando el instalador de $($App.Name)..."
+                Save-WebFile $inst.Url $file
+                $downloaded[$inst.Url] = $file
+            }
+            Write-Log '  Instalando...'
+            if ($inst.Type -eq 'msi') {
+                $argList = @('/i', ('"' + $file + '"')) + @($inst.Args) + @('/qn', '/norestart')
+                $p = Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\msiexec.exe') -ArgumentList $argList -Wait -PassThru
+            }
+            elseif (@($inst.Args).Count -gt 0) { $p = Start-Process -FilePath $file -ArgumentList $inst.Args -Wait -PassThru }
+            else { $p = Start-Process -FilePath $file -Wait -PassThru }
+            Write-Log "    El instalador terminó con código $($p.ExitCode)."
+            Start-Sleep -Seconds 2
+            if (& $App.Detect) {
+                foreach ($f in $downloaded.Values) { Remove-Item $f -Force -ErrorAction SilentlyContinue }
+                Write-Log "  $($App.Name) instalado."
+                return $true
+            }
+        }
+        catch { Write-Log "    Falló: $($_.Exception.Message)" }
     }
-    catch { Write-Log "    La instalación con MSI falló: $($_.Exception.Message)" }
-
-    # 3) Instalador EXE de Google
-    try {
-        $exe = Join-Path $env:TEMP 'ChromeStandaloneSetup64.exe'
-        Write-Log '  Probando con el instalador EXE de Google...'
-        Save-WebFile 'https://dl.google.com/chrome/direct/ChromeStandaloneSetup64.exe' $exe
-        $p = Start-Process -FilePath $exe -ArgumentList '/silent', '/install' -Wait -PassThru
-        Remove-Item $exe -Force -ErrorAction SilentlyContinue
-        Write-Log "    El instalador terminó con código $($p.ExitCode)."
-        if (Test-ChromeInstalled) { Write-Log '  Chrome instalado.'; return $true }
-    }
-    catch { Write-Log "    La instalación con EXE falló: $($_.Exception.Message)" }
-
-    Write-Log '  ERROR: no se pudo instalar Chrome. Descargalo desde google.com/chrome.'
+    foreach ($f in $downloaded.Values) { Remove-Item $f -Force -ErrorAction SilentlyContinue }
+    Write-Log "  ERROR: no se pudo instalar $($App.Name)."
     return $false
 }
 
@@ -3148,9 +3205,12 @@ $script:WzOptTitle  = $script:window.FindName('WzOptTitle')
 $script:WzOptSub    = $script:window.FindName('WzOptSub')
 $script:WzEdgeUpdNote = $script:window.FindName('WzEdgeUpdNote')
 $script:OptStage    = 'Optimizar'
+$script:AppChecks    = @()
+$script:InstalledNames = New-Object System.Collections.ArrayList
+$script:WzAppsList  = $script:window.FindName('WzAppsList')
 $script:WzDoneText  = $script:window.FindName('WzDoneText')
 $script:WzPages = @{}
-foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Chrome', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
+foreach ($n in 'Restore', 'Mode', 'Progress', 'Optional', 'Edge', 'EdgeUpd', 'Apps', 'Done') { $script:WzPages[$n] = $script:window.FindName("Wz$n") }
 
 function Show-WizardPage([string]$Name) {
     foreach ($k in $script:WzPages.Keys) {
@@ -3220,6 +3280,7 @@ function Show-Done {
         $txt += "`n`nNo se pudieron aplicar ($($script:BatchFail.Count)): " + ($script:BatchFail -join ', ') + ".`nMirá la pestaña Registro del modo avanzado para ver el motivo."
     }
     $txt += "`n`nAlgunos cambios se ven recién al cerrar sesión o reiniciar la PC."
+    if ($script:InstalledNames.Count -gt 0) { $txt += "`n`nProgramas instalados: " + ($script:InstalledNames -join ', ') + "." }
     if ($script:SignOutNeeded) { $txt += "`n`nPara que se vea bien la flecha de los accesos directos, cerrá sesión y volvé a entrar." }
     $script:WzDoneText.Text = $txt
     Show-WizardPage 'Done'
@@ -3320,6 +3381,54 @@ function Show-EdgeQuestion {
     if (Test-EdgeInstalled) { Show-WizardPage 'Edge' } else { Show-Done }
 }
 
+# Pantalla de selección: navegadores arriba y programas opcionales abajo (solo lo que no está instalado)
+function Show-AppsPage {
+    $script:WzAppsList.Children.Clear()
+    $script:AppChecks = @()
+    foreach ($grp in 'Navegadores', 'Programas opcionales') {
+        $apps = @($script:AppCatalog | Where-Object { $_.Group -eq $grp -and -not (& $_.Detect) })
+        if ($apps.Count -eq 0) { continue }
+        $title = New-Object Windows.Controls.TextBlock
+        $title.Text = $grp
+        $title.FontSize = 15
+        $title.FontWeight = [Windows.FontWeights]::SemiBold
+        $title.Foreground = [Windows.Media.Brushes]::White
+        $title.Margin = [Windows.Thickness]::new(4, 8, 0, 6)
+        [void]$script:WzAppsList.Children.Add($title)
+
+        $card = New-Object Windows.Controls.Border
+        $card.Style = $script:window.FindResource('GlassCard')
+        $card.Margin = [Windows.Thickness]::new(0, 0, 0, 8)
+        $stack = New-Object Windows.Controls.StackPanel
+        $card.Child = $stack
+        for ($k = 0; $k -lt $apps.Count; $k++) {
+            $row = New-OptionRow $apps[$k] ($k -lt $apps.Count - 1)
+            [void]$stack.Children.Add($row)
+            $script:AppChecks += $row.Tag
+        }
+        [void]$script:WzAppsList.Children.Add($card)
+    }
+    Show-WizardPage 'Apps'
+}
+
+# Instala los programas elegidos mostrando la barra de progreso
+function Start-AppInstalls($Apps) {
+    $total = @($Apps).Count
+    $n = 0
+    foreach ($a in $Apps) {
+        $script:WzProgBar.Value  = [math]::Round(100 * $n / $total)
+        $script:WzProgText.Text  = "Instalando $($a.Name)..."
+        $script:WzProgCount.Text = "$($n + 1) de $total"
+        Update-UI
+        $res = Install-App $a
+        if ([bool]($res | Select-Object -Last 1)) { [void]$script:InstalledNames.Add($a.Name) }
+        else { [void]$script:BatchFail.Add("Instalar $($a.Name)") }
+        $n++
+    }
+    $script:WzProgBar.Value = 100
+    Update-UI
+}
+
 function Start-QuickMode {
     $ids = @($script:Tweaks | Where-Object { $_.Quick } | ForEach-Object { $_.Id })
     $msg = "El modo rápido va a aplicar $($ids.Count) ajustes, entre ellos:`n`n" +
@@ -3376,7 +3485,7 @@ $script:window.FindName('WzEdgeYes').Add_Click({
         $script:WzEdgeUpdNote.Visibility = 'Visible'
         Show-WizardPage 'EdgeUpd'
     }
-    elseif (-not (Test-ChromeInstalled)) { Show-WizardPage 'Chrome' }
+    elseif (-not ((Test-ChromeInstalled) -or (Test-BraveInstalled))) { Show-AppsPage }
     else { Show-Done }
 })
 $script:window.FindName('WzEdgeNo').Add_Click({
@@ -3393,16 +3502,18 @@ $script:window.FindName('WzEdgeUpdYes').Add_Click({
 })
 $script:window.FindName('WzEdgeUpdNo').Add_Click({ Show-Done })
 
-# Chrome: solo aparece si se quitó Edge y no se detecta Chrome
-$script:window.FindName('WzChromeInstall').Add_Click({
-    $script:window.FindName('WzChromeButtons').Visibility = 'Collapsed'
-    $script:window.FindName('WzChromeBusy').Visibility = 'Visible'
-    Update-UI
-    $res = Install-Chrome
-    if ([bool]($res | Select-Object -Last 1)) { $script:BatchOk++ } else { [void]$script:BatchFail.Add('Instalar Google Chrome') }
+# Pantalla de navegadores y programas opcionales (aparece si se quitó Edge y no hay Chrome ni Brave)
+$script:window.FindName('WzAppsInstall').Add_Click({
+    $sel = @($script:AppChecks | Where-Object { $_.IsChecked } | ForEach-Object { $_.Tag })
+    if ($sel.Count -gt 0) {
+        $script:WzProgTitle.Text = 'Instalando programas...'
+        Show-WizardPage 'Progress'
+        Update-UI
+        Start-AppInstalls $sel
+    }
     Show-Done
 })
-$script:window.FindName('WzChromeSkip').Add_Click({ Show-Done })
+$script:window.FindName('WzAppsSkip').Add_Click({ Show-Done })
 $script:window.FindName('WzDoneAdvanced').Add_Click({ Enter-Advanced })
 $script:window.FindName('WzDoneClose').Add_Click({ $script:window.Close() })
 
